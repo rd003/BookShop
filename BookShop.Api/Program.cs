@@ -1,4 +1,5 @@
 using System.Text;
+using BookShop.Api.Exceptions;
 using BookShop.Api.Models;
 using BookShop.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +39,8 @@ builder.Services.AddAuthentication(options =>
 }
 );
 
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +50,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
