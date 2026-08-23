@@ -1,4 +1,5 @@
 using System.Text;
+using BookShop.Api.Data;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Models;
 using BookShop.Api.Services;
@@ -11,34 +12,34 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<TokenService>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=Bookshop.db"));
-builder.Services
-       .AddIdentity<ApplicationUser, IdentityRole>()
-       .AddEntityFrameworkStores<AppDbContext>()
-       .AddDefaultTokenProviders();
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+ .AddEntityFrameworkStores<AppDbContext>()
+ .AddDefaultTokenProviders();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        ClockSkew = TimeSpan.Zero,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-    };
-}
-);
+ .AddJwtBearer(options =>
+ {
+     options.SaveToken = true;
+     options.RequireHttpsMetadata = false;
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+         ValidateIssuer = true,
+         ValidateAudience = true,
+         ValidAudience = builder.Configuration["JWT:ValidAudience"],
+         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+         ClockSkew = TimeSpan.Zero,
+         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:secret"]))
+     };
+ });
 
 
 builder.Services.AddProblemDetails(options =>
@@ -54,6 +55,17 @@ builder.Services.AddProblemDetails(options =>
 });
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
+builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins("http://localhost:5173").
+                AllowCredentials().
+                AllowAnyHeader().
+                AllowAnyMethod().WithExposedHeaders("X-Pagination");
+
+            });
+        });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,10 +76,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseExceptionHandler();
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+await DbSeeder.SeedData(app);
 
 app.Run();

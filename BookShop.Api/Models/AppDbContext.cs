@@ -1,3 +1,4 @@
+using BookShop.Api.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,4 +10,5 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
 
     }
+    public DbSet<TokenInfo> TokenInfos { get; set; }
 }
