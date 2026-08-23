@@ -17,14 +17,14 @@ public class AuthenticationController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost("/register")]
-    public async Task<IActionResult> Register(SignupModel model)
+    [HttpPost("signup")]
+    public async Task<IActionResult> Signup(SignupModel model)
     {
         await _authService.Register(model, UserRoles.User);
         return Ok();
     }
 
-    [HttpPost("/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login(LoginModel model)
     {
         string token = await _authService.Login(model);
