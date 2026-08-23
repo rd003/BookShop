@@ -1,4 +1,5 @@
 @base_address = http://localhost:5288/api/auth
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im1hbmlzaHJhd2F0QGV4YW1wbGUuY29tIiwianRpIjoiNGVhNDEzYWMtODdjOS00ODU2LWFjNmYtNzM2MTAxM2NjODc0Iiwicm9sZSI6IlVzZXIiLCJuYmYiOjE3ODc0ODA3MDQsImV4cCI6MTc4NzQ4MDc2NCwiaWF0IjoxNzg3NDgwNzA0LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0IiwiYXVkIjpbImh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJodHRwczovL2xvY2FsaG9zdDo3MDg0Il19.rKBtPK14qX56yro66hNFTNu8Do_0KdI4vG5ydNYq2Ro
 
 POST {{base_address}}/signup
 Content-Type: application/json
@@ -17,3 +18,17 @@ Content-Type: application/json
   "username":"manishrawat@example.com",
   "password": "Manish@123"
 }
+
+###
+POST {{base_address}}/refresh
+Content-Type: application/json
+
+{
+  
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im1hbmlzaHJhd2F0QGV4YW1wbGUuY29tIiwianRpIjoiNGVhNDEzYWMtODdjOS00ODU2LWFjNmYtNzM2MTAxM2NjODc0Iiwicm9sZSI6IlVzZXIiLCJuYmYiOjE3ODc0ODA3MDQsImV4cCI6MTc4NzQ4MDc2NCwiaWF0IjoxNzg3NDgwNzA0LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0IiwiYXVkIjpbImh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJodHRwczovL2xvY2FsaG9zdDo3MDg0Il19.rKBtPK14qX56yro66hNFTNu8Do_0KdI4vG5ydNYq2Ro",
+  "refreshToken": "LLxWGNuz0R+yrLdUkqMA+gFpW7PjVgkjk/fdDjZzQgo="
+}
+
+### protected route
+GET http://localhost:5288/weatherforecast
+Authorization: Bearer {{accessToken}}

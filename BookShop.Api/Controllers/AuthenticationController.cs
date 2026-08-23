@@ -6,6 +6,7 @@ using BookShop.Api.Models;
 using BookShop.Api.Models.DTOs;
 using BookShop.Api.Models.Entities;
 using BookShop.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,7 +54,7 @@ public class AuthenticationController : ControllerBase
             {
                 var roleErros = roleResult.Errors.Select(e => e.Description);
                 _logger.LogError($"Failed to create user role. Errors : {string.Join(",", roleErros)}");
-                throw new BadRequestException($"Failed to create user role. Errors : {string.Join(",", roleErros)}"); //TODO: Am I exposing any security?
+                throw new BadRequestException($"Failed to create user role");
             }
         }
 
@@ -77,7 +78,7 @@ public class AuthenticationController : ControllerBase
             _logger.LogError(
                 $"Failed to create user. Errors: {string.Join(", ", errors)}"
             );
-            throw new BadRequestException($"Failed to create user. Errors: {string.Join(", ", errors)}"); //TODO: Am I exposing any security?
+            throw new BadRequestException($"Failed to create a user.");
         }
 
         // adding role to user
@@ -104,7 +105,7 @@ public class AuthenticationController : ControllerBase
         bool isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
         if (isValidPassword == false)
         {
-            throw new UnAuthorizedException("Invalid username or password");
+            throw new UnAuthorizedException("Invalid user");
         }
 
         // creating the necessary claims
@@ -138,7 +139,7 @@ public class AuthenticationController : ControllerBase
             {
                 Username = user.UserName,
                 RefreshToken = refreshToken,
-                ExpiredAt = DateTime.UtcNow.AddDays(7)
+                ExpiredAt = DateTime.UtcNow.AddMinutes(2)
             };
             _context.TokenInfos.Add(ti);
         }
@@ -146,7 +147,7 @@ public class AuthenticationController : ControllerBase
         else
         {
             tokenInfo.RefreshToken = refreshToken;
-            tokenInfo.ExpiredAt = DateTime.UtcNow.AddDays(7);
+            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(2);
         }
 
         await _context.SaveChangesAsync();
@@ -156,5 +157,49 @@ public class AuthenticationController : ControllerBase
             AccessToken = token,
             RefreshToken = refreshToken
         });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh(TokenModel tokenModel)
+    {
+        var principal = _tokenService.GetPrincipalFromExpiredToken(tokenModel.AccessToken);
+        var username = principal.Identity.Name;
+
+        var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
+        if (tokenInfo == null
+        || tokenInfo.RefreshToken != tokenModel.RefreshToken
+        || tokenInfo.ExpiredAt <= DateTime.UtcNow)
+        {
+            throw new BadRequestException("Invalid refresh token. Please login again.");
+        }
+
+        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+
+        tokenInfo.RefreshToken = newRefreshToken; // rotating the refresh token
+        await _context.SaveChangesAsync();
+
+        return Ok(new TokenModel
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        });
+    }
+
+    [HttpPost("token/revoke")]
+    [Authorize]
+    public async Task<IActionResult> Revoke()
+    {
+        var username = User.Identity.Name;
+
+        var user = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
+        if (user == null)
+        {
+            throw new BadRequestException("Invalid user");
+        }
+
+        user.RefreshToken = string.Empty;
+        await _context.SaveChangesAsync();
+        return Ok();
     }
 }
