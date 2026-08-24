@@ -9,6 +9,7 @@ using BookShop.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
@@ -35,7 +36,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("signup")]
-    public async Task Signup(SignupModel model)
+    public async Task<IActionResult> Signup(SignupModel model)
     {
 
         var existingUser = await _userManager.FindByNameAsync(model.Email);
@@ -90,6 +91,7 @@ public class AuthenticationController : ControllerBase
             _logger.LogError($"Failed to add role to the user. Errors : {string.Join(",", errors)}");
             throw new BadRequestException($"Failed to add role to the user. Errors : {string.Join(",", errors)}"); //TODO: Am I exposing any security?
         }
+        return Ok();
     }
 
     [HttpPost("login")]
@@ -103,25 +105,15 @@ public class AuthenticationController : ControllerBase
         }
 
         bool isValidPassword = await _userManager.CheckPasswordAsync(user, model.Password);
-        if (isValidPassword == false)
+        if (!isValidPassword)
         {
             throw new UnAuthorizedException("Invalid user");
         }
 
-        // creating the necessary claims
-        List<Claim> authClaims = [
-                new (ClaimTypes.Name, user.UserName),
-                new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                // unique id for token
-        ];
-
         var userRoles = await _userManager.GetRolesAsync(user);
 
-        // adding roles to the claims. So that we can get the user role from the token.
-        foreach (var userRole in userRoles)
-        {
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-        }
+        // new line
+        var authClaims = _tokenService.GenerateClaims(user.UserName, userRoles.ToArray());
 
         // generating access token
         var token = _tokenService.GenerateAccessToken(authClaims);
@@ -129,8 +121,8 @@ public class AuthenticationController : ControllerBase
         string refreshToken = _tokenService.GenerateRefreshToken();
 
         //save refreshToken with exp date in the database
-        var tokenInfo = _context.TokenInfos.
-                    FirstOrDefault(a => a.Username == user.UserName);
+        var tokenInfo = await _context.TokenInfos.
+                    SingleOrDefaultAsync(a => a.Username == user.UserName);
 
         // If tokenInfo is null for the user, create a new one
         if (tokenInfo == null)
@@ -152,38 +144,81 @@ public class AuthenticationController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(new TokenModel
+        // new lines
+        // set token cookies
+        var tokenModel = new TokenModel
         {
             AccessToken = token,
             RefreshToken = refreshToken
-        });
+        };
+        _tokenService.SetTokenCookies(tokenModel, HttpContext);
+
+        return Ok(tokenModel);
     }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(TokenModel tokenModel)
     {
-        var principal = _tokenService.GetPrincipalFromExpiredToken(tokenModel.AccessToken);
-        var username = principal.Identity.Name;
+        // Console.WriteLine("=== ALL COOKIES ===");
+        // foreach (var cookie in HttpContext.Request.Cookies)
+        // {
+        //     Console.WriteLine($"Cookie: {cookie.Key} = {cookie.Value}");
+        // }
+        // Console.WriteLine("===================");
 
-        var tokenInfo = _context.TokenInfos.SingleOrDefault(u => u.Username == username);
-        if (tokenInfo == null
-        || tokenInfo.RefreshToken != tokenModel.RefreshToken
-        || tokenInfo.ExpiredAt <= DateTime.UtcNow)
+        // I can not do auto validation, since I don't need to pass any payload in req body, if I am using it http only cookies
+        // But, if this api is used by mobile app client, then we must both value in req body
+        tokenModel ??= new TokenModel();
+
+        HttpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken);
+
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            tokenModel.RefreshToken = refreshToken;
+        }
+        // If no cookies, tokenModel should have values from request body (mobile client)
+        else if (string.IsNullOrEmpty(tokenModel.RefreshToken))
+        {
+            throw new BadRequestException("No valid tokens found in cookies or request body");
+        }
+
+        var tokenInfo = await _context.TokenInfos.SingleOrDefaultAsync(a => a.RefreshToken == tokenModel.RefreshToken);
+
+        if (tokenInfo == null || tokenInfo.ExpiredAt <= DateTime.UtcNow)
         {
             throw new BadRequestException("Invalid refresh token. Please login again.");
         }
 
-        var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
+        var user = await _userManager.FindByNameAsync(tokenInfo.Username);
+
+        if (user == null)
+        {
+            throw new BadRequestException("Invalid refresh token. Please login again.");
+        }
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var claims = _tokenService.GenerateClaims(user.UserName, userRoles.ToArray());
+
+        var newAccessToken = _tokenService.GenerateAccessToken(claims);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
         tokenInfo.RefreshToken = newRefreshToken; // rotating the refresh token
         await _context.SaveChangesAsync();
 
-        return Ok(new TokenModel
+        var newTokenData = new TokenModel
         {
             AccessToken = newAccessToken,
             RefreshToken = newRefreshToken
-        });
+        };
+
+        // set token cookies
+
+        _tokenService.SetTokenCookies(newTokenData, HttpContext);
+
+        // also sending it as a response, because cookie don't work with mobile app clients
+        return Ok(newTokenData);
+
     }
 
     [HttpPost("token/revoke")]
@@ -201,5 +236,38 @@ public class AuthenticationController : ControllerBase
         user.RefreshToken = string.Empty;
         await _context.SaveChangesAsync();
         return Ok();
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        string? username = User.Identity?.Name;
+        if (string.IsNullOrEmpty(username))
+        {
+            throw new UnAuthorizedException("You are not authorized.");
+        }
+
+        // remove token info from database
+        await _context.TokenInfos.Where(t => t.Username == username).ExecuteDeleteAsync();
+
+        // remove token cookies
+        Response.Cookies.Delete("accessToken", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            Path = "/",
+            SameSite = SameSiteMode.None // TODO: change to strict/lax in production
+        });
+
+        Response.Cookies.Delete("refreshToken", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            Path = "/",
+            SameSite = SameSiteMode.None // TODO: change to strict/lax in production
+        });
+
+        return NoContent();
     }
 }

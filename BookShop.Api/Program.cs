@@ -39,6 +39,20 @@ builder.Services.AddAuthentication(options =>
          ClockSkew = TimeSpan.Zero,
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:secret"]))
      };
+
+     // new lines
+     // cokie related config
+     options.Events = new JwtBearerEvents
+     {
+         OnMessageReceived = ctx =>
+         {
+             ctx.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+             if (!string.IsNullOrEmpty(accessToken))
+                 ctx.Token = accessToken;
+
+             return Task.CompletedTask;
+         }
+     };
  });
 
 
@@ -60,10 +74,8 @@ builder.Services.AddCors(options =>
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins("http://localhost:5173").
-                AllowCredentials().
-                AllowAnyHeader().
+                AllowCredentials(). //for cookie
                 AllowAnyMethod().WithExposedHeaders("X-Pagination");
-
             });
         });
 var app = builder.Build();
