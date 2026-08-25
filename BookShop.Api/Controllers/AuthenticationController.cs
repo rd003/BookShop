@@ -38,7 +38,6 @@ public class AuthenticationController : ControllerBase
     [HttpPost("signup")]
     public async Task<IActionResult> Signup(SignupModel model)
     {
-
         var existingUser = await _userManager.FindByNameAsync(model.Email);
         if (existingUser != null)
         {
@@ -50,7 +49,6 @@ public class AuthenticationController : ControllerBase
         {
             var roleResult = await _roleManager
                   .CreateAsync(new IdentityRole(Roles.User));
-
             if (roleResult.Succeeded == false)
             {
                 var roleErros = roleResult.Errors.Select(e => e.Description);
@@ -58,6 +56,20 @@ public class AuthenticationController : ControllerBase
                 throw new BadRequestException($"Failed to create user role");
             }
         }
+
+        // TODO: Delete this
+        if ((await _roleManager.RoleExistsAsync(Roles.Manager)) == false)
+        {
+            var roleResult = await _roleManager
+                  .CreateAsync(new IdentityRole(Roles.Manager));
+            if (roleResult.Succeeded == false)
+            {
+                var roleErros = roleResult.Errors.Select(e => e.Description);
+                _logger.LogError($"Failed to create manager role. Errors : {string.Join(",", roleErros)}");
+                throw new BadRequestException($"Failed to create manager role");
+            }
+        }
+        // TODO: Delete above
 
         ApplicationUser user = new()
         {
@@ -84,6 +96,8 @@ public class AuthenticationController : ControllerBase
 
         // adding role to user
         var addUserToRoleResult = await _userManager.AddToRoleAsync(user: user, role: Roles.User);
+        //TODO: delete this line
+        var addUserToRoleResult1 = await _userManager.AddToRoleAsync(user: user, role: Roles.Manager);
 
         if (addUserToRoleResult.Succeeded == false)
         {
@@ -269,5 +283,31 @@ public class AuthenticationController : ControllerBase
         });
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        string? username = User.Identity?.Name;
+        if (string.IsNullOrEmpty(username))
+        {
+            throw new UnAuthorizedException("You are not authorized.");
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            throw new UnAuthorizedException("You are not authorized.");
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return Ok(new
+        {
+            user.Email,
+            Username = user.Name,
+            Roles = roles
+        });
     }
 }
