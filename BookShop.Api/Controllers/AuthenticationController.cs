@@ -55,20 +55,6 @@ public class AuthenticationController : ControllerBase
             }
         }
 
-        // TODO: Delete this
-        if ((await _roleManager.RoleExistsAsync(Roles.Manager)) == false)
-        {
-            var roleResult = await _roleManager
-                  .CreateAsync(new IdentityRole(Roles.Manager));
-            if (roleResult.Succeeded == false)
-            {
-                var roleErros = roleResult.Errors.Select(e => e.Description);
-                _logger.LogError($"Failed to create manager role. Errors : {string.Join(",", roleErros)}");
-                throw new BadRequestException($"Failed to create manager role");
-            }
-        }
-        // TODO: Delete above
-
         ApplicationUser user = new()
         {
             Email = model.Email,
@@ -94,14 +80,12 @@ public class AuthenticationController : ControllerBase
 
         // adding role to user
         var addUserToRoleResult = await _userManager.AddToRoleAsync(user: user, role: Roles.User);
-        //TODO: delete this line
-        var addUserToRoleResult1 = await _userManager.AddToRoleAsync(user: user, role: Roles.Manager);
 
         if (addUserToRoleResult.Succeeded == false)
         {
             var errors = addUserToRoleResult.Errors.Select(e => e.Description);
             _logger.LogError($"Failed to add role to the user. Errors : {string.Join(",", errors)}");
-            throw new BadRequestException($"Failed to add role to the user. Errors : {string.Join(",", errors)}"); //TODO: Am I exposing any security?
+            throw new BadRequestException($"Failed to add role to the user");
         }
         return Ok();
     }
