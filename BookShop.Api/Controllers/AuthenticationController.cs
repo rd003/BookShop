@@ -1,5 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using BookShop.Api.Constants;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Models;
