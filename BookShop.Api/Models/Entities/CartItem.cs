@@ -1,6 +1,6 @@
 namespace BookShop.Api.Models.Entities;
 
-public class CartItem
+public class CartItem : EntityBase
 {
     public int Id { get; set; }
 

@@ -25,6 +25,17 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Genre>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Publisher>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Author>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Book>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Address>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Cart>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<CartItem>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<Order>().HasQueryFilter(k => k.Deleted != null);
+        builder.Entity<OrderItem>().HasQueryFilter(k => k.Deleted != null);
+
+
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         base.OnModelCreating(builder);
     }
