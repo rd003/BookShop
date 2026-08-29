@@ -1,5 +1,8 @@
 using BookShop.Api.Constants;
+using BookShop.Api.Exceptions;
+using BookShop.Api.Mappers;
 using BookShop.Api.Models;
+using BookShop.Api.Models.DTOs;
 using BookShop.Api.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +12,7 @@ namespace BookShop.Api.Controllers;
 
 // [Authorize(Roles = Roles.Admin)]
 [ApiController]
-[Route("/api/[controller]2")]
+[Route("/api/[controller]")]
 public class GenresController(ILogger<GenresController> logger, AppDbContext context) : ControllerBase
 {
     [AllowAnonymous]
@@ -17,19 +20,24 @@ public class GenresController(ILogger<GenresController> logger, AppDbContext con
     public async Task<IActionResult> GetGenres()
     {
         IQueryable<Genre> genresQuery = context.Genres;
-        return Ok(await genresQuery.ToListAsync());
+        var genres = await genresQuery.Select(g => g.ToDto())
+        .ToListAsync();
+        return Ok(genres);
     }
 
     // TODO: Protect this endpoint
-    public async Task<IActionResult> CreateGenre()
+    public async Task<IActionResult> CreateGenre(CreateGenreDto createGenre)
     {
-        int createdId = 1;
-        return CreatedAtRoute("GetGenre", new { id = createdId });
+        var genre = createGenre.ToDomain();
+        context.Genres.Add(genre);
+        await context.SaveChangesAsync();
+        return CreatedAtRoute(nameof(GetGenre), new { id = genre.Id }, genre.ToDto());
     }
 
-    [HttpGet("{id}", Name = "GetGenre")]
+    [HttpGet("{id:int}", Name = nameof(GetGenre))]
     public async Task<IActionResult> GetGenre(int id)
     {
-        return Ok();
+        var genre = await context.Genres.FindAsync(id) ?? throw new NotFoundException("Genre does not found");
+        return Ok(genre.ToDto());
     }
 }
