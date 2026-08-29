@@ -14,7 +14,7 @@ public class Order : EntityBase
     public PaymentStatus PaymentStatus { get; set; }
 
     public int ShippingAddressId { get; set; }
-    public Address ShippingAddress { get; set; } = null!;
+    public Address? ShippingAddress { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = [];
 }

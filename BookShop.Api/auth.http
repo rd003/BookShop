@@ -1,13 +1,13 @@
 @base_address = http://localhost:5288/api/auth
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InN1ZTJAZXhhbXBsZS5jb20iLCJqdGkiOiI5MGE2MzYyNC01MDU4LTRlNzctOTU0NC0yZTMwMWFmMDg5OWEiLCJyb2xlIjpbIlVzZXIiLCJNYW5hZ2VyIl0sIm5iZiI6MTc4NzY0MDUxNCwiZXhwIjoxNzg3NjQwNTc0LCJpYXQiOjE3ODc2NDA1MTQsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.jSa5WNfwO0gabl_7tEh725f9fUs45PiDRwGgwC7ZVko
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI4YmJhOWZmNS03MzdhLTQ5N2UtYWI2YS03Zjg4NjE1NDY4YzQiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4NzkxMzY3NSwiZXhwIjoxNzg3OTEzNzM1LCJpYXQiOjE3ODc5MTM2NzUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.emgeQ6WPYGy_AFhUMJNlN4bl93UFOoAK2JhyUx7PicU
 
 POST {{base_address}}/signup
 Content-Type: application/json
 
 {
-  "name":"Sue Storm 2",
-  "email": "sue2@example.com",
-  "password": "Sue2@123"
+  "name":"John Doe",
+  "email": "john@example.com",
+  "password": "John@123"
 }
 ###
 
@@ -15,8 +15,8 @@ POST {{base_address}}/login
 Content-Type: application/json
 
 {
-  "username":"sue2@example.com",
-  "password": "Sue2@123"
+  "username":"john@example.com",
+  "password": "John@123"
 }
 
 ###

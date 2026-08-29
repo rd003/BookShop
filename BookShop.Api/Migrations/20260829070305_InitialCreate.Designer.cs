@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookShop.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260828070112_CartItem_EntityBase")]
-    partial class CartItem_EntityBase
+    [Migration("20260829070305_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,6 +185,24 @@ namespace BookShop.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bio = "English writer, best known for The Lord of the Rings.",
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "J.R.R. Tolkien",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Bio = "American science fiction author, best known for Dune.",
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Frank Herbert",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.Book", b =>
@@ -238,6 +256,34 @@ namespace BookShop.Api.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CoverImageUrl = "",
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "The first volume of The Lord of the Rings.",
+                            Isbn = "9780618346257",
+                            Price = 12.99m,
+                            PublisherId = 1,
+                            StockQuantity = 50,
+                            Title = "The Fellowship of the Ring",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CoverImageUrl = "",
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A science fiction novel set on the desert planet Arrakis.",
+                            Isbn = "9780441172719",
+                            Price = 15.99m,
+                            PublisherId = 2,
+                            StockQuantity = 40,
+                            Title = "Dune",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.BookAuthor", b =>
@@ -256,6 +302,18 @@ namespace BookShop.Api.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("BookAuthors");
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = 1,
+                            AuthorId = 1
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            AuthorId = 2
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.BookGenre", b =>
@@ -274,6 +332,28 @@ namespace BookShop.Api.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("BookGenres");
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = 1,
+                            GenreId = 2
+                        },
+                        new
+                        {
+                            BookId = 1,
+                            GenreId = 1
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            GenreId = 3
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            GenreId = 1
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.Cart", b =>
@@ -363,6 +443,29 @@ namespace BookShop.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("Genres");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Fiction",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Fantasy",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Science Fiction",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.Order", b =>
@@ -470,6 +573,22 @@ namespace BookShop.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "HarperCollins",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Created = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Ace Books",
+                            Updated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("BookShop.Api.Models.Entities.TokenInfo", b =>

@@ -12,7 +12,7 @@ public class Book : EntityBase
 
     public int PublisherId { get; set; }
 
-    public Publisher Publisher { get; set; } = new Publisher();
+    public Publisher? Publisher { get; set; }
 
     public List<BookAuthor> BookAuthors { get; set; } = [];
     public List<BookGenre> BookGenres { get; set; } = [];
