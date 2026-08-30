@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BookShop.Api.Models.DTOs;
 
-public class UpdatePublisherDto
+public class CreatePublisherDto
 {
-    public int Id { get; set; }
-
     [Required]
     [MaxLength(200)]
     public string Name { get; set; } = string.Empty;
