@@ -16,6 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddTransient<TokenService>();
 builder.Services.AddTransient<SortHelper<Genre>>();
+builder.Services.AddTransient<SortHelper<Author>>();
+builder.Services.AddTransient<SortHelper<Publisher>>();
+builder.Services.AddTransient<SortHelper<Book>>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=Bookshop.db"));
 
