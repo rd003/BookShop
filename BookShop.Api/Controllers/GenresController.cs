@@ -1,5 +1,6 @@
 using BookShop.Api.Constants;
 using BookShop.Api.Exceptions;
+using BookShop.Api.Helpers;
 using BookShop.Api.Mappers;
 using BookShop.Api.Models;
 using BookShop.Api.Models.DTOs;
@@ -10,22 +11,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
+// TODO: Protect the controler
 // [Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
-public class GenresController(ILogger<GenresController> logger, AppDbContext context) : ControllerBase
+public class GenresController(AppDbContext context) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetGenres()
+    public async Task<IActionResult> GetGenres([FromQuery] QueryParameters queryParameters)
     {
         IQueryable<Genre> genresQuery = context.Genres;
-        var genres = await genresQuery.Select(g => g.ToDto())
-        .ToListAsync();
-        return Ok(genres);
+
+        // filter by search term
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            genresQuery = genresQuery.Where(a => a.Name.ToLower().StartsWith(queryParameters.SearchTerm));
+        }
+        // if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        // {
+        //     genresQuery = _sortHelper.ApplySort(genresQuery, queryParameters.SortBy);
+        // }
+
+        var pagedGenres = await PagedList<Genre>.ToPagedListAsync(genresQuery, queryParameters.PageNumber, queryParameters.PageSize);
+        var pagedGenreDtos = pagedGenres.ToPagedList(g => g.ToDto());
+
+        return Ok(pagedGenreDtos);
     }
 
-    // TODO: Protect this endpoint
+
     [HttpPost]
     public async Task<IActionResult> CreateGenre(CreateGenreDto createGenre)
     {
