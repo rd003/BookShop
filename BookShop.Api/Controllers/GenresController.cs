@@ -15,7 +15,7 @@ namespace BookShop.Api.Controllers;
 // [Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
-public class GenresController(AppDbContext context) : ControllerBase
+public class GenresController(AppDbContext context, SortHelper<Genre> sortHelper) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
@@ -28,10 +28,10 @@ public class GenresController(AppDbContext context) : ControllerBase
         {
             genresQuery = genresQuery.Where(a => a.Name.ToLower().StartsWith(queryParameters.SearchTerm));
         }
-        // if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        // {
-        //     genresQuery = _sortHelper.ApplySort(genresQuery, queryParameters.SortBy);
-        // }
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            genresQuery = sortHelper.ApplySort(genresQuery, queryParameters.SortBy);
+        }
 
         var pagedGenres = await PagedList<Genre>.ToPagedListAsync(genresQuery, queryParameters.PageNumber, queryParameters.PageSize);
         var pagedGenreDtos = pagedGenres.ToPagedList(g => g.ToDto());

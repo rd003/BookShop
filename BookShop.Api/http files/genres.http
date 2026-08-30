@@ -1,6 +1,6 @@
 @base_url = http://localhost:5288/api/genres
 
-GET {{base_url}}?pageNumber=1&pageSize=5&searchTerm=
+GET {{base_url}}?pageNumber=1&pageSize=5&searchTerm=&sortBy=name desc
 
 ### 
 GET {{base_url}}/12

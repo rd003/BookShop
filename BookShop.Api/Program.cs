@@ -1,7 +1,9 @@
 using System.Text;
 using BookShop.Api.Data;
 using BookShop.Api.Exceptions;
+using BookShop.Api.Helpers;
 using BookShop.Api.Models;
+using BookShop.Api.Models.Entities;
 using BookShop.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
@@ -13,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddTransient<TokenService>();
+builder.Services.AddTransient<SortHelper<Genre>>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=Bookshop.db"));
 
