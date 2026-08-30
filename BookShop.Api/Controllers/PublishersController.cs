@@ -14,7 +14,7 @@ namespace BookShop.Api.Controllers;
 // [Publisherize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
-public class PublisherController(AppDbContext context, SortHelper<Publisher> sortHelper) : ControllerBase
+public class PublishersController(AppDbContext context, SortHelper<Publisher> sortHelper) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
