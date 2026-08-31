@@ -23,6 +23,8 @@ public class CreateBookDto
     // In case, if you want to create a new publisher
     public string? PublisherName { get; set; }
 
-    public IEnumerable<CreateGenreDto> Genres { get; set; } = [];
-    public IEnumerable<CreateGenreDto> Author { get; set; } = [];
+    public IEnumerable<int> ExistingGenreIds { get; set; } = [];
+    public IEnumerable<string> NewGenreNames { get; set; } = [];
+    public IEnumerable<int> ExistingAuthorIds { get; set; } = [];
+    public IEnumerable<string> NewAuthorNames { get; set; } = [];
 }

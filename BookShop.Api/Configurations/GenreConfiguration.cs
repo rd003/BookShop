@@ -8,7 +8,11 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
 {
     public void Configure(EntityTypeBuilder<Genre> builder)
     {
-        builder.Property(g => g.Name).IsRequired().HasMaxLength(100);
+        builder.Property(g => g.Name)
+        .IsRequired()
+        .HasMaxLength(100)
+        .UseCollation(DbCollations.CaseInsensitive);
+
         builder.HasIndex(g => g.Name, "IX_GenreName").IsUnique();
     }
 }
