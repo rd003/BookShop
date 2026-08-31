@@ -14,6 +14,6 @@ public class ReadBookDto
 
     public string PublisherName { get; set; } = string.Empty;
     public IEnumerable<ReadGenreDto> Genres { get; set; } = [];
-    public IEnumerable<ReadGenreDto> Authors { get; set; } = [];
+    public IEnumerable<ReadAuthorDto> Authors { get; set; } = [];
 
 }

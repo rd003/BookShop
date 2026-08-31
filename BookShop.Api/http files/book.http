@@ -1,0 +1,19 @@
+@base_url = http://localhost:5288/api/books
+
+POST {{base_url}}
+Content-Type: application/json
+
+{
+  "title": "Example book",
+  "description": "Example description",
+  "isbn": "9781250301691",
+  "price": 100.00,
+  "stockQuantity": 1,
+  "coverImageUrl": "https://example.com/covers/ex1.jpg",
+  "publisherId": 1,
+  "newPublisherName": null,
+  "existingGenreIds": [1,4],
+  "newGenreNames": [],
+  "existingAuthorIds": [2,6],
+  "newAuthorNames": []
+}
