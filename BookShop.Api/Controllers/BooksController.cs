@@ -24,8 +24,8 @@ public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper)
     }
 
     [AllowAnonymous]
-    [HttpGet("{id:int}", Name = nameof(GetBookById))]
-    public async Task<IActionResult> GetBookById(int id)
+    [HttpGet("{id:int}", Name = nameof(GetBook))]
+    public async Task<IActionResult> GetBook(int id)
     {
         return Ok();
     }
@@ -154,9 +154,17 @@ public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper)
 
         await context.SaveChangesAsync();
         await tran.CommitAsync();
+        ReadBookDto? bookToReturn = await GetBookById(createdBook.Id);
+
+        return CreatedAtRoute(nameof(GetBook), new { id = createdBook.Id }, bookToReturn);
+
+    }
+
+    private async Task<ReadBookDto?> GetBookById(int id)
+    {
         // find book with joins with authors,genres,publisher, then return
 
-        var bookToReturn = await context.Books
+        return await context.Books
         .Include(b => b.Publisher)
         .Include(b => b.BookAuthors)
         .Include(b => b.BookGenres)
@@ -174,8 +182,136 @@ public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper)
             Authors = b.BookAuthors.Select(ba => ba.Author.ToDto()).ToList(),
             Genres = b.BookGenres.Select(bg => bg.Genre.ToDto()).ToList()
         })
-        .SingleOrDefaultAsync(b => b.Id == createdBook.Id);
+        .SingleOrDefaultAsync(b => b.Id == id);
+    }
 
-        return CreatedAtRoute(nameof(GetBookById), new { id = createdBook.Id }, bookToReturn);
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateBook(int id, UpdateBookDto updateBookDto)
+    {
+        var book = await context.Books.FindAsync(id);
+        if (book is null)
+        {
+            throw new NotFoundException("Book does not found");
+        }
+
+        if (updateBookDto.PublisherId is not null && !string.IsNullOrWhiteSpace(updateBookDto.NewPublisherName))
+        {
+            throw new BadRequestException("Pass at most one of publisherId or publisherName");
+        }
+
+        using var tran = await context.Database.BeginTransactionAsync();
+
+        if (updateBookDto.Title is not null) book.Title = updateBookDto.Title;
+        if (updateBookDto.Description is not null) book.Description = updateBookDto.Description;
+        if (updateBookDto.Isbn is not null) book.Isbn = updateBookDto.Isbn;
+        if (updateBookDto.Price is not null) book.Price = updateBookDto.Price.Value;
+        if (updateBookDto.StockQuantity is not null) book.StockQuantity = updateBookDto.StockQuantity.Value;
+        if (updateBookDto.CoverImageUrl is not null) book.CoverImageUrl = updateBookDto.CoverImageUrl;
+
+        // Publisher
+        if (updateBookDto.PublisherId is not null)
+        {
+            book.PublisherId = updateBookDto.PublisherId.Value;
+        }
+        else if (!string.IsNullOrWhiteSpace(updateBookDto.NewPublisherName))
+        {
+            var existingPublisher = await context.Publishers
+                .SingleOrDefaultAsync(x => EF.Functions.Like(x.Name, updateBookDto.NewPublisherName));
+
+            if (existingPublisher is null)
+            {
+                var newPublisher = new Publisher { Name = updateBookDto.NewPublisherName };
+                context.Publishers.Add(newPublisher);
+                await context.SaveChangesAsync();
+                book.PublisherId = newPublisher.Id;
+            }
+            else
+            {
+                book.PublisherId = existingPublisher.Id;
+            }
+        }
+
+        // Genres — only touch relations if caller sent something
+        if (updateBookDto.GenreIds is not null || (updateBookDto.NewGenreNames?.Any() ?? false))
+        {
+            var finalGenreIds = new HashSet<int>(updateBookDto.GenreIds ?? []);
+
+            if (updateBookDto.NewGenreNames?.Any() ?? false)
+            {
+                var existingGenres = await context.Genres
+                    .Where(g => updateBookDto.NewGenreNames.Contains(g.Name))
+                    .ToListAsync();
+
+                var existingByName = existingGenres
+                    .ToDictionary(g => g.Name, g => g.Id, StringComparer.CurrentCultureIgnoreCase);
+
+                var genresToCreate = updateBookDto.NewGenreNames
+                    .Where(name => !existingByName.ContainsKey(name))
+                    .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                    .Select(name => new Genre { Name = name })
+                    .ToList();
+
+                if (genresToCreate.Count > 0)
+                {
+                    context.Genres.AddRange(genresToCreate);
+                    await context.SaveChangesAsync();
+                }
+
+                finalGenreIds.UnionWith(existingByName.Values);
+                finalGenreIds.UnionWith(genresToCreate.Select(g => g.Id));
+            }
+
+            var currentLinks = await context.BookGenres.Where(bg => bg.BookId == id).ToListAsync();
+            var currentIds = currentLinks.Select(l => l.GenreId).ToHashSet();
+
+            context.BookGenres.RemoveRange(currentLinks.Where(l => !finalGenreIds.Contains(l.GenreId)));
+            context.BookGenres.AddRange(finalGenreIds.Except(currentIds)
+                .Select(gid => new BookGenre { BookId = id, GenreId = gid }));
+        }
+
+        // Authors 
+        if (updateBookDto.AuthorIds is not null || (updateBookDto.NewAuthorNames?.Any() ?? false))
+        {
+            var finalAuthorIds = new HashSet<int>(updateBookDto.AuthorIds ?? []);
+
+            if (updateBookDto.NewAuthorNames?.Any() ?? false)
+            {
+                var existingAuthors = await context.Authors
+                    .Where(a => updateBookDto.NewAuthorNames.Contains(a.Name))
+                    .ToListAsync();
+
+                var existingByName = existingAuthors
+                    .ToDictionary(a => a.Name, a => a.Id, StringComparer.CurrentCultureIgnoreCase);
+
+                var authorsToCreate = updateBookDto.NewAuthorNames
+                    .Where(name => !existingByName.ContainsKey(name))
+                    .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                    .Select(name => new Author { Name = name })
+                    .ToList();
+
+                if (authorsToCreate.Count > 0)
+                {
+                    context.Authors.AddRange(authorsToCreate);
+                    await context.SaveChangesAsync();
+                }
+
+                finalAuthorIds.UnionWith(existingByName.Values);
+                finalAuthorIds.UnionWith(authorsToCreate.Select(a => a.Id));
+            }
+
+            var currentLinks = await context.BookAuthors.Where(ba => ba.BookId == id).ToListAsync();
+            var currentIds = currentLinks.Select(l => l.AuthorId).ToHashSet();
+
+            context.BookAuthors.RemoveRange(currentLinks.Where(l => !finalAuthorIds.Contains(l.AuthorId)));
+            context.BookAuthors.AddRange(finalAuthorIds.Except(currentIds)
+                .Select(aid => new BookAuthor { BookId = id, AuthorId = aid }));
+        }
+
+        await context.SaveChangesAsync();
+        await tran.CommitAsync();
+
+        var bookToReturn = await GetBookById(id);
+
+        return Ok(bookToReturn);
     }
 }

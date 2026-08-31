@@ -17,3 +17,22 @@ Content-Type: application/json
   "existingAuthorIds": [2,6],
   "newAuthorNames": []
 }
+
+###
+PATCH {{base_url}}/6
+Content-Type: application/json
+
+{
+  "title": "Example book1",
+  "description": "Example description1",
+  "isbn": "9781250301691",
+  "price": 100.00,
+  "stockQuantity": 1,
+  "coverImageUrl": "https://example.com/covers/ex1.jpg",
+  "publisherId": 1,
+  "newPublisherName": null,
+  "existingGenreIds": [1,2],
+  "newGenreNames": ["New example genre"],
+  "existingAuthorIds": [1,7],
+  "newAuthorNames": ["New example author"]
+}
