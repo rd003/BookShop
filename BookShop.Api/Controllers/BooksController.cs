@@ -14,20 +14,66 @@ namespace BookShop.Api.Controllers;
 // [Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
-public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper) : ControllerBase
+public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetBooks()
+    public async Task<IActionResult> GetBooks([FromQuery] QueryParameters queryParameters, [FromQuery] int[] genreIds, [FromQuery] int[] authorIds)
     {
-        return Ok();
+        IQueryable<Book> booksQuery = context.Books
+        .Include(b => b.Publisher)
+        .Include(b => b.BookAuthors)
+        .ThenInclude(ba => ba.Author)
+        .Include(b => b.BookGenres)
+        .ThenInclude(bg => bg.Genre);
+
+        // filter by search term
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            booksQuery = booksQuery.Where(a => a.Title.ToLower().StartsWith(queryParameters.SearchTerm));
+        }
+
+        if (authorIds.Length != 0)
+        {
+            booksQuery = booksQuery.Where(b => b.BookAuthors.Any(ba => authorIds.Contains(ba.AuthorId)));
+        }
+
+        // TODO: Filter by genres
+        if (genreIds.Length != 0)
+        {
+            booksQuery = booksQuery.Where(b => b.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)));
+        }
+
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            booksQuery = sortHelper.ApplySort(booksQuery, queryParameters.SortBy);
+        }
+
+        var pagedBooks = await PagedList<Book>.ToPagedListAsync(booksQuery, queryParameters.PageNumber, queryParameters.PageSize);
+
+        var pagedBookDtos = pagedBooks.ToPagedList(b => new ReadBookDto
+        {
+            Id = b.Id,
+            PublisherName = b.Publisher.Name,
+            Isbn = b.Isbn,
+            CoverImageUrl = b.CoverImageUrl,
+            Description = b.Description,
+            Price = b.Price,
+            PublisherId = b.PublisherId,
+            Title = b.Title,
+            StockQuantity = b.StockQuantity,
+            Authors = b.BookAuthors.Select(ba => ba.Author.ToDto()).ToList(),
+            Genres = b.BookGenres.Select(bg => bg.Genre.ToDto()).ToList()
+        });
+        return Ok(pagedBookDtos);
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}", Name = nameof(GetBook))]
     public async Task<IActionResult> GetBook(int id)
     {
-        return Ok();
+        var book = await GetBookById(id) ?? throw new NotFoundException("Book Not found");
+        return Ok(book);
     }
 
     [HttpPost]
@@ -201,6 +247,7 @@ public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper)
 
         using var tran = await context.Database.BeginTransactionAsync();
 
+        book.Updated = DateTime.UtcNow;
         if (updateBookDto.Title is not null) book.Title = updateBookDto.Title;
         if (updateBookDto.Description is not null) book.Description = updateBookDto.Description;
         if (updateBookDto.Isbn is not null) book.Isbn = updateBookDto.Isbn;
@@ -313,5 +360,29 @@ public class BooksController(AppDbContext context, SortHelper<Genre> sortHelper)
         var bookToReturn = await GetBookById(id);
 
         return Ok(bookToReturn);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteBook(int id)
+    {
+        var book = await context.Books.FindAsync(id) ??
+            throw new NotFoundException("Book not found");
+
+        book.Deleted = DateTime.UtcNow;
+
+        var bookGenres = await context.BookGenres.Where(bg => bg.BookId == id).ToListAsync();
+        foreach (var bookGenre in bookGenres)
+        {
+            bookGenre.Deleted = DateTime.UtcNow;
+        }
+
+        var bookAuthors = await context.BookAuthors.Where(ba => ba.BookId == id).ToListAsync();
+        foreach (var bookAuthor in bookAuthors)
+        {
+            bookAuthor.Deleted = DateTime.UtcNow;
+        }
+
+        await context.SaveChangesAsync();
+        return NoContent();
     }
 }
