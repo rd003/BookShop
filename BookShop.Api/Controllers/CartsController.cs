@@ -133,6 +133,11 @@ public class CartsController(AppDbContext context, UserManager<ApplicationUser> 
         return NoContent();
     }
 
+    // private  GetCartAsync(string userId)
+    // {
+
+    // }
+
     private async Task<string> GetUserIdAsync()
     {
         var username = User.Identity?.Name ?? throw new UnAuthorizedException("User is not authorized");
