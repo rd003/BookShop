@@ -15,11 +15,20 @@ namespace BookShop.Api.Controllers;
 [Route("/api/[controller]")]
 public class AddressesController(AppDbContext context, UserManager<ApplicationUser> userManager) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAddresses()
+    {
+        var userId = await GetUserIdAsync();
+        var addresses = await context.Addresses.AsNoTracking().Where(a => a.UserId == userId).ToListAsync();
+        return Ok(addresses);
+    }
 
     [HttpGet("{id:int}", Name = nameof(GetAddress))]
     public async Task<IActionResult> GetAddress(int id)
     {
-        return Ok();
+        var userId = await GetUserIdAsync();
+        var address = await context.Addresses.AsNoTracking().SingleOrDefaultAsync(a => a.Id == id && a.UserId == userId) ?? throw new NotFoundException("Address not found");
+        return Ok(address.ToDto());
     }
 
     [HttpPost]
