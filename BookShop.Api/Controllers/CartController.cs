@@ -15,7 +15,7 @@ namespace BookShop.Api.Controllers;
 public class CartController(AppDbContext context, UserManager<ApplicationUser> userManager) : ControllerBase
 {
 
-    // POST: api/carts/items
+    // POST: api/cart/items
     [HttpPost("items")]
     public async Task<IActionResult> AddCartItem(AddCartItemDto cartItemDto)
     {

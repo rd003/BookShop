@@ -1,5 +1,5 @@
-@base_url = http://localhost:5288/api/carts
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI3NGViNDlkMC0wNDMzLTQyZDEtODNlNi1jZWM5ZDI1ZGZlYmQiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODMyNjYzMSwiZXhwIjoxNzg4MzI2NjkxLCJpYXQiOjE3ODgzMjY2MzEsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.l1RckxM5PlKqYYT_q6GXJ5JbC1tfM_bRKT0HvVz0UAM 
+@base_url = http://localhost:5288/api/cart
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiIzMjUxYTVkNi04YWUzLTQ4NTItYmRjNy1hOGIyYmRhZTk0M2EiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODMzMjA2MywiZXhwIjoxNzg4MzMyOTYzLCJpYXQiOjE3ODgzMzIwNjMsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.6GlrDO7JEijrfC0-0BXPztaxIszFJglpfhPoKYPKeyg
 
 ### userCart 
 GET {{base_url}}
@@ -11,6 +11,20 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-   "bookId":5,
-   "quantity":6
+   "bookId":2,
+   "quantity":1
 }
+
+### Update cart item (increment/decrement)
+### /items/{cartItemId}
+PUT  {{base_url}}/items/2
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "Quantity": 0
+}
+
+### Empty cart collection 
+DELETE {{base_url}}/items
+Authorization: Bearer {{accessToken}}
