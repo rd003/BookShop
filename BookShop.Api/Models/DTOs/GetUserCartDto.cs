@@ -2,6 +2,7 @@ namespace BookShop.Api.Models.DTOs;
 
 public class GetUserCartDto
 {
+    public int CartId { get; set; }
     public IEnumerable<ReadCartItemDto> CartItems { get; set; } = [];
-    public decimal TotalQuantity { get => CartItems.Sum(ci => ci.TotalPrice); }
+    public decimal TotalAmount { get => CartItems.Sum(ci => ci.TotalPrice); }
 }

@@ -1,6 +1,6 @@
 @base_url = http://localhost:5288/api/books
 
-GET {{base_url}}?pageNumber=1&pageSize=5
+GET {{base_url}}?pageNumber=1&pageSize=15
 
 ### with filters
 GET {{base_url}}?pageNumber=1&pageSize=3&searchTerm=&sortBy=&genreIds=13&genreIds=14&authorIds=7&authorIds=8

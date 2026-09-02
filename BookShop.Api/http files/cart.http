@@ -1,0 +1,16 @@
+@base_url = http://localhost:5288/api/carts
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI3NGViNDlkMC0wNDMzLTQyZDEtODNlNi1jZWM5ZDI1ZGZlYmQiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODMyNjYzMSwiZXhwIjoxNzg4MzI2NjkxLCJpYXQiOjE3ODgzMjY2MzEsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.l1RckxM5PlKqYYT_q6GXJ5JbC1tfM_bRKT0HvVz0UAM 
+
+### userCart 
+GET {{base_url}}
+Authorization: Bearer {{accessToken}}
+
+### add Item
+POST {{base_url}}/items
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+   "bookId":5,
+   "quantity":6
+}

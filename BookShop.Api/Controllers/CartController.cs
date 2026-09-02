@@ -12,7 +12,7 @@ namespace BookShop.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("/api/[controller]")]
-public class CartsController(AppDbContext context, UserManager<ApplicationUser> userManager) : ControllerBase
+public class CartController(AppDbContext context, UserManager<ApplicationUser> userManager) : ControllerBase
 {
 
     // POST: api/carts/items
@@ -86,7 +86,10 @@ public class CartsController(AppDbContext context, UserManager<ApplicationUser> 
             await tran.RollbackAsync();
             throw new ConflictException("This item was just modified by another request. Please retry.");
         }
-        return NoContent(); // TODO: Or should I return a user cart?
+
+        var userCart = await GetCartAsync(userId);
+
+        return Ok(userCart);
     }
 
     // Note: this handles increment and decrement, but client need to handle. If client pass quantity:0, cartItem will be deleted
@@ -111,7 +114,10 @@ public class CartsController(AppDbContext context, UserManager<ApplicationUser> 
         }
         cartItem.Cart!.Updated = DateTime.UtcNow;
         await context.SaveChangesAsync();
-        return NoContent(); //TODO: shoud I return a userCart?
+
+        var userCart = await GetCartAsync(userId);
+
+        return Ok(userCart);
     }
 
     [HttpDelete("items")]
@@ -121,22 +127,52 @@ public class CartsController(AppDbContext context, UserManager<ApplicationUser> 
 
         // I am opting out soft delete, I think it was a bad design choice
         await context.CartItems
-        .Where(ci => ci.Cart.UserId == userId)
+        .Where(ci => ci.Cart!.UserId == userId)
         .ExecuteDeleteAsync();
 
         return NoContent();
     }
 
-    [HttpGet("items")]
+    [HttpGet]
     public async Task<IActionResult> GetUserCart()
     {
-        return NoContent();
+        var userId = await GetUserIdAsync();
+        var userCart = await GetCartAsync(userId);
+        // TODO: pagination is need in future
+        return Ok(userCart);
     }
 
-    // private  GetCartAsync(string userId)
-    // {
+    private async Task<GetUserCartDto> GetCartAsync(string userId)
+    {
+        GetUserCartDto userCart = new();
 
-    // }
+        var cart = await context.Carts.
+                AsNoTracking()
+                .SingleOrDefaultAsync(c => c.UserId == userId);
+
+        if (cart is null) { return userCart; }
+
+        var cartItems = await context
+        .CartItems
+        .AsNoTracking()
+        .Where(ci => ci.CartId == cart.Id)
+        .Select(ci => new ReadCartItemDto
+        {
+            CartItemId = ci.Id,
+            Quantity = ci.Quantity,
+            BookId = ci.BookId,
+            BookTitle = ci.Book!.Title,
+            UnitPrice = ci.Book!.Price,
+            Authors = ci.Book.BookAuthors.Select(ba => ba.Author!.Name),
+            Genres = ci.Book.BookGenres.Select(bg => bg.Genre!.Name)
+        })
+        .ToListAsync();
+
+        userCart.CartId = cart.Id;
+        userCart.CartItems = cartItems;
+
+        return userCart;
+    }
 
     private async Task<string> GetUserIdAsync()
     {
