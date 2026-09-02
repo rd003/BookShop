@@ -18,7 +18,7 @@ public class UpdateAddressDto
     public string Line1 { get; set; } = string.Empty;
 
     [MaxLength(300)]
-    public string Line2 { get; set; } = string.Empty;
+    public string? Line2 { get; set; }
 
     [Required]
     [MaxLength(100)]

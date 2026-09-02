@@ -18,8 +18,6 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
         builder.Property(a => a.PostalCode).IsRequired().HasMaxLength(20);
         builder.Property(a => a.Country).IsRequired().HasMaxLength(100);
 
-        builder.HasIndex(a => a.UserId)
-        .HasFilter("IsDefault = 1")
-        .IsUnique();
+        builder.HasIndex(a => a.UserId);
     }
 }

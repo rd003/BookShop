@@ -5,7 +5,6 @@ using BookShop.Api.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
@@ -19,7 +18,12 @@ public class AddressesController(AppDbContext context, UserManager<ApplicationUs
     public async Task<IActionResult> GetAddresses()
     {
         var userId = await GetUserIdAsync();
-        var addresses = await context.Addresses.AsNoTracking().Where(a => a.UserId == userId).ToListAsync();
+        var addresses = await context.Addresses
+        .AsNoTracking()
+        .Where(a => a.UserId == userId)
+        .OrderByDescending(a => a.IsDefault)
+        .Select(a => a.ToDto())
+        .ToListAsync();
         return Ok(addresses);
     }
 
@@ -46,17 +50,20 @@ public class AddressesController(AppDbContext context, UserManager<ApplicationUs
         {
             address.IsDefault = true;
         }
-        context.Add(address);
-        try
+        else if (address.IsDefault && hasAnyDefaultAddress)
         {
-            await context.SaveChangesAsync();
-            return CreatedAtRoute(nameof(GetAddress), new { id = address.Id }, address);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqliteException { SqliteErrorCode: 19 })
-        {
-            throw new ConflictException("User already has a default address.");
-        }
+            // This one IS being marked default, and another default already exists — demote the other one
+            var existingDefault = await context.Addresses
+                .SingleOrDefaultAsync(a => a.UserId == userId && a.IsDefault);
 
+            if (existingDefault is not null)
+            {
+                existingDefault.IsDefault = false;
+            }
+        }
+        context.Add(address);
+        await context.SaveChangesAsync();
+        return CreatedAtRoute(nameof(GetAddress), new { id = address.Id }, address);
     }
 
     [HttpPatch("{id:int}")]
@@ -138,6 +145,21 @@ public class AddressesController(AppDbContext context, UserManager<ApplicationUs
 
         await context.SaveChangesAsync();
 
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteAddress(int id)
+    {
+        var userId = await GetUserIdAsync();
+        var address = await context.Addresses.SingleOrDefaultAsync(a => a.UserId == userId && a.Id == id) ?? throw new NotFoundException("Address not found");
+
+        if (address.IsDefault)
+        {
+            throw new BadRequestException("Can not delete the default address, make another address default first.");
+        }
+        address.Deleted = DateTime.UtcNow;
+        await context.SaveChangesAsync();
         return NoContent();
     }
 

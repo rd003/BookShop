@@ -1,0 +1,48 @@
+@base_address = http://localhost:5288/api/addresses
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI5YzBiMWEyZS1jOGNjLTRkYzItOWVlNi1hYWU3NWY0NDgwZDkiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODM1MTYzOSwiZXhwIjoxNzg4MzUyNTM5LCJpYXQiOjE3ODgzNTE2MzksImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.goDhA2yGmLlayRMrO2yfgPWOXhouD57DAEoAEUJv4z8
+
+GET {{base_address}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{base_address}}/1
+Authorization: Bearer {{accessToken}}
+
+###
+POST {{base_address}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "fullName":"Jane Doe",
+    "phone": "44444",
+    "Line1":"DLF tower, Sector 62, Noida",
+    "line2":null,
+    "city":"Noida",
+    "state":"Uttar Pradesh",
+    "postalCode":"201301",
+    "country":"India",
+    "isDefault":true
+}
+
+###
+PATCH {{base_address}}/5
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "id":5,
+    "fullName":"Jane Doe",
+    "phone": "44444",
+    "Line1":"DLF tower, Sector 63, Noida",
+    "line2":null,
+    "city":"Noida",
+    "state":"Uttar Pradesh",
+    "postalCode":"201301",
+    "country":"India",
+    "isDefault":true
+}
+
+###
+DELETE {{base_address}}/1
+Authorization: Bearer {{accessToken}}
