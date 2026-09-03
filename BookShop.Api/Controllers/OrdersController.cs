@@ -83,7 +83,8 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         {
             await context.SaveChangesAsync();
             await tran.CommitAsync();
-            return Ok(); // Todo: create createdAtRout later
+            GetUserOrderDto orderDto = await GetUserOrderAsync(order.OrderNumber);
+            return CreatedAtRoute(nameof(GetOrder), new { orderNumber = order.OrderNumber }, orderDto);
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -97,17 +98,47 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         }
     }
 
-    [HttpGet]
-    private async Task<IActionResult> GetOrder()
+    [HttpGet("{orderNumber:string}", Name = nameof(GetOrder))]
+    public async Task<IActionResult> GetOrder(string orderNumber)
     {
-        string userId = await GetUserIdAsync();
-        return Ok();
+        if (string.IsNullOrWhiteSpace(orderNumber))
+        {
+            throw new BadRequestException("Please Provide OrderNumber");
+        }
+        GetUserOrderDto order = await GetUserOrderAsync(orderNumber);
+        return Ok(order);
     }
 
-    // private async Task<GetUserOrderDto> GetUserOrder(string orderNumber)
-    // {
-
-    // }
+    private async Task<GetUserOrderDto> GetUserOrderAsync(string orderNumber)
+    {
+        orderNumber = orderNumber.Trim().ToUpperInvariant();
+        string userId = await GetUserIdAsync();
+        var order = await context.Orders
+                    .Where(o => o.UserId == userId && o.OrderNumber == orderNumber)
+                    .AsNoTracking()
+                    .Select(o => new GetUserOrderDto
+                    {
+                        OrderDate = o.OrderDate,
+                        OrderStatus = o.Status,
+                        OrderNumber = o.OrderNumber,
+                        OrderTotal = o.TotalAmount,
+                        OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
+                        {
+                            BookId = oi.BookId,
+                            BookTitle = oi.Book!.Title,
+                            UnitPrice = oi.UnitPrice,
+                            Quantity = oi.Quantity,
+                            Authors = oi.Book.BookAuthors.Select(ba => ba.Author!.Name).ToList(),
+                            Genres = oi.Book.BookGenres.Select(ba => ba.Genre!.Name).ToList()
+                        })
+                    })
+                    .SingleOrDefaultAsync();
+        if (order is null)
+        {
+            throw new NotFoundException("Order not found");
+        }
+        return order;
+    }
 
     private async Task<string> GetUserIdAsync()
     {
