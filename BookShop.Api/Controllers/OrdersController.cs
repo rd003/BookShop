@@ -43,6 +43,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         // create order from cart
         var order = new Order
         {
+            OrderNumber = GenerateOrderNumber(),
             OrderDate = DateTime.UtcNow,
             PaymentMethod = PaymentMethod.CashOnDelivery,
             ShippingAddressId = createOrderDto.ShippingAddressId,
@@ -96,12 +97,29 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         }
     }
 
-    // private async Task<IActionResult> 
+    [HttpGet]
+    private async Task<IActionResult> GetOrder()
+    {
+        string userId = await GetUserIdAsync();
+        return Ok();
+    }
+
+    // private async Task<GetUserOrderDto> GetUserOrder(string orderNumber)
+    // {
+
+    // }
 
     private async Task<string> GetUserIdAsync()
     {
         var username = User.Identity?.Name ?? throw new UnAuthorizedException("User is not authorized");
         var currentUser = await userManager.FindByNameAsync(username) ?? throw new UnAuthorizedException("User is not authorized");
         return currentUser.Id;
+    }
+
+    private static string GenerateOrderNumber()
+    {
+        var datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+        var randomPart = Guid.NewGuid().ToString("N")[..5].ToUpperInvariant();
+        return $"ORD-{datePart}-{randomPart}";
     }
 }

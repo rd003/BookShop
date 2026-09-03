@@ -8,7 +8,7 @@ public class Order : EntityBase
     public string UserId { get; set; } = null!;
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
-
+    public string OrderNumber { get; set; } = null!;
     public OrderStatus Status { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
