@@ -50,6 +50,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             UserId = userId,
             Status = OrderStatus.Pending
         };
+
         foreach (var cartItem in cartItems)
         {
             var rowsAffected = await context.Books
@@ -72,6 +73,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             order.OrderItems.Add(orderItem);
         }
         order.TotalAmount = order.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
+        context.Orders.Add(order);
 
         // remove cart items
         foreach (var item in cartItems)
@@ -98,7 +100,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         }
     }
 
-    [HttpGet("{orderNumber:string}", Name = nameof(GetOrder))]
+    [HttpGet("{orderNumber}", Name = nameof(GetOrder))]
     public async Task<IActionResult> GetOrder(string orderNumber)
     {
         if (string.IsNullOrWhiteSpace(orderNumber))

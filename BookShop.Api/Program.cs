@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using BookShop.Api.Data;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Helpers;
@@ -14,6 +15,12 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddTransient<TokenService>();
 builder.Services.AddTransient<SortHelper<Genre>>();
 builder.Services.AddTransient<SortHelper<Author>>();

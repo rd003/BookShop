@@ -1,30 +1,15 @@
-@base_url = http://localhost:5288/api/cart
+@base_address = http://localhost:5288/api/orders
 @accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI4MmE1ODE5NC0wZTcxLTRmMjAtOWVlMy01Y2ZiZTE5NzdlNzciLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODQzMzExNywiZXhwIjoxNzg4NDM0MDE3LCJpYXQiOjE3ODg0MzMxMTcsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.5-sE6hLdnlObLwq_MVxXEfN97Cjp2C5FdIHKQoi3HQM
 
-### userCart 
-GET {{base_url}}
-Authorization: Bearer {{accessToken}}
-
-### add Item
-POST {{base_url}}/items
+### Create order
+POST {{base_address}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-   "bookId":5,
-   "quantity":1
+    "shippingAddressId": 1
 }
 
-### Update cart item (increment/decrement)
-### /items/{cartItemId}
-PUT  {{base_url}}/items/2
-Content-Type: application/json
-Authorization: Bearer {{accessToken}}
-
-{
-    "Quantity": 0
-}
-
-### Empty cart collection 
-DELETE {{base_url}}/items
+### Get order
+GET {{base_address}}/ORD-20260903-64401
 Authorization: Bearer {{accessToken}}
