@@ -1,0 +1,9 @@
+@base_url = http://localhost:5288/api/enums
+
+GET {{base_url}}/order-statuses
+
+###
+GET {{base_url}}/payment-statuses
+
+###
+GET {{base_url}}/payment-methods
