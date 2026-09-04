@@ -10,8 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
-//TODO: uncoment it
-// [Authorize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/admin/orders")]
 public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHelper) : ControllerBase

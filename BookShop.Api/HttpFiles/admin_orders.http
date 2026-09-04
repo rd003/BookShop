@@ -9,7 +9,6 @@ Authorization: Bearer {{accessToken}}
 GET {{base_address}}/2
 Authorization: Bearer {{accessToken}}
 
-
 ###
 POST {{base_address}}/change-payment-status
 Authorization: Bearer {{accessToken}}
