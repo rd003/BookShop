@@ -169,6 +169,8 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             OrderStatus = o.Status,
             OrderNumber = o.OrderNumber,
             OrderTotal = o.TotalAmount,
+            PyamentMethod = o.PaymentMethod,
+            PyamentStatus = o.PaymentStatus,
             OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
             {
                 BookId = oi.BookId,

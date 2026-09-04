@@ -5,13 +5,13 @@ using BookShop.Api.Models;
 using BookShop.Api.Models.DTOs;
 using BookShop.Api.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
-[Authorize(Roles = Roles.Admin)]
+//TODO: uncoment it
+// [Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/admin/orders")]
 public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHelper) : ControllerBase
@@ -56,6 +56,7 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
         }
 
         ordersQuery = ordersQuery
+            .Include(o => o.User)
             .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookAuthors).ThenInclude(ba => ba.Author)
             .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookGenres).ThenInclude(bg => bg.Genre);
 
@@ -63,11 +64,14 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
 
         var pagedOrderDtos = pagedOrders.ToPagedList(o => new GetAdminOrderDto
         {
+            OrderId = o.Id,
             OrderDate = o.OrderDate,
             OrderStatus = o.Status,
             OrderNumber = o.OrderNumber,
             OrderTotal = o.TotalAmount,
-            CustomerEmail = o.User!.Email!,
+            PyamentMethod = o.PaymentMethod,
+            PyamentStatus = o.PaymentStatus,
+            CustomerEmail = o.User != null ? o.User.Email ?? "N/A" : "N/A",
             OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
             {
                 BookId = oi.BookId,
@@ -81,4 +85,57 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
 
         return Ok(pagedOrderDtos);
     }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetOrders(int id)
+    {
+        var order = await context.Orders
+            .Include(o => o.User)
+            .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookAuthors).ThenInclude(ba => ba.Author)
+            .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookGenres).ThenInclude(bg => bg.Genre)
+            .AsNoTracking()
+            .Select(
+                o => new GetAdminOrderDto
+                {
+                    OrderId = o.Id,
+                    OrderDate = o.OrderDate,
+                    OrderStatus = o.Status,
+                    OrderNumber = o.OrderNumber,
+                    OrderTotal = o.TotalAmount,
+                    PyamentMethod = o.PaymentMethod,
+                    PyamentStatus = o.PaymentStatus,
+                    CustomerEmail = o.User != null ? o.User.Email ?? "N/A" : "N/A",
+                    OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
+                    {
+                        BookId = oi.BookId,
+                        BookTitle = oi.Book!.Title,
+                        UnitPrice = oi.UnitPrice,
+                        Quantity = oi.Quantity,
+                        Authors = oi.Book!.BookAuthors.Select(ba => ba.Author!.Name).ToList(),
+                        Genres = oi.Book.BookGenres.Select(bg => bg.Genre!.Name).ToList()
+                    })
+                }
+            ).SingleOrDefaultAsync(o => o.OrderId == id);
+        if (order is null)
+        {
+            throw new NotFoundException("Order not found");
+        }
+        return Ok(order);
+    }
+
+    [HttpPost("change-payment-status")]
+    public async Task<IActionResult> ChangePaymentStatus(ChangePaymentStatusDto paymentStatusDto)
+    {
+        Console.WriteLine($"\n\n=== orderId: {paymentStatusDto.OrderId}, paymentStatus: {paymentStatusDto.PaymentStatus} ===\n\n");
+
+        var order = await context.Orders.FindAsync(paymentStatusDto.OrderId) ?? throw new NotFoundException("Order not found");
+
+        order.PaymentStatus = paymentStatusDto.PaymentStatus!.Value;
+
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    // TODO: get orders have always pending status
+    // TODO: get user order method
 }

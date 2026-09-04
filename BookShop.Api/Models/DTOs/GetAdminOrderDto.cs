@@ -4,6 +4,7 @@ namespace BookShop.Api.Models.DTOs;
 
 public class GetAdminOrderDto
 {
+    public int OrderId { get; set; }
     public string CustomerEmail { get; set; } = null!;
     public string OrderNumber { get; set; } = null!;
     public DateTime OrderDate { get; set; }

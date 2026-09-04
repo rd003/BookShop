@@ -1,5 +1,21 @@
 @base_address = http://localhost:5288/api/admin/orders
-@accessToken = 
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFkbWluQGV4YW1wbGUuY29tIiwianRpIjoiODMzOGJhZmUtMTJjYS00OTFjLWJhYmEtYzA0YjRjOTA2ZWEwIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzg4NTA1Nzg1LCJleHAiOjE3ODg1MDY2ODUsImlhdCI6MTc4ODUwNTc4NSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzA4NCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQifQ._8h1nsG3rn7Nu_yQQNRenfbKUF0oX5KBpQ0_1HVL3Eo
 
+###
 GET {{base_address}}
 Authorization: Bearer {{accessToken}}
+
+### GET single order
+GET {{base_address}}/1
+Authorization: Bearer {{accessToken}}
+
+
+###
+POST {{base_address}}/change-payment-status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "OrderId":2,
+    "PaymentStatus":"paid"
+}
