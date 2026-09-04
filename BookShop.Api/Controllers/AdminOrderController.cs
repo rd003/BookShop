@@ -126,8 +126,6 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
     [HttpPost("change-payment-status")]
     public async Task<IActionResult> ChangePaymentStatus(ChangePaymentStatusDto paymentStatusDto)
     {
-        Console.WriteLine($"\n\n=== orderId: {paymentStatusDto.OrderId}, paymentStatus: {paymentStatusDto.PaymentStatus} ===\n\n");
-
         var order = await context.Orders.FindAsync(paymentStatusDto.OrderId) ?? throw new NotFoundException("Order not found");
 
         order.PaymentStatus = paymentStatusDto.PaymentStatus!.Value;
@@ -136,6 +134,15 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
         return NoContent();
     }
 
-    // TODO: get orders have always pending status
-    // TODO: get user order method
+    [HttpPost("change-order-status")]
+    public async Task<IActionResult> ChangeOrderStatus(ChangeOrderStatusDto orderStatusDto)
+    {
+        var order = await context.Orders.FindAsync(orderStatusDto.OrderId) ?? throw new NotFoundException("Order not found");
+
+        order.Status = orderStatusDto.OrderStatus!.Value;
+
+        await context.SaveChangesAsync();
+        return NoContent();
+    }
+
 }

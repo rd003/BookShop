@@ -6,7 +6,7 @@ GET {{base_address}}
 Authorization: Bearer {{accessToken}}
 
 ### GET single order
-GET {{base_address}}/1
+GET {{base_address}}/2
 Authorization: Bearer {{accessToken}}
 
 
@@ -18,4 +18,14 @@ Content-Type: application/json
 {
     "OrderId":2,
     "PaymentStatus":"paid"
+}
+
+###
+POST {{base_address}}/change-order-status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "OrderId":2,
+    "OrderStatus":"Confirmed"
 }
