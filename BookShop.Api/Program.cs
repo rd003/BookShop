@@ -26,6 +26,7 @@ builder.Services.AddTransient<SortHelper<Genre>>();
 builder.Services.AddTransient<SortHelper<Author>>();
 builder.Services.AddTransient<SortHelper<Publisher>>();
 builder.Services.AddTransient<SortHelper<Book>>();
+builder.Services.AddTransient<SortHelper<Order>>();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=Bookshop.db"));
 

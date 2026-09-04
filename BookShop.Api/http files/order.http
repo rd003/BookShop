@@ -1,5 +1,5 @@
 @base_address = http://localhost:5288/api/orders
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiI4MmE1ODE5NC0wZTcxLTRmMjAtOWVlMy01Y2ZiZTE5NzdlNzciLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODQzMzExNywiZXhwIjoxNzg4NDM0MDE3LCJpYXQiOjE3ODg0MzMxMTcsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.5-sE6hLdnlObLwq_MVxXEfN97Cjp2C5FdIHKQoi3HQM
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJqdGkiOiIwNDExNDI5NC05OWI3LTRiNWEtYmFjMC00NWE0NjliNWZhYTAiLCJyb2xlIjoiVXNlciIsIm5iZiI6MTc4ODQ5ODg5MywiZXhwIjoxNzg4NDk5NzkzLCJpYXQiOjE3ODg0OTg4OTMsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwODQiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0In0.Bh6hqbrNvS11rCT84buLsGpFXb4V7gwUyiK1czCCU_o
 
 ### Create order
 POST {{base_address}}
@@ -9,6 +9,10 @@ Authorization: Bearer {{accessToken}}
 {
     "shippingAddressId": 1
 }
+
+### Get orders
+GET {{base_address}}?pageNumber=1&pageSize=15&sortBy=&startingOrderDate&endingOrderDate
+Authorization: Bearer {{accessToken}}
 
 ### Get order
 GET {{base_address}}/ORD-20260903-64401
