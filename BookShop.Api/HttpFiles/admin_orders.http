@@ -1,0 +1,5 @@
+@base_address = http://localhost:5288/api/admin/orders
+@accessToken = 
+
+GET {{base_address}}
+Authorization: Bearer {{accessToken}}

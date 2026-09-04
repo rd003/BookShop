@@ -11,11 +11,18 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(o => o.TotalAmount).HasPrecision(10, 2);
         builder.Property(o => o.OrderNumber)
     .UseCollation("NOCASE");
+
         builder.HasIndex(o => o.OrderNumber)
                .IsUnique();
+
         builder.HasOne(o => o.ShippingAddress)
             .WithMany()
             .HasForeignKey(o => o.ShippingAddressId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(o => o.User)
+.WithMany()
+.HasForeignKey(o => o.UserId)
+.OnDelete(DeleteBehavior.Restrict);
     }
 }

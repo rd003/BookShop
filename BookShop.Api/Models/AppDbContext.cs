@@ -10,6 +10,27 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
 
     }
+    // In ApplicationDbContext
+
+    public override int SaveChanges()
+    {
+        UpdateTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimestamps()
+    {
+        foreach (var entry in ChangeTracker.Entries<EntityBase>().Where(e => e.State == EntityState.Modified))
+        {
+            entry.Entity.Updated = DateTime.UtcNow;
+        }
+    }
     public DbSet<TokenInfo> TokenInfos { get; set; }
     public DbSet<Author> Authors { get; set; }
     public DbSet<Genre> Genres { get; set; }

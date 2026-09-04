@@ -15,6 +15,6 @@ public class Order : EntityBase
 
     public int ShippingAddressId { get; set; }
     public Address? ShippingAddress { get; set; }
-
+    public ApplicationUser? User { get; set; }
     public List<OrderItem> OrderItems { get; set; } = [];
 }
