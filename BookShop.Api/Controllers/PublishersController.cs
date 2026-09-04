@@ -7,16 +7,15 @@ using BookShop.Api.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using BookShop.Api.Constants;
 
 namespace BookShop.Api.Controllers;
 
-// TODO: Protect the controler
-// [Publisherize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
 public class PublishersController(AppDbContext context, SortHelper<Publisher> sortHelper) : ControllerBase
 {
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetPublishers([FromQuery] QueryParameters queryParameters)
     {

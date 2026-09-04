@@ -11,8 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
-// TODO: Protect the controler
-// [Authorize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
 public class GenresController(AppDbContext context, SortHelper<Genre> sortHelper) : ControllerBase

@@ -1,3 +1,4 @@
+using BookShop.Api.Constants;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Helpers;
 using BookShop.Api.Mappers;
@@ -10,8 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
-// TODO: Protect the controler
-// [Authorize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
 public class AuthorsController(AppDbContext context, SortHelper<Author> sortHelper) : ControllerBase
@@ -62,6 +62,7 @@ public class AuthorsController(AppDbContext context, SortHelper<Author> sortHelp
         return NoContent();
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}", Name = nameof(GetAuthor))]
     public async Task<IActionResult> GetAuthor(int id)
     {

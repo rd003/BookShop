@@ -1,3 +1,4 @@
+using BookShop.Api.Constants;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Helpers;
 using BookShop.Api.Mappers;
@@ -10,8 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookShop.Api.Controllers;
 
-// TODO: Protect the controler
-// [Authorize(Roles = Roles.Admin)]
+[Authorize(Roles = Roles.Admin)]
 [ApiController]
 [Route("/api/[controller]")]
 public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) : ControllerBase
