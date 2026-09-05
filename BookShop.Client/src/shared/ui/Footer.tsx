@@ -9,17 +9,17 @@ const FOOTER_COLUMNS: FooterLink[] = [
         title: "Shop",
         links: [
             { label: "Catalog", href: "/" },
-            { label: "New Arrivals", href: "#" },
-            { label: "Bestsellers", href: "#" },
-            { label: "Gift Cards", href: "#" }
+            { label: "New Arrivals", href: "new-arrivals" },
+            { label: "Bestsellers", href: "best-sellers" },
+            { label: "Gift Cards", href: "gift-cards" }
         ],
     },
     {
         title: "Help",
         links: [
-            { label: "Track Order", href: "#" },
-            { label: "Returns", href: "#" },
-            { label: "Shipping Info", href: "#" },
+            { label: "Track Order", href: "track-order" },
+            { label: "Returns", href: "returns" },
+            { label: "Shipping Info", href: "shipping-info" },
             { label: "Contact Us", href: "/contact" }
         ]
     },

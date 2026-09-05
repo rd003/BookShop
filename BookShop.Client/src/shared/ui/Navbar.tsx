@@ -23,7 +23,7 @@ import type { LinkType } from "../types/LinkType";
 const NAV_LINKS: LinkType[] = [
     { label: "Catalog", href: "/" },
     { label: "About", href: "/about" },
-    { label: "New arrivals", href: "#" },
+    { label: "New arrivals", href: "new-arrivals" },
 ];
 
 // cartCount is a prop so the real app can wire it to actual cart state
