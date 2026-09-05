@@ -17,7 +17,7 @@ import {
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { NavLink, type NavLinkRenderProps } from "react-router-dom";
+import { Link, NavLink, type NavLinkRenderProps } from "react-router-dom";
 import type { LinkType } from "../types/LinkType";
 
 const NAV_LINKS: LinkType[] = [
@@ -112,13 +112,13 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                     </Button>
                 ) : (
                     <div className="hidden md:flex items-center gap-2 ml-2">
-                        <a href="/login"
+                        <Link to="/login"
                             className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
                         >
                             Login
-                        </a>
-                        <Button size="sm" className="bg-[#8A2E2E] hover:bg-[#732626]">
-                            <a href="/signup">Sign Up</a>
+                        </Link>
+                        <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]">
+                            Sign Up
                         </Button>
                     </div>
                 )}
