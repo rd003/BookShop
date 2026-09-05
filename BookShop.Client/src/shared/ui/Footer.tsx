@@ -1,19 +1,36 @@
 import { BookOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import type { FooterLink } from "../types/FooterLinks";
+import { Link } from "react-router-dom";
 
-const FOOTER_COLUMNS = [
+const FOOTER_COLUMNS: FooterLink[] = [
     {
         title: "Shop",
-        links: ["Catalog", "New Arrivals", "Bestsellers", "Gift Cards"],
+        links: [
+            { label: "Catalog", href: "/" },
+            { label: "New Arrivals", href: "#" },
+            { label: "Bestsellers", href: "#" },
+            { label: "Gift Cards", href: "#" }
+        ],
     },
     {
         title: "Help",
-        links: ["Track Order", "Returns", "Shipping Info", "Contact Us"],
+        links: [
+            { label: "Track Order", href: "#" },
+            { label: "Returns", href: "#" },
+            { label: "Shipping Info", href: "#" },
+            { label: "Contact Us", href: "/contact" }
+        ]
     },
     {
         title: "Company",
-        links: ["About", "Careers", "Terms of Service", "Privacy Policy"],
+        links: [
+            { label: "About", href: "/about" },
+            { label: "Careers", href: "/careers" },
+            { label: "Terms of Service", href: "/terms" },
+            { label: "Privacy Policy", href: "/privacy" },
+        ]
     },
 ];
 
@@ -55,13 +72,13 @@ export default function Footer() {
                             <h3 className="text-sm font-medium text-stone-900">{col.title}</h3>
                             <ul className="mt-3 space-y-2">
                                 {col.links.map((link) => (
-                                    <li key={link}>
-                                        <a
-                                            href="#"
+                                    <li key={link.label}>
+                                        <Link
+                                            to={link.href}
                                             className="text-sm text-stone-500 hover:text-stone-900 transition-colors"
                                         >
-                                            {link}
-                                        </a>
+                                            {link.label}
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

@@ -5,17 +5,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { X } from "lucide-react";
 
-// Replace MOCK_BOOKS with data from your GET /api/books endpoint.
-// Shape mirrors the multi-genre / multi-author model: genres and authors are arrays.
+const MOCK_BOOKS: any[] = [
+    { id: 1, title: "The Midnight Library", authors: ["Matt Haig"], genres: ["Fiction", "Fantasy"], price: 399, cover: "https://placehold.co/300x440?text=Book" },
+    { id: 2, title: "Sapiens", authors: ["Yuval Noah Harari"], genres: ["Non-Fiction", "History"], price: 549, cover: "https://placehold.co/300x440?text=Book" },
+    { id: 3, title: "Project Hail Mary", authors: ["Andy Weir"], genres: ["Sci-Fi", "Fiction"], price: 449, cover: "https://placehold.co/300x440?text=Book" },
+    { id: 4, title: "Good Omens", authors: ["Terry Pratchett", "Neil Gaiman"], genres: ["Fantasy", "Comedy"], price: 375, cover: "https://placehold.co/300x440?text=Book" },
+    { id: 5, title: "Atomic Habits", authors: ["James Clear"], genres: ["Non-Fiction", "Self-Help"], price: 425, cover: "https://placehold.co/300x440?text=Book" },
+    { id: 6, title: "Dune", authors: ["Frank Herbert"], genres: ["Sci-Fi"], price: 499, cover: "https://placehold.co/300x440?text=Book" },
+];
 
 
 function getAllGenres(books: any) {
     return [...new Set(books.flatMap((b: any) => b.genres))].sort();
 }
 
-export default function BookCatalog({ books, onAddToCart }: { books: any[], onAddToCart?: (book: any) => void }) {
+export default function Books() {
+    const books: any[] = MOCK_BOOKS;
     const allGenres: any = useMemo(() => getAllGenres(books), [books]);
     const [selectedGenres, setSelectedGenres] = useState<any[]>([]);
+
+    function onAddToCart(book: any) {
+
+    }
 
     function toggleGenre(genre: any) {
         setSelectedGenres((prev: any) =>

@@ -1,22 +1,34 @@
-import BookCatalog from "./books/BookCatalog";
-import Footer from "./shared/ui/Footer";
-import Navbar from "./shared/ui/Navbar";
+import { Route, Routes } from "react-router-dom";
+import Books from "./books/Books";
+import NotFound from "./pages/NotFound";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Careers from "./pages/Careers";
+import TermsOfService from "./pages/TermsOfService";
+import About from "./pages/About";
+import ContactUs from "./pages/ContactUs";
+import Layout from "./shared/ui/Layout";
 
 export function App() {
-  const MOCK_BOOKS: any[] = [
-    { id: 1, title: "The Midnight Library", authors: ["Matt Haig"], genres: ["Fiction", "Fantasy"], price: 399, cover: "https://placehold.co/300x440?text=Book" },
-    { id: 2, title: "Sapiens", authors: ["Yuval Noah Harari"], genres: ["Non-Fiction", "History"], price: 549, cover: "https://placehold.co/300x440?text=Book" },
-    { id: 3, title: "Project Hail Mary", authors: ["Andy Weir"], genres: ["Sci-Fi", "Fiction"], price: 449, cover: "https://placehold.co/300x440?text=Book" },
-    { id: 4, title: "Good Omens", authors: ["Terry Pratchett", "Neil Gaiman"], genres: ["Fantasy", "Comedy"], price: 375, cover: "https://placehold.co/300x440?text=Book" },
-    { id: 5, title: "Atomic Habits", authors: ["James Clear"], genres: ["Non-Fiction", "Self-Help"], price: 425, cover: "https://placehold.co/300x440?text=Book" },
-    { id: 6, title: "Dune", authors: ["Frank Herbert"], genres: ["Sci-Fi"], price: 499, cover: "https://placehold.co/300x440?text=Book" },
-  ];
-
   return (
     <>
-      <Navbar />
-      <BookCatalog books={MOCK_BOOKS} />
-      <Footer />
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Books />} />
+          <Route path="login" element={<Signup />} />
+          <Route path="signup" element={<Login />} />
+          <Route path="privacy" element={<PrivacyPolicy />} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="careers" element={<Careers />} />
+          <Route path="terms" element={<TermsOfService />} />
+          <Route path="about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+
+      </Routes>
+
+
     </>
   )
 }

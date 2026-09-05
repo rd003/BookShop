@@ -17,18 +17,22 @@ import {
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { NavLink, type NavLinkRenderProps } from "react-router-dom";
+import type { LinkType } from "../types/LinkType";
 
-const NAV_LINKS = [
-    { label: "Catalog", href: "/catalog" },
-    { label: "New Arrivals", href: "/new-arrivals" },
-    { label: "Bestsellers", href: "/bestsellers" },
-    { label: "Orders", href: "/orders" },
+const NAV_LINKS: LinkType[] = [
+    { label: "Catalog", href: "/" },
+    { label: "About", href: "/about" },
+    { label: "New arrivals", href: "#" },
 ];
 
 // cartCount is a prop so the real app can wire it to actual cart state
 export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
     const [query, setQuery] = useState("");
     const { theme, setTheme } = useTheme();
+
+    const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
+        `${base} ${isActive ? "text-stone-900 font-medium" : "text-stone-600"}`;
 
     function handleSearchSubmit(e: React.SubmitEvent) {
         e.preventDefault();
@@ -39,23 +43,23 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
         <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#FBF8F3]/95 backdrop-blur">
             <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
                 {/* Logo */}
-                <a href="/" className="flex items-center gap-2 shrink-0">
+                <NavLink to="/" className="flex items-center gap-2 shrink-0">
                     <BookOpen className="h-6 w-6 text-[#8A2E2E]" strokeWidth={1.75} />
                     <span className="font-serif text-lg tracking-tight text-stone-900">
                         Chapter & Verse
                     </span>
-                </a>
+                </NavLink>
 
                 {/* Desktop nav links */}
                 <nav className="hidden md:flex items-center gap-6 ml-4">
                     {NAV_LINKS.map((link) => (
-                        <a
+                        <NavLink
                             key={link.href}
-                            href={link.href}
-                            className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
+                            to={link.href}
+                            className={navLinkClass("text-sm hover:text-stone-900 transition-colors")}
                         >
                             {link.label}
-                        </a>
+                        </NavLink>
                     ))}
                 </nav>
 
@@ -154,13 +158,13 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                                 />
                             </form>
                             {NAV_LINKS.map((link) => (
-                                <a
+                                <NavLink
                                     key={link.href}
-                                    href={link.href}
-                                    className="text-base text-stone-700 hover:text-stone-900"
+                                    to={link.href}
+                                    className={navLinkClass("text-base hover:text-stone-900")}
                                 >
                                     {link.label}
-                                </a>
+                                </NavLink>
                             ))}
                         </div>
                     </SheetContent>
