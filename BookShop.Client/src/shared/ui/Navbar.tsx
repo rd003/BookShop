@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Moon, Monitor } from "lucide-react";
-import { useTheme } from "@/components/theme-provider"; // adjust path to wherever ThemeProvider.tsx lives
+import { useTheme } from "@/components/theme-provider";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { User } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -26,7 +26,7 @@ const NAV_LINKS = [
 ];
 
 // cartCount is a prop so the real app can wire it to actual cart state
-export default function Navbar({ cartCount = 0 }) {
+export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
     const [query, setQuery] = useState("");
     const { theme, setTheme } = useTheme();
 
@@ -72,6 +72,8 @@ export default function Navbar({ cartCount = 0 }) {
                         className="pl-9 bg-white"
                     />
                 </form>
+
+                {/* Theme button */}
                 <DropdownMenu>
                     <DropdownMenuTrigger>
                         <Button variant="ghost" size="icon" aria-label="Toggle theme">
@@ -96,6 +98,28 @@ export default function Navbar({ cartCount = 0 }) {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* login/signup */}
+                {isLoggedIn ? (
+                    <Button variant="ghost" size="icon" aria-label="Account">
+                        <a href="/account">
+                            <User className="h-5 w-5 text-stone-700" />
+                        </a>
+                    </Button>
+                ) : (
+                    <div className="hidden md:flex items-center gap-2 ml-2">
+                        <a href="/login"
+                            className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
+                        >
+                            Login
+                        </a>
+                        <Button size="sm" className="bg-[#8A2E2E] hover:bg-[#732626]">
+                            <a href="/signup">Sign Up</a>
+                        </Button>
+                    </div>
+                )}
+
+
                 {/* Cart */}
                 <Button
                     variant="ghost"
@@ -142,6 +166,6 @@ export default function Navbar({ cartCount = 0 }) {
                     </SheetContent>
                 </Sheet>
             </div>
-        </header>
+        </header >
     );
 }
