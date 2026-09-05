@@ -9,6 +9,7 @@ import TermsOfService from "./pages/TermsOfService";
 import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 import Layout from "./shared/ui/Layout";
+import Cart from "./cart/Cart";
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
           <Route path="careers" element={<Careers />} />
           <Route path="terms" element={<TermsOfService />} />
           <Route path="about" element={<About />} />
+          <Route path="cart" element={<Cart />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 

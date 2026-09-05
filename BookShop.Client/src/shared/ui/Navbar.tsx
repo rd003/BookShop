@@ -130,6 +130,7 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                     size="icon"
                     className="relative ml-auto md:ml-2"
                     aria-label="Cart"
+                    render={<Link to="/cart" />}
                 >
                     <ShoppingCart className="h-5 w-5 text-stone-700" />
                     {cartCount > 0 && (
