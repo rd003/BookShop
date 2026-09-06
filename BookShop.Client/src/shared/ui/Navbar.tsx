@@ -79,16 +79,15 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
 
                 {/* Theme button */}
                 <DropdownMenu>
-                    <DropdownMenuTrigger>
-                        <Button variant="ghost" size="icon" aria-label="Toggle theme">
-                            {theme === "dark" ? (
-                                <Moon className="h-5 w-5 text-stone-700" />
-                            ) : theme === "light" ? (
-                                <Sun className="h-5 w-5 text-stone-700" />
-                            ) : (
-                                <Monitor className="h-5 w-5 text-stone-700" />
-                            )}
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon" aria-label="Toggle theme">
+                        {theme === "dark" ? (
+                            <Moon className="h-5 w-5 text-stone-700" />
+                        ) : theme === "light" ? (
+                            <Sun className="h-5 w-5 text-stone-700" />
+                        ) : (
+                            <Monitor className="h-5 w-5 text-stone-700" />
+                        )}
+                    </Button>}>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setTheme("light")}>
@@ -105,10 +104,8 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
 
                 {/* login/signup */}
                 {isLoggedIn ? (
-                    <Button variant="ghost" size="icon" aria-label="Account">
-                        <a href="/account">
-                            <User className="h-5 w-5 text-stone-700" />
-                        </a>
+                    <Button render={<Link to="/account" />} variant="ghost" size="icon" aria-label="Account" nativeButton={false}>
+                        <User className="h-5 w-5 text-stone-700" />
                     </Button>
                 ) : (
                     <div className="hidden md:flex items-center gap-2 ml-2">
@@ -117,7 +114,7 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                         >
                             Login
                         </Link>
-                        <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]">
+                        <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]" nativeButton={false}>
                             Sign Up
                         </Button>
                     </div>
@@ -130,6 +127,7 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                     size="icon"
                     className="relative ml-auto md:ml-2"
                     aria-label="Cart"
+                    nativeButton={false}
                     render={<Link to="/cart" />}
                 >
                     <ShoppingCart className="h-5 w-5 text-stone-700" />
@@ -142,10 +140,10 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
 
                 {/* Mobile menu */}
                 <Sheet>
-                    <SheetTrigger>
-                        <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
-                            <Menu className="h-5 w-5" />
-                        </Button>
+                    <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+                        <Menu className="h-5 w-5" />
+                    </Button>}>
+
                     </SheetTrigger>
                     <SheetContent side="right" className="bg-[#FBF8F3]">
                         <div className="mt-8 flex flex-col gap-4">
