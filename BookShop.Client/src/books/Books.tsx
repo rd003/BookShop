@@ -10,6 +10,7 @@ import type { ReadBook } from "./types/readBook";
 import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import { getGenres } from "@/genres/genreApi";
+import { useSearchParams } from "react-router-dom";
 
 export default function Books() {
     const { data: genreData, status: genreStatus, error: genreError, isFetching: isGenreFetching } = useQuery<PagedList<ReadGenre>, Error>({
@@ -22,10 +23,11 @@ export default function Books() {
     const allGenres = genreData?.items ?? [];
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
     const genreIds = selectedGenres.map(g => g.id);
-
-    const bookQueryParam = { pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' };
+    const [searchParams] = useSearchParams();
+    const searchTerm = searchParams.get('search') ?? '';
+    const bookQueryParam = { pageNumber: 1, pageSize: 1000, searchTerm, sortBy: '' };
     const { data, status, error, isFetching } = useQuery<PagedList<ReadBook>, Error>({
-        queryKey: ['books', genreIds],
+        queryKey: ['books', bookQueryParam, genreIds],
         queryFn: () => fetchBooks(bookQueryParam, genreIds),
         staleTime: 30_000,
         gcTime: 5 * 60_000

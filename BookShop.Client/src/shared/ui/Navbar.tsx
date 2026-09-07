@@ -17,7 +17,7 @@ import {
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { Link, NavLink, type NavLinkRenderProps } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate, useSearchParams, type NavLinkRenderProps } from "react-router-dom";
 import type { LinkType } from "../types/LinkType";
 
 const NAV_LINKS: LinkType[] = [
@@ -28,15 +28,20 @@ const NAV_LINKS: LinkType[] = [
 
 // cartCount is a prop so the real app can wire it to actual cart state
 export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
-    const [query, setQuery] = useState("");
+    const [searchParams] = useSearchParams();
+    const [query, setQuery] = useState(searchParams.get('search') ?? '');
     const { theme, setTheme } = useTheme();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
         `${base} ${isActive ? "text-stone-900 font-medium" : "text-stone-600"}`;
 
     function handleSearchSubmit(e: React.SubmitEvent) {
         e.preventDefault();
-        console.log("search:", query);
+        const params = new URLSearchParams(location.search);
+        query ? params.set('search', query) : params.delete('search');
+        navigate({ pathname: '/catalog', search: params.toString() });
     }
 
     return (
