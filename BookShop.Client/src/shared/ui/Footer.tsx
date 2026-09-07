@@ -8,7 +8,7 @@ const FOOTER_COLUMNS: FooterLink[] = [
     {
         title: "Shop",
         links: [
-            { label: "Catalog", href: "/" },
+            { label: "Catalog", href: "/catalog" },
             { label: "New Arrivals", href: "new-arrivals" },
             { label: "Bestsellers", href: "best-sellers" },
             { label: "Gift Cards", href: "gift-cards" }

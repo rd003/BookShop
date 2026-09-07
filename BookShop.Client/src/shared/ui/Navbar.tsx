@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Search, ShoppingCart, Menu, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import { Link, NavLink, useLocation, useNavigate, useSearchParams, type NavLinkR
 import type { LinkType } from "../types/LinkType";
 
 const NAV_LINKS: LinkType[] = [
-    { label: "Catalog", href: "/" },
+    { label: "Catalog", href: "/catalog" },
     { label: "About", href: "/about" },
     { label: "New arrivals", href: "new-arrivals" },
 ];
@@ -33,6 +33,23 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
+
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false; // skip the redundant navigate on initial mount
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            const params = new URLSearchParams(location.search);
+            query ? params.set('search', query) : params.delete('search');
+            navigate({ pathname: '/catalog', search: params.toString() }, { replace: true });
+        }, 400); // debounce delay
+
+        return () => clearTimeout(timeoutId); // cancel if user types again before delay elapses
+    }, [query]);
 
     const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
         `${base} ${isActive ? "text-stone-900 font-medium" : "text-stone-600"}`;
