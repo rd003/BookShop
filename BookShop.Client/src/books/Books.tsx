@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,22 +9,27 @@ import type { PagedList } from "@/shared/types/pagedList";
 import type { ReadBook } from "./types/readBook";
 import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
+import { getGenres } from "@/genres/genreApi";
 
 export default function Books() {
-    const { data, status, error, isFetching, refetch } = useQuery<PagedList<ReadBook>, Error>({
+    const { data, status, error, isFetching } = useQuery<PagedList<ReadBook>, Error>({
         queryKey: ['books'],
         queryFn: () => fetchBooks({ pageNumber: 1, pageSize: 10, searchTerm: '', sortBy: '' }),
         staleTime: 30_000,
         gcTime: 5 * 60_000
     });
 
+    const { data: genreData, status: genreStatus, error: genreError, isFetching: isGenreFetching } = useQuery<PagedList<ReadGenre>, Error>({
+        queryKey: ['genres'],
+        queryFn: () => getGenres({ pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' }),
+        staleTime: 30_000,
+        gcTime: 5 * 60_000
+    });
+
     const books: ReadBook[] = data?.items ?? [];
 
-    const allGenres: ReadGenre[] = [
-        { id: 1, name: "Fiction" },
-        { id: 2, name: "Sci-Fi" },
-        { id: 3, name: "Action" },
-    ];
+    const allGenres = genreData?.items ?? [];
+
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
 
     function onAddToCart(book: any) {
