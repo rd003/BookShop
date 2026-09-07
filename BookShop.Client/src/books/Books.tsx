@@ -12,13 +12,6 @@ import type { ReadGenre } from "@/genres/types/readGenre";
 import { getGenres } from "@/genres/genreApi";
 
 export default function Books() {
-    const { data, status, error, isFetching } = useQuery<PagedList<ReadBook>, Error>({
-        queryKey: ['books'],
-        queryFn: () => fetchBooks({ pageNumber: 1, pageSize: 10, searchTerm: '', sortBy: '' }),
-        staleTime: 30_000,
-        gcTime: 5 * 60_000
-    });
-
     const { data: genreData, status: genreStatus, error: genreError, isFetching: isGenreFetching } = useQuery<PagedList<ReadGenre>, Error>({
         queryKey: ['genres'],
         queryFn: () => getGenres({ pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' }),
@@ -26,18 +19,25 @@ export default function Books() {
         gcTime: 5 * 60_000
     });
 
+    const allGenres = genreData?.items ?? [];
+    const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
+    const genreIds = selectedGenres.map(g => g.id);
+
+    const bookQueryParam = { pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' };
+    const { data, status, error, isFetching } = useQuery<PagedList<ReadBook>, Error>({
+        queryKey: ['books', genreIds],
+        queryFn: () => fetchBooks(bookQueryParam, genreIds),
+        staleTime: 30_000,
+        gcTime: 5 * 60_000
+    });
     const books: ReadBook[] = data?.items ?? [];
 
-    const allGenres = genreData?.items ?? [];
-
-    const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
-
     function onAddToCart(book: any) {
-
     }
 
     function toggleGenre(genre: ReadGenre) {
-        console.log(genre);
+        setSelectedGenres(prev => prev.some(g => g.id === genre.id) ? prev.filter(g => g.id !== genre.id) : [...prev, genre]);
+
     }
 
     function clearFilters() {
