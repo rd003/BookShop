@@ -31,7 +31,6 @@ export default function Books() {
     const { data,
         status,
         error,
-        isFetching,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage } = useInfiniteQuery<PagedList<ReadBook>, Error>({
