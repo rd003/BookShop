@@ -5,6 +5,7 @@ import GenreSidebar from "./GenreSidebar";
 import BookGrid from "./BookGrid";
 import useGenreQuery from "./hooks/useGenreQuery";
 import { useBooksQuery } from "./hooks/useBooksQuery";
+import { useInfiniteScroll } from "./hooks/useInfinitScroll";
 
 export default function Books() {
     const { allGenres, genreError, genreStatus } = useGenreQuery();
@@ -22,24 +23,7 @@ export default function Books() {
         hasNextPage,
         isFetchingNextPage } = useBooksQuery(searchTerm, genreIds);
 
-    const loadMoreRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const el = loadMoreRef.current;
-        if (!el) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                }
-            },
-            { threshold: 1.0 }
-        );
-
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+    const loadMoreRef = useInfiniteScroll({ hasNextPage, isFetchingNextPage, fetchNextPage });
 
     function handleAddToCart(bookId: number) {
         console.log(bookId);
