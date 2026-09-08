@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 
-import { X } from "lucide-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { PagedList } from "@/shared/types/pagedList";
 import type { ReadBook } from "./types/readBook";
@@ -10,9 +8,10 @@ import type { ReadGenre } from "@/genres/types/readGenre";
 import { getGenres } from "@/genres/genreApi";
 import { useSearchParams } from "react-router-dom";
 import BookList from "./BookList";
+import GenreSidebar from "./GenreSidebar";
 
 export default function Books() {
-    const { data: genreData, status: genreStatus, error: genreError, isFetching: isGenreFetching } = useQuery<PagedList<ReadGenre>, Error>({
+    const { data: genreData, status: genreStatus, error: genreError } = useQuery<PagedList<ReadGenre>, Error>({
         queryKey: ['genres'],
         queryFn: () => getGenres({ pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' }),
         staleTime: 30_000,
@@ -77,42 +76,14 @@ export default function Books() {
         <div className="mx-auto max-w-6xl px-4 py-10">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr]">
                 {/* Genre filter sidebar */}
-                <aside>
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-sm font-medium text-stone-900">Genres</h2>
-                        {selectedGenres.length > 0 && (
-                            <button
-                                onClick={clearFilters}
-                                className="text-xs text-stone-400 hover:text-stone-700 flex items-center gap-1"
-                            >
-                                <X className="h-3 w-3" /> Clear
-                            </button>
-                        )}
-                    </div>
-
-                    {/* genres */}
-                    {genreStatus === 'pending' && <p className="text-xs text-stone-400">Loading genres...</p>}
-
-                    {genreStatus === 'error' && <p className="text-xs text-red-500">{genreError?.message}</p>}
-
-                    <ul className="mt-3 space-y-2">
-                        {allGenres.map((genre: ReadGenre) => (
-                            <li key={genre.id} className="flex items-center gap-2">
-                                <Checkbox
-                                    id={`genre-${genre.id}`}
-                                    checked={selectedGenres.some((g) => g.id === genre.id)}
-                                    onCheckedChange={() => toggleGenre(genre)}
-                                />
-                                <label
-                                    htmlFor={`genre-${genre.id}`}
-                                    className="text-sm text-stone-600 cursor-pointer select-none"
-                                >
-                                    {genre.name}
-                                </label>
-                            </li>
-                        ))}
-                    </ul>
-                </aside>
+                <GenreSidebar
+                    allGenres={allGenres}
+                    genreStatus={genreStatus}
+                    genreError={genreError}
+                    selectedGenres={selectedGenres}
+                    onToggleGenre={toggleGenre}
+                    onClearFilters={clearFilters}
+                />
 
                 {/* Book grid */}
                 {status === 'pending' && <p className="text-sm text-stone-500 py-12 text-center">Loading books...</p>}
