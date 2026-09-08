@@ -1,14 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
-import { useInfiniteQuery } from "@tanstack/react-query";
-import type { PagedList } from "@/shared/types/pagedList";
-import type { ReadBook } from "./types/readBook";
-import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import { useSearchParams } from "react-router-dom";
 import GenreSidebar from "./GenreSidebar";
 import BookGrid from "./BookGrid";
 import useGenreQuery from "./hooks/useGenreQuery";
+import { useBooksQuery } from "./hooks/useBooksQuery";
 
 export default function Books() {
     const { allGenres, genreError, genreStatus } = useGenreQuery();
@@ -18,22 +14,13 @@ export default function Books() {
 
     const [searchParams] = useSearchParams();
     const searchTerm = searchParams.get('search') ?? '';
-    const bookQueryParam = { pageNumber: 1, pageSize: 2, searchTerm, sortBy: '' };
 
-    const { data,
+    const { books,
         status,
         error,
         fetchNextPage,
         hasNextPage,
-        isFetchingNextPage } = useInfiniteQuery<PagedList<ReadBook>, Error>({
-            queryKey: ['books', bookQueryParam, genreIds],
-            queryFn: ({ pageParam }) => fetchBooks({ ...bookQueryParam, pageNumber: pageParam as number }, genreIds),
-            initialPageParam: 1,
-            getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.pageNumber + 1 : undefined,
-            staleTime: 30_000,
-            gcTime: 5 * 60_000
-        });
-    const books: ReadBook[] = data?.pages.flatMap(page => page.items) ?? [];
+        isFetchingNextPage } = useBooksQuery(searchTerm, genreIds);
 
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
