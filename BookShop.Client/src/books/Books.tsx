@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+
 import { X } from "lucide-react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { PagedList } from "@/shared/types/pagedList";
@@ -11,6 +9,7 @@ import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import { getGenres } from "@/genres/genreApi";
 import { useSearchParams } from "react-router-dom";
+import BookList from "./BookList";
 
 export default function Books() {
     const { data: genreData, status: genreStatus, error: genreError, isFetching: isGenreFetching } = useQuery<PagedList<ReadGenre>, Error>({
@@ -62,7 +61,8 @@ export default function Books() {
         return () => observer.disconnect();
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    function onAddToCart(book: any) {
+    function handAddToCart(bookId: number) {
+        console.log(bookId);
     }
 
     function toggleGenre(genre: ReadGenre) {
@@ -133,44 +133,7 @@ export default function Books() {
                     ) : (
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
                             {books.map((book: ReadBook) => (
-                                <Card key={book.id} className="overflow-hidden border-stone-200 py-0 gap-0">
-                                    <img
-                                        src={book.coverImageUrl || "https://placehold.co/300x440?text=Book"}
-                                        alt={book.title}
-                                        className="h-56 w-full object-cover"
-                                    />
-                                    <CardContent className="p-3">
-                                        <h3 className="text-sm font-medium text-stone-900 line-clamp-2">
-                                            {book.title}
-                                        </h3>
-                                        <p className="text-xs text-stone-500 mt-0.5">
-                                            {book.authors.map((a) => a.name).join(", ")}
-                                        </p>
-                                        <div className="mt-2 flex flex-wrap gap-1">
-                                            {book.genres.map((g: ReadGenre) => (
-                                                <Badge
-                                                    key={g.id}
-                                                    variant="secondary"
-                                                    className="text-[10px] bg-stone-100 text-stone-600"
-                                                >
-                                                    {g.name}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="flex items-center justify-between p-3 pt-0">
-                                        <span className="text-sm font-medium text-stone-900">
-                                            ₹{book.price}
-                                        </span>
-                                        <Button
-                                            size="sm"
-                                            className="bg-[#8A2E2E] hover:bg-[#732626]"
-                                            onClick={() => onAddToCart?.(book)}
-                                        >
-                                            Add
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
+                                <BookList key={book.id} book={book} onAddToCart={handAddToCart} />
                             ))}
                         </div>
 
