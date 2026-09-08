@@ -5,7 +5,7 @@ import type { QueryParameters } from "@/shared/types/queryParameters";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/books";
 
 export async function fetchBooks(queryParams: QueryParameters, genreIds: number[]): Promise<PagedList<ReadBook>> {
-    let url = `${BASE_URL}?pageSize=${queryParams.pageSize}&pagNumber=${queryParams.pageNumber}&searchTerm=${queryParams.searchTerm}&sortBy=${queryParams.sortBy}`;
+    let url = `${BASE_URL}?pageSize=${queryParams.pageSize}&pageNumber=${queryParams.pageNumber}&searchTerm=${queryParams.searchTerm}&sortBy=${queryParams.sortBy}`;
     for (let genreId of genreIds) {
         url += `&genreIds=${genreId}`;
     }
