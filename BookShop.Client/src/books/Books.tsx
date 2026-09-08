@@ -1,24 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import type { PagedList } from "@/shared/types/pagedList";
 import type { ReadBook } from "./types/readBook";
 import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
-import { getGenres } from "@/genres/genreApi";
 import { useSearchParams } from "react-router-dom";
 import GenreSidebar from "./GenreSidebar";
 import BookGrid from "./BookGrid";
+import useGenreQuery from "./hooks/useGenreQuery";
 
 export default function Books() {
-    const { data: genreData, status: genreStatus, error: genreError } = useQuery<PagedList<ReadGenre>, Error>({
-        queryKey: ['genres'],
-        queryFn: () => getGenres({ pageNumber: 1, pageSize: 1000, searchTerm: '', sortBy: '' }),
-        staleTime: 30_000,
-        gcTime: 5 * 60_000
-    });
+    const { allGenres, genreError, genreStatus } = useGenreQuery();
 
-    const allGenres = genreData?.items ?? [];
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
     const genreIds = selectedGenres.map(g => g.id);
 
