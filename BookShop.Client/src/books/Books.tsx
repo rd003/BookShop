@@ -7,8 +7,8 @@ import { fetchBooks } from "./booksApi";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import { getGenres } from "@/genres/genreApi";
 import { useSearchParams } from "react-router-dom";
-import BookList from "./BookList";
 import GenreSidebar from "./GenreSidebar";
+import BookGrid from "./BookGrid";
 
 export default function Books() {
     const { data: genreData, status: genreStatus, error: genreError } = useQuery<PagedList<ReadGenre>, Error>({
@@ -60,7 +60,7 @@ export default function Books() {
         return () => observer.disconnect();
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    function handAddToCart(bookId: number) {
+    function handleAddToCart(bookId: number) {
         console.log(bookId);
     }
 
@@ -75,7 +75,6 @@ export default function Books() {
     return (
         <div className="mx-auto max-w-6xl px-4 py-10">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr]">
-                {/* Genre filter sidebar */}
                 <GenreSidebar
                     allGenres={allGenres}
                     genreStatus={genreStatus}
@@ -85,31 +84,12 @@ export default function Books() {
                     onClearFilters={clearFilters}
                 />
 
-                {/* Book grid */}
-                {status === 'pending' && <p className="text-sm text-stone-500 py-12 text-center">Loading books...</p>}
-
-                {status === 'error' && <p className="text-sm text-red-500 py-12 text-center">{error?.message}</p>}
-
-                <section>
-                    <div className="mb-4 flex items-center justify-between">
-                        <p className="text-sm text-stone-500">
-                            {books.length} {books.length === 1 ? "book" : "books"}
-                        </p>
-                    </div>
-
-                    {books.length === 0 ? (
-                        <p className="text-sm text-stone-500 py-12 text-center">
-                            No books match the selected genres.
-                        </p>
-                    ) : (
-                        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
-                            {books.map((book: ReadBook) => (
-                                <BookList key={book.id} book={book} onAddToCart={handAddToCart} />
-                            ))}
-                        </div>
-
-                    )}
-                </section>
+                <BookGrid
+                    books={books}
+                    status={status}
+                    error={error}
+                    onAddToCart={handleAddToCart}
+                />
             </div>
             <div ref={loadMoreRef} className="h-1" />
             {isFetchingNextPage && (
