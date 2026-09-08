@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { X } from "lucide-react";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { PagedList } from "@/shared/types/pagedList";
 import type { ReadBook } from "./types/readBook";
 import { fetchBooks } from "./booksApi";
@@ -90,6 +90,12 @@ export default function Books() {
                             </button>
                         )}
                     </div>
+
+                    {/* genres */}
+                    {genreStatus === 'pending' && <p className="text-xs text-stone-400">Loading genres...</p>}
+
+                    {genreStatus === 'error' && <p className="text-xs text-red-500">{genreError?.message}</p>}
+
                     <ul className="mt-3 space-y-2">
                         {allGenres.map((genre: ReadGenre) => (
                             <li key={genre.id} className="flex items-center gap-2">
@@ -110,6 +116,10 @@ export default function Books() {
                 </aside>
 
                 {/* Book grid */}
+                {status === 'pending' && <p className="text-sm text-stone-500 py-12 text-center">Loading books...</p>}
+
+                {status === 'error' && <p className="text-sm text-red-500 py-12 text-center">{error?.message}</p>}
+
                 <section>
                     <div className="mb-4 flex items-center justify-between">
                         <p className="text-sm text-stone-500">
