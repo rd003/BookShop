@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import Books from "./books/Books";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
-import Login from "./pages/Login";
+import Login from "./auth/Login";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Careers from "./pages/Careers";
 import TermsOfService from "./pages/TermsOfService";

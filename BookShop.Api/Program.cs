@@ -87,8 +87,9 @@ builder.Services.AddCors(options =>
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins("http://localhost:5173").
-                AllowCredentials(). //for cookie
-                AllowAnyMethod().WithExposedHeaders("X-Pagination");
+                AllowCredentials() //for cookie
+                .AllowAnyMethod()
+                .WithHeaders("Content-Type", "Accept");
             });
         });
 var app = builder.Build();
