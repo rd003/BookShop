@@ -1,26 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Search, ShoppingCart, Menu, BookOpen } from "lucide-react";
+import { ShoppingCart, Menu, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { User } from "lucide-react";
 import {
     Sheet,
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { Link, NavLink, useLocation, useNavigate, useSearchParams, type NavLinkRenderProps } from "react-router-dom";
+import { Link, NavLink, type NavLinkRenderProps } from "react-router-dom";
 import type { LinkType } from "../types/LinkType";
 import { useUser } from "@/auth/hooks/useUser";
 import SearchBar from "../components/SearchBar";
+import ThemeToggle from "../components/ThemeToggle";
 
 const NAV_LINKS: LinkType[] = [
     { label: "Catalog", href: "/catalog" },
@@ -31,7 +23,6 @@ const NAV_LINKS: LinkType[] = [
 // cartCount is a prop so the real app can wire it to actual cart state
 export default function Navbar() {
     const cartCount = 0;
-    const { theme, setTheme } = useTheme();
     const { data: user, isLoading: isUserLoading } = useUser();
 
     const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
@@ -67,29 +58,7 @@ export default function Navbar() {
                 <SearchBar className="hidden md:flex flex-1 max-w-sm ml-auto relative" />
 
                 {/* Theme button */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon" aria-label="Toggle theme">
-                        {theme === "dark" ? (
-                            <Moon className="h-5 w-5 text-stone-700" />
-                        ) : theme === "light" ? (
-                            <Sun className="h-5 w-5 text-stone-700" />
-                        ) : (
-                            <Monitor className="h-5 w-5 text-stone-700" />
-                        )}
-                    </Button>}>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setTheme("light")}>
-                            <Sun className="mr-2 h-4 w-4" /> Light
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("dark")}>
-                            <Moon className="mr-2 h-4 w-4" /> Dark
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("system")}>
-                            <Monitor className="mr-2 h-4 w-4" /> System
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <ThemeToggle />
 
                 {/* login/signup */}
                 {!isUserLoading && (
