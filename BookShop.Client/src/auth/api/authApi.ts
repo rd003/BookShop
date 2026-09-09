@@ -18,3 +18,8 @@ export async function login(loginReq: LoginRequest) {
     }
     return res.json();
 }
+
+export function getUserInfo() {
+    const url = baseUrl + "/me";
+    // i will work on this later.
+}
