@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
-import { login } from './api/authApi';
+import { login, getUserInfo } from './api/authApi';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+// Login.tsx — add these imports at top, alongside existing ones
+import { useNavigate } from "react-router-dom";
+import { useQueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const schema = z.object({
     username: z.string()
@@ -21,10 +24,22 @@ export default function Login() {
         resolver: zodResolver(schema),
         mode: 'onChange'
     })
+
     const onFormSubmit: SubmitHandler<IFormInput> = (data) => {
         login(data);
         reset();
     }
+
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const loginMutation = useMutation({
+        mutationFn: login,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+            navigate('/');
+        }
+    })
 
     return (
         <div className="flex min-h-[80vh] items-center justify-center bg-[#FBF8F3] px-4 py-4">
