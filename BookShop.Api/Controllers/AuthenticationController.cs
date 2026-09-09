@@ -214,7 +214,6 @@ public class AuthenticationController : ControllerBase
 
         // also sending it as a response, because cookie don't work with mobile app clients
         return Ok(newTokenData);
-
     }
 
     [HttpPost("token/revoke")]

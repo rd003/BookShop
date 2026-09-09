@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
-import { login, getUserInfo } from './api/authApi';
+import { login } from './api/authApi';
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -61,6 +61,7 @@ export default function Login() {
                             id="username"
                             name="username"
                             type="text"
+                            value="john@example.com"
                             placeholder="you@example.com"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
@@ -77,8 +78,10 @@ export default function Login() {
                                 Forgot password?
                             </Link>
                         </div>
+                        {/* TODO: remove value of username and password after testing */}
                         <input
                             {...register("password")}
+                            value="John@123"
                             id="password"
                             name="password"
                             type="password"
