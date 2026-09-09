@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 // Login.tsx — add these imports at top, alongside existing ones
 import { useNavigate } from "react-router-dom";
-import { useQueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const schema = z.object({
     username: z.string()
@@ -26,8 +26,9 @@ export default function Login() {
     })
 
     const onFormSubmit: SubmitHandler<IFormInput> = (data) => {
-        login(data);
-        reset();
+        loginMutation.mutate(data, {
+            onSuccess: () => reset()
+        })
     }
 
     const navigate = useNavigate();
@@ -86,11 +87,13 @@ export default function Login() {
                         />
                         {errors.password && <p style={{ 'color': 'red' }}>{errors.password.message}</p>}
                     </div>
-
+                    {
+                        loginMutation.isError && (<p className="text-red-500">Invalid username or password</p>)
+                    }
                     <button
                         type="submit"
                         className="mt-2 rounded-md bg-[#8A2E2E] px-4 py-2 text-sm font-medium text-white hover:bg-[#732626]"
-                        disabled={!isDirty || !isValid}
+                        disabled={!isDirty || !isValid || loginMutation.isPending}
                     >
                         Log in
                     </button>

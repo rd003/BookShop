@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/apiClient";
 import type { LoginRequest } from "../types/loginRequest";
+import type { UserInfo } from "../types/UserInfo";
 
 export async function login(loginReq: LoginRequest) {
     return apiFetch("/auth/login", {
@@ -8,17 +9,21 @@ export async function login(loginReq: LoginRequest) {
     })
 }
 
-export function getUserInfo() {
+export async function refresh() {
+    return apiFetch("auth/refresh")
+}
+
+export async function getUserInfo(): Promise<UserInfo> {
     return apiFetch("auth/me")
 }
 
-export function logout() {
+export async function logout() {
     return apiFetch("auth/logout", {
         method: 'POST'
     });
 }
 
-export function revokeToken() {
+export async function revokeToken() {
     return apiFetch("auth/token/revoke", {
         method: 'POST'
     });

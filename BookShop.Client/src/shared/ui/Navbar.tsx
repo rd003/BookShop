@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/sheet";
 import { Link, NavLink, useLocation, useNavigate, useSearchParams, type NavLinkRenderProps } from "react-router-dom";
 import type { LinkType } from "../types/LinkType";
+import { useUser } from "@/auth/hooks/useUser";
+import SearchBar from "../components/SearchBar";
 
 const NAV_LINKS: LinkType[] = [
     { label: "Catalog", href: "/catalog" },
@@ -27,39 +29,15 @@ const NAV_LINKS: LinkType[] = [
 ];
 
 // cartCount is a prop so the real app can wire it to actual cart state
-export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
-    const [searchParams] = useSearchParams();
-    const [query, setQuery] = useState(searchParams.get('search') ?? '');
+export default function Navbar() {
+    const cartCount = 0;
     const { theme, setTheme } = useTheme();
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const isFirstRender = useRef(true);
-
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false; // skip the redundant navigate on initial mount
-            return;
-        }
-
-        const timeoutId = setTimeout(() => {
-            const params = new URLSearchParams(location.search);
-            query ? params.set('search', query) : params.delete('search');
-            navigate({ pathname: '/catalog', search: params.toString() }, { replace: true });
-        }, 400); // debounce delay
-
-        return () => clearTimeout(timeoutId); // cancel if user types again before delay elapses
-    }, [query]);
+    const { data: user, isLoading: isUserLoading } = useUser();
 
     const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
         `${base} ${isActive ? "text-stone-900 font-medium" : "text-stone-600"}`;
 
-    function handleSearchSubmit(e: React.SubmitEvent) {
-        e.preventDefault();
-        const params = new URLSearchParams(location.search);
-        query ? params.set('search', query) : params.delete('search');
-        navigate({ pathname: '/catalog', search: params.toString() });
-    }
+
 
     return (
         <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#FBF8F3]/95 backdrop-blur">
@@ -86,18 +64,7 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                 </nav>
 
                 {/* Search - desktop */}
-                <form
-                    onSubmit={handleSearchSubmit}
-                    className="hidden md:flex flex-1 max-w-sm ml-auto relative"
-                >
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                    <Input
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search titles, authors, ISBN..."
-                        className="pl-9 bg-white"
-                    />
-                </form>
+                <SearchBar className="hidden md:flex flex-1 max-w-sm ml-auto relative" />
 
                 {/* Theme button */}
                 <DropdownMenu>
@@ -125,23 +92,27 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                 </DropdownMenu>
 
                 {/* login/signup */}
-                {isLoggedIn ? (
-                    <Button render={<Link to="/account" />} variant="ghost" size="icon" aria-label="Account" nativeButton={false}>
-                        <User className="h-5 w-5 text-stone-700" />
-                    </Button>
-                ) : (
-                    <div className="hidden md:flex items-center gap-2 ml-2">
-                        <Link to="/login"
-                            className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
-                        >
-                            Login
-                        </Link>
-                        <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]" nativeButton={false}>
-                            Sign Up
-                        </Button>
-                    </div>
+                {!isUserLoading && (
+                    user ? (
+                        <>
+                            <Button render={<Link to="/account" />} variant="ghost" size="icon" aria-label="Account" nativeButton={false}>
+                                <User className="h-5 w-5 text-stone-700" />
+                            </Button>
+                            <span>({user.username})</span>
+                        </>
+                    ) : (
+                        <div className="hidden md:flex items-center gap-2 ml-2">
+                            <Link to="/login"
+                                className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
+                            >
+                                Login
+                            </Link>
+                            <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]" nativeButton={false}>
+                                Sign Up
+                            </Button>
+                        </div>
+                    )
                 )}
-
 
                 {/* Cart */}
                 <Button
@@ -165,19 +136,10 @@ export default function Navbar({ cartCount = 0, isLoggedIn = false }) {
                     <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
                         <Menu className="h-5 w-5" />
                     </Button>}>
-
                     </SheetTrigger>
                     <SheetContent side="right" className="bg-[#FBF8F3]">
                         <div className="mt-8 flex flex-col gap-4">
-                            <form onSubmit={handleSearchSubmit} className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-                                <Input
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                    placeholder="Search titles..."
-                                    className="pl-9 bg-white"
-                                />
-                            </form>
+                            <SearchBar className="relative" placeholder="Search titles..." />
                             {NAV_LINKS.map((link) => (
                                 <NavLink
                                     key={link.href}
