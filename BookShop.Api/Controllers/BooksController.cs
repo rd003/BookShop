@@ -16,9 +16,10 @@ namespace BookShop.Api.Controllers;
 [Route("/api/[controller]")]
 public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) : ControllerBase
 {
+    // Filter available: genreIds[] and searchTerm for title and authros 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetBooks([FromQuery] QueryParameters queryParameters, [FromQuery] int[] genreIds, [FromQuery] int[] authorIds)
+    public async Task<IActionResult> GetBooks([FromQuery] QueryParameters queryParameters, [FromQuery] int[] genreIds)
     {
         IQueryable<Book> booksQuery = context.Books
         .Include(b => b.Publisher)
@@ -30,15 +31,12 @@ public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) 
         // filter by search term
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
         {
-            booksQuery = booksQuery.Where(a => a.Title.ToLower().StartsWith(queryParameters.SearchTerm));
+            var term = queryParameters.SearchTerm;
+            booksQuery = booksQuery.Where(a =>
+                a.Title.StartsWith(term) ||
+                a.BookAuthors.Any(ba => ba.Author!.Name.Contains(term)));
         }
 
-        if (authorIds.Length != 0)
-        {
-            booksQuery = booksQuery.Where(b => b.BookAuthors.Any(ba => authorIds.Contains(ba.AuthorId)));
-        }
-
-        // TODO: Filter by genres
         if (genreIds.Length != 0)
         {
             booksQuery = booksQuery.Where(b => b.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)));
