@@ -1,18 +1,16 @@
-import { ShoppingCart, Menu, BookOpen } from "lucide-react";
+import { Menu, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useTheme } from "@/components/theme-provider";
-import { User } from "lucide-react";
 import {
     Sheet,
     SheetContent,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { Link, NavLink, type NavLinkRenderProps } from "react-router-dom";
+import { NavLink, type NavLinkRenderProps } from "react-router-dom";
 import type { LinkType } from "../types/LinkType";
-import { useUser } from "@/auth/hooks/useUser";
 import SearchBar from "../components/SearchBar";
 import ThemeToggle from "../components/ThemeToggle";
+import AuthNav from "../components/AuthNav";
+import CartIcon from "../components/CartIcon";
 
 const NAV_LINKS: LinkType[] = [
     { label: "Catalog", href: "/catalog" },
@@ -23,12 +21,9 @@ const NAV_LINKS: LinkType[] = [
 // cartCount is a prop so the real app can wire it to actual cart state
 export default function Navbar() {
     const cartCount = 0;
-    const { data: user, isLoading: isUserLoading } = useUser();
 
     const navLinkClass = (base: string) => ({ isActive }: NavLinkRenderProps) =>
         `${base} ${isActive ? "text-stone-900 font-medium" : "text-stone-600"}`;
-
-
 
     return (
         <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#FBF8F3]/95 backdrop-blur">
@@ -57,48 +52,11 @@ export default function Navbar() {
                 {/* Search - desktop */}
                 <SearchBar className="hidden md:flex flex-1 max-w-sm ml-auto relative" />
 
-                {/* Theme button */}
                 <ThemeToggle />
 
-                {/* login/signup */}
-                {!isUserLoading && (
-                    user ? (
-                        <>
-                            <Button render={<Link to="/account" />} variant="ghost" size="icon" aria-label="Account" nativeButton={false}>
-                                <User className="h-5 w-5 text-stone-700" />
-                            </Button>
-                            <span>({user.username})</span>
-                        </>
-                    ) : (
-                        <div className="hidden md:flex items-center gap-2 ml-2">
-                            <Link to="/login"
-                                className="text-sm text-stone-600 hover:text-stone-900 transition-colors"
-                            >
-                                Login
-                            </Link>
-                            <Button size="sm" render={<Link to="/signup" />} className="bg-[#8A2E2E] hover:bg-[#732626]" nativeButton={false}>
-                                Sign Up
-                            </Button>
-                        </div>
-                    )
-                )}
+                <AuthNav />
 
-                {/* Cart */}
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="relative ml-auto md:ml-2"
-                    aria-label="Cart"
-                    nativeButton={false}
-                    render={<Link to="/cart" />}
-                >
-                    <ShoppingCart className="h-5 w-5 text-stone-700" />
-                    {cartCount > 0 && (
-                        <Badge className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full bg-[#8A2E2E] px-1 text-[10px] text-white hover:bg-[#8A2E2E]">
-                            {cartCount}
-                        </Badge>
-                    )}
-                </Button>
+                <CartIcon />
 
                 {/* Mobile menu */}
                 <Sheet>
