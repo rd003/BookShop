@@ -23,7 +23,7 @@ public class TokenService(IConfiguration configuration)
             Issuer = _configuration["JWT:ValidIssuer"],
             Audience = _configuration["JWT:ValidAudience"],
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddMinutes(15),
+            Expires = GetAccessTokenExpiry(),
             SigningCredentials = new SigningCredentials
         (authSigningKey, SecurityAlgorithms.HmacSha256)
         };
@@ -95,7 +95,7 @@ public class TokenService(IConfiguration configuration)
     {
         context.Response.Cookies.Append("accessToken", tokenModel.AccessToken, new CookieOptions
         {
-            Expires = DateTime.UtcNow.AddMinutes(1),  // TODO : set to 15 min
+            Expires = GetAccessTokenExpiry(),
             HttpOnly = true,
             IsEssential = true,
             Secure = true,
@@ -105,7 +105,7 @@ public class TokenService(IConfiguration configuration)
 
         context.Response.Cookies.Append("refreshToken", tokenModel.RefreshToken, new CookieOptions
         {
-            Expires = DateTime.UtcNow.AddMinutes(2),  // TODO : set to atleast 7 days
+            Expires = GetRefreshTokenExpiry(),
             HttpOnly = true,
             IsEssential = true,
             Secure = true,
@@ -113,4 +113,10 @@ public class TokenService(IConfiguration configuration)
             SameSite = SameSiteMode.None // TODO: set it to strict or lax for production
         });
     }
+
+    public DateTime GetAccessTokenExpiry() =>
+    DateTime.UtcNow.AddMinutes(_configuration.GetValue<double>("JWT:AccessTokenExpiryMinutes"));
+
+    public DateTime GetRefreshTokenExpiry() =>
+        DateTime.UtcNow.AddMinutes(_configuration.GetValue<double>("JWT:RefreshTokenExpiryMinutes"));
 }

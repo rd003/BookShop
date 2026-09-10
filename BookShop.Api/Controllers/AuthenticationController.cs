@@ -18,19 +18,22 @@ public class AuthenticationController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ILogger<AuthenticationController> _logger;
-    private readonly TokenService _tokenService; // new code
-    private readonly AppDbContext _context; // new code
+    private readonly TokenService _tokenService;
+    private readonly AppDbContext _context;
+    private readonly IConfiguration _configuration;
 
     public AuthenticationController(UserManager<ApplicationUser> userManager,
                  RoleManager<IdentityRole> roleManager,
                  ILogger<AuthenticationController> logger,
-                 TokenService tokenService, AppDbContext context)
+                 TokenService tokenService, AppDbContext context,
+                 IConfiguration configuration)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _logger = logger;
         _tokenService = tokenService;  // new code
         _context = context; // new code
+        _configuration = configuration;
     }
 
     [HttpPost("signup")]
@@ -93,7 +96,6 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginModel model)
     {
-
         var user = await _userManager.FindByNameAsync(model.Username);
         if (user == null)
         {
@@ -127,7 +129,7 @@ public class AuthenticationController : ControllerBase
             {
                 Username = user.UserName,
                 RefreshToken = refreshToken,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(2)
+                ExpiredAt = _tokenService.GetRefreshTokenExpiry()
             };
             _context.TokenInfos.Add(ti);
         }
@@ -135,12 +137,11 @@ public class AuthenticationController : ControllerBase
         else
         {
             tokenInfo.RefreshToken = refreshToken;
-            tokenInfo.ExpiredAt = DateTime.UtcNow.AddMinutes(2);
+            tokenInfo.ExpiredAt = _tokenService.GetRefreshTokenExpiry();
         }
 
         await _context.SaveChangesAsync();
 
-        // new lines
         // set token cookies
         var tokenModel = new TokenModel
         {
