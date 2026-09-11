@@ -285,11 +285,12 @@ public class AuthenticationController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return Ok(new
-        {
-            user.Email,
-            Username = user.Name,
-            Roles = roles
-        });
+        return Ok(new UserInfoDto
+        (
+            Name: user.Name,
+            Email: user.Email,
+            Username: user.UserName,
+            Roles: roles
+        ));
     }
 }
