@@ -1,80 +1,20 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import type { ReadCart, ReadCartItems } from "./types/readCart";
+import { useCart } from "./hooks/useCart";
 
-// Replace with the real GET /api/cart response.
-const MOCK_CART: ReadCart = {
-    cartId: 1,
-    totalAmount: 1273,
-    totalItems: 3,
-    cartItems: [
-        {
-            cartItemId: 101,
-            bookId: 1,
-            bookTitle: "The Midnight Library",
-            authors: ["Matt Haig"],
-            genres: ["Fiction", "Fantasy"],
-            unitPrice: 399,
-            quantity: 1,
-            totalPrice: 399,
-        },
-        {
-            cartItemId: 102,
-            bookId: 3,
-            bookTitle: "Project Hail Mary",
-            authors: ["Andy Weir"],
-            genres: ["Sci-Fi", "Fiction"],
-            unitPrice: 449,
-            quantity: 1,
-            totalPrice: 449,
-        },
-        {
-            cartItemId: 103,
-            bookId: 5,
-            bookTitle: "Atomic Habits",
-            authors: ["James Clear"],
-            genres: ["Non-Fiction", "Self-Help"],
-            unitPrice: 425,
-            quantity: 1,
-            totalPrice: 425,
-        },
-    ],
-};
-
-// Recomputes totalItems/totalAmount from cartItems — call after any quantity/remove change.
-function recalculateCart(cartItems: ReadCartItems[], cartId: number): ReadCart {
-    return {
-        cartId,
-        cartItems,
-        totalItems: cartItems.reduce((sum, item) => sum + item.quantity, 0),
-        totalAmount: cartItems.reduce((sum, item) => sum + item.totalPrice, 0),
-    };
-}
 
 export default function Cart() {
-    const [cart, setCart] = useState<ReadCart>(MOCK_CART);
+    const { cart, status, error } = useCart();
 
     function updateQuantity(cartItemId: number, delta: number) {
-        const updatedItems = cart.cartItems
-            .map((item) =>
-                item.cartItemId === cartItemId
-                    ? {
-                        ...item,
-                        quantity: Math.max(1, item.quantity + delta),
-                        totalPrice: Math.max(1, item.quantity + delta) * item.unitPrice,
-                    }
-                    : item
-            );
-        setCart(recalculateCart(updatedItems, cart.cartId));
+
     }
 
     function removeItem(cartItemId: number) {
-        const updatedItems = cart.cartItems.filter((item) => item.cartItemId !== cartItemId);
-        setCart(recalculateCart(updatedItems, cart.cartId));
+
     }
 
-    if (cart.cartItems.length === 0) {
+    if (cart && cart.cartItems.length === 0) {
         return (
             <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
                 <p className="text-stone-600">Your cart is empty.</p>
@@ -90,7 +30,7 @@ export default function Cart() {
             <h1 className="font-serif text-2xl text-stone-900">Your Cart</h1>
 
             <div className="mt-6 flex flex-col gap-4">
-                {cart.cartItems.map((item) => (
+                {cart?.cartItems.map((item) => (
                     <div
                         key={item.cartItemId}
                         className="flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4"
@@ -137,8 +77,8 @@ export default function Cart() {
             </div>
 
             <div className="mt-8 flex flex-col items-end gap-1 border-t border-stone-200 pt-6">
-                <p className="text-sm text-stone-500">{cart.totalItems} items</p>
-                <p className="text-lg font-medium text-stone-900">Total: ₹{cart.totalAmount}</p>
+                <p className="text-sm text-stone-500">{cart ? cart.totalItems : 0} items</p>
+                <p className="text-lg font-medium text-stone-900">Total: ₹{cart ? cart.totalAmount : 0}</p>
                 <button className="mt-3 rounded-md bg-[#8A2E2E] px-6 py-2 text-sm font-medium text-white hover:bg-[#732626]">
                     Proceed to checkout
                 </button>
