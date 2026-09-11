@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import { login } from './api/authApi';
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -33,13 +33,14 @@ export default function Login() {
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const location = useLocation();
 
     const loginMutation = useMutation({
         mutationFn: login,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user'] });
-            console.trace("Login onSuccess, navigating to /");
-            navigate('/');
+            const from = location.state?.from?.pathname || '/';
+            navigate(from, { replace: true });
         }
     })
 
