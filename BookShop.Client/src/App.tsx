@@ -11,6 +11,7 @@ import ContactUs from "./pages/ContactUs";
 import Layout from "./shared/ui/Layout";
 import Cart from "./cart/Cart";
 import Account from "./auth/Account";
+import RequireAuth from "./routes/requireAuth";
 
 export function App() {
   return (
@@ -21,19 +22,18 @@ export function App() {
           <Route path="catalog" element={<Books />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path="account" element={<Account />} />
           <Route path="privacy" element={<PrivacyPolicy />} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="careers" element={<Careers />} />
           <Route path="terms" element={<TermsOfService />} />
           <Route path="about" element={<About />} />
-          <Route path="cart" element={<Cart />} />
+          <Route element={<RequireAuth />}>
+            <Route path="account" element={<Account />} />
+            <Route path="cart" element={<Cart />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Route>
-
       </Routes>
-
-
     </>
   )
 }
