@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCart } from "../cartApi";
 
 export function useCart() {
-    const { data, status, error } = useQuery({
+    const { data, status, error, isLoading } = useQuery({
         queryKey: ['cart'],
         queryFn: getCart
     })
@@ -10,5 +10,6 @@ export function useCart() {
         cart: data,
         status,
         error,
+        isLoading
     }
 }
