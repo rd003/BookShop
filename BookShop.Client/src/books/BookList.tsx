@@ -6,9 +6,10 @@ import type { ReadGenre } from "@/genres/types/readGenre";
 
 interface BookListProps {
     book: ReadBook,
+    disableCartButton: boolean,
     onAddToCart: (bookId: number) => void
 }
-export default function BookList({ book, onAddToCart }: BookListProps) {
+export default function BookList({ book, disableCartButton, onAddToCart }: BookListProps) {
     return (
         <Card className="overflow-hidden border-stone-200 py-0 gap-0">
             <img
@@ -43,6 +44,7 @@ export default function BookList({ book, onAddToCart }: BookListProps) {
                     size="sm"
                     className="bg-[#8A2E2E] hover:bg-[#732626]"
                     onClick={() => onAddToCart?.(book.id)}
+                    disabled={disableCartButton}
                 >
                     Add
                 </Button>

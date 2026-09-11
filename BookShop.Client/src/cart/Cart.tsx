@@ -4,7 +4,7 @@ import { useCart } from "./hooks/useCart";
 
 
 export default function Cart() {
-    const { cart, status, error } = useCart();
+    const { cart, status, error, isLoading } = useCart();
 
     function updateQuantity(cartItemId: number, delta: number) {
 
@@ -14,7 +14,13 @@ export default function Cart() {
 
     }
 
-    if (cart && cart.cartItems.length === 0) {
+    if (status === 'error') {
+        return (<p className="text-red-500">{error ? error.message : "Something went wrong!"}</p>)
+    }
+
+
+
+    if (cart === null || cart?.cartItems.length === 0) {
         return (
             <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
                 <p className="text-stone-600">Your cart is empty.</p>

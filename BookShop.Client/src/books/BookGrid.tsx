@@ -5,9 +5,10 @@ type BookGridProps = {
     books: ReadBook[],
     status: "error" | "success" | "pending",
     error: Error | null,
+    disableCartButton: boolean,
     onAddToCart: (bookId: number) => void
 }
-export default function BookGrid({ books, error, status, onAddToCart }: BookGridProps) {
+export default function BookGrid({ books, error, status, disableCartButton, onAddToCart }: BookGridProps) {
     return (
         <section>
             {status === 'pending' && <p className="text-sm text-stone-500 py-12 text-center">Loading books...</p>}
@@ -29,7 +30,7 @@ export default function BookGrid({ books, error, status, onAddToCart }: BookGrid
                     ) : (
                         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
                             {books.map((book: ReadBook) => (
-                                <BookList key={book.id} book={book} onAddToCart={onAddToCart} />
+                                <BookList disableCartButton={disableCartButton} key={book.id} book={book} onAddToCart={onAddToCart} />
                             ))}
                         </div>
                     )}
