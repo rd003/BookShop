@@ -18,17 +18,20 @@ export default function SearchBar({ className, placeholder = "Search title or  a
 
     useEffect(() => {
         if (isFirstRender.current) {
-            isFirstRender.current = false; // skip the redundant navigate on initial mount
+            isFirstRender.current = false;
             return;
         }
+
+        const currentSearchParam = new URLSearchParams(location.search).get('search') ?? '';
+        if (query === currentSearchParam) return; // new: nothing actually changed, don't navigate (fixes StrictMode double-invoke bug)
 
         const timeoutId = setTimeout(() => {
             const params = new URLSearchParams(location.search);
             query ? params.set('search', query) : params.delete('search');
             navigate({ pathname: '/catalog', search: params.toString() }, { replace: true });
-        }, 400); // debounce delay
+        }, 400);
 
-        return () => clearTimeout(timeoutId); // cancel if user types again before delay elapses
+        return () => clearTimeout(timeoutId);
     }, [query]);
 
     function handleSearchSubmit(e: React.SubmitEvent) {
