@@ -1,41 +1,9 @@
-import { Route, Routes } from "react-router-dom";
-import Books from "./books/Books";
-import NotFound from "./pages/NotFound";
-import Signup from "./pages/Signup";
-import Login from "./auth/Login";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Careers from "./pages/Careers";
-import TermsOfService from "./pages/TermsOfService";
-import About from "./pages/About";
-import ContactUs from "./pages/ContactUs";
-import Layout from "./shared/ui/Layout";
-import Cart from "./cart/Cart";
-import Account from "./auth/Account";
-import RequireAuth from "./routes/requireAuth";
+import AppRoutes from "./routes/AppRoutes";
 
-export function App() {
+export default function App() {
   return (
     <>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Books />} />
-          <Route path="catalog" element={<Books />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-          <Route path="privacy" element={<PrivacyPolicy />} />
-          <Route path="contact" element={<ContactUs />} />
-          <Route path="careers" element={<Careers />} />
-          <Route path="terms" element={<TermsOfService />} />
-          <Route path="about" element={<About />} />
-          <Route element={<RequireAuth />}>
-            <Route path="account" element={<Account />} />
-            <Route path="cart" element={<Cart />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+      <AppRoutes />
     </>
   )
 }
-
-export default App
