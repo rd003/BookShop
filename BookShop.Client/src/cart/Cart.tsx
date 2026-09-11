@@ -4,7 +4,7 @@ import { useCart } from "./hooks/useCart";
 
 
 export default function Cart() {
-    const { cart, status, error, isLoading } = useCart();
+    const { cart, status, error } = useCart();
 
     function updateQuantity(cartItemId: number, delta: number) {
 
@@ -18,6 +18,9 @@ export default function Cart() {
         return (<p className="text-red-500">{error ? error.message : "Something went wrong!"}</p>)
     }
 
+    if (status === 'pending') {
+        return (<p>Loading...</p>)
+    }
 
 
     if (cart === null || cart?.cartItems.length === 0) {
