@@ -4,7 +4,7 @@ import type { PagedList } from "@/shared/types/pagedList";
 import { fetchBooks } from "../booksApi";
 
 export function useBooksQuery(searchTerm: string, genreIds: number[]) {
-    const bookQueryParam = { pageNumber: 1, pageSize: 2, searchTerm, sortBy: '' };
+    const bookQueryParam = { pageNumber: 1, pageSize: 10, searchTerm, sortBy: '' };
 
     const { data,
         status,
