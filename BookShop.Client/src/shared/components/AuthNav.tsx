@@ -13,6 +13,7 @@ export default function AuthNav() {
         mutationFn: logout,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user'] });
+            console.trace("Logout onSuccess navigate ('/') firing");
             navigate('/');
         }
     })

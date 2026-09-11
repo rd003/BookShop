@@ -10,6 +10,7 @@ import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 import Layout from "./shared/ui/Layout";
 import Cart from "./cart/Cart";
+import Account from "./auth/Account";
 
 export function App() {
   return (
@@ -20,6 +21,7 @@ export function App() {
           <Route path="catalog" element={<Books />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="account" element={<Account />} />
           <Route path="privacy" element={<PrivacyPolicy />} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="careers" element={<Careers />} />

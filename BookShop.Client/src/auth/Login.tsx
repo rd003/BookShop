@@ -38,6 +38,7 @@ export default function Login() {
         mutationFn: login,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user'] });
+            console.trace("Login onSuccess, navigating to /");
             navigate('/');
         }
     })

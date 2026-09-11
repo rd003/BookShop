@@ -6,5 +6,6 @@ export function useUser() {
         queryKey: ['user'],
         queryFn: getUserInfo,
         retry: false,
+        meta: { skipGlobalAuthRedirect: true }, // tells queryClient's onError not to force-redirect on this query's failure
     });
 }
