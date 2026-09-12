@@ -2,7 +2,10 @@ import { addCartItem, clearCart, updateCartItem } from "@/cart/cartApi";
 import type { ReadCart } from "@/cart/types/readCart";
 import type { UpdateCartItemRequest } from "@/cart/types/updateCartItemRequest";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+export type UpdateCartItemVariables = {
+    cartItemId: number;
+    cartItemReq: UpdateCartItemRequest;
+};
 function useInvalidateCart() {
     const queryClient = useQueryClient();
     return () => queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -15,14 +18,11 @@ export function useAddCartItem() {
         onSuccess: invalidateCart
     });
 }
-type UpdateCartItemVariables = {
-    cartId: number;
-    cartItem: UpdateCartItemRequest;
-};
+
 export function useUpdateCartItem() {
     const invalidateCart = useInvalidateCart();
     return useMutation<ReadCart, Error, UpdateCartItemVariables>({
-        mutationFn: ({ cartId, cartItem }) => updateCartItem(cartId, cartItem),
+        mutationFn: ({ cartItemId, cartItemReq }) => updateCartItem(cartItemId, cartItemReq),
         onSuccess: invalidateCart,
     });
 }

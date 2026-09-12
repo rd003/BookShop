@@ -1,21 +1,28 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "./hooks/useCart";
+import { useUpdateCartItem, type UpdateCartItemVariables } from "@/books/hooks/useCartMutation";
 
 
 export default function Cart() {
     const { cart, status, error } = useCart();
+    const {
+        mutate: updateCartItemMutate,
+        status: updateCartItemStatus,
+        error: updateCartItemError // TODO: can we utilize this?
+    } = useUpdateCartItem();
+    const disableUpdate = updateCartItemStatus === 'pending';
 
-    function updateQuantity(cartItemId: number, delta: number) {
-
-    }
-
-    function removeItem(cartItemId: number) {
-
+    function updateQuantity(cartItemId: number, qty: number) {
+        const mutatationObj: UpdateCartItemVariables = {
+            cartItemId: cartItemId,
+            cartItemReq: { quantity: qty }
+        };
+        updateCartItemMutate(mutatationObj);
     }
 
     if (status === 'error') {
-        return (<p className="text-red-500">{error ? error.message : "Something went wrong!"}</p>)
+        return (<p className="text-red-500">{error ? error.message : "Error on fetching cart!"}</p>)
     }
 
     if (status === 'pending') {
@@ -54,17 +61,19 @@ export default function Cart() {
 
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => updateQuantity(item.cartItemId, -1)}
+                                onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                                 className="rounded border border-stone-300 p-1 hover:bg-stone-100"
                                 aria-label="Decrease quantity"
+                                disabled={disableUpdate}
                             >
                                 <Minus className="h-3.5 w-3.5" />
                             </button>
                             <span className="w-6 text-center text-sm">{item.quantity}</span>
                             <button
-                                onClick={() => updateQuantity(item.cartItemId, 1)}
+                                onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                                 className="rounded border border-stone-300 p-1 hover:bg-stone-100"
                                 aria-label="Increase quantity"
+                                disabled={disableUpdate}
                             >
                                 <Plus className="h-3.5 w-3.5" />
                             </button>
@@ -75,9 +84,10 @@ export default function Cart() {
                         </p>
 
                         <button
-                            onClick={() => removeItem(item.cartItemId)}
+                            onClick={() => updateQuantity(item.cartItemId, 0)}
                             className="shrink-0 text-stone-400 hover:text-[#8A2E2E]"
                             aria-label="Remove item"
+                            disabled={disableUpdate}
                         >
                             <Trash2 className="h-4 w-4" />
                         </button>
