@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
+import { useCartCount } from "@/cart/hooks/useCartCount";
 
 export default function CartIcon() {
-    const cartCount = 0;
+    const cartCount = useCartCount();
     return (<Button
         variant="ghost"
         size="icon"
