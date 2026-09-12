@@ -5,7 +5,7 @@ import type { UpdateAddress } from "../types/updateAddress";
 
 const url = "/addresses";
 
-export async function getAddress(): Promise<ReadAddress[]> {
+export async function getAddresses(): Promise<ReadAddress[]> {
     const addresses = await apiFetch<ReadAddress[]>(url);
     return addresses;
 }
