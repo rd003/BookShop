@@ -12,6 +12,9 @@ import Login from "@/auth/Login";
 import Cart from "@/cart/Cart";
 import NotFound from "@/pages/NotFound";
 import Layout from "@/shared/ui/Layout";
+import Addresses from "@/addresses/Addresses";
+import ChangePassword from "@/auth/ChangePassword";
+import Orders from "@/orders/Orders";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -27,6 +30,9 @@ export default function AppRoutes() {
             <Route path="about" element={<About />} />
             <Route element={<RequireAuth />}>
                 <Route path="account" element={<Account />} />
+                <Route path="account/addresses" element={<Addresses />} />
+                <Route path="account/change-password" element={<ChangePassword />} />
+                <Route path="account/orders" element={<Orders />} />
                 <Route path="cart" element={<Cart />} />
             </Route>
             <Route path="*" element={<NotFound />} />
