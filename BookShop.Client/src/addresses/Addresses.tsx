@@ -1,33 +1,10 @@
 import { AddressList } from "./AddressList";
+import useAddress from "./hooks/useAddress";
 import type { ReadAddress } from "./types/readAddress";
 
 export default function Addresses() {
-    const sampleAddresses: ReadAddress[] = [
-        {
-            id: 1,
-            fullName: "John Doe",
-            phone: "+1 555-123-4567",
-            line1: "123 Main St",
-            line2: "Apt 4B",
-            city: "San Francisco",
-            state: "CA",
-            postalCode: "94105",
-            country: "United States",
-            isDefault: true,
-        },
-        {
-            id: 2,
-            fullName: "Jane Smith",
-            phone: "+1 555-987-6543",
-            line1: "456 Market Ave",
-            line2: null,
-            city: "New York",
-            state: "NY",
-            postalCode: "10001",
-            country: "United States",
-            isDefault: false,
-        },
-    ];
+    const { addresses, addressQueryStatus, addressQueryError } = useAddress();
+
     function handleEditAddress(address: ReadAddress) {
         console.log("edit", address);
     }
@@ -43,8 +20,13 @@ export default function Addresses() {
     return (
         <div className="container mx-auto p-6">
             <h1 className="mb-6 text-2xl font-semibold">My Addresses</h1>
+
+            {addressQueryStatus === 'pending' && <p>Loading...</p>}
+
+            {addressQueryStatus === 'error' && <p>{addressQueryError?.message ?? 'Error on loading addresses!'}</p>}
+
             <AddressList
-                addresses={sampleAddresses}
+                addresses={addresses}
                 onEdit={handleEditAddress}
                 onDelete={handleDeleteAddress}
                 onSetDefault={handleChangeDefaultAddress}
