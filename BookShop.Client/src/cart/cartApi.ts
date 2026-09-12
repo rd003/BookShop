@@ -13,8 +13,8 @@ export async function addCartItem(cartItem: AddCartItemRequest): Promise<ReadCar
     return cart;
 }
 
-export async function updateCartItem(cartId: number, cartItem: UpdateCartItemRequest) {
-    const cart = await apiFetch<ReadCart>(`${url}/items/${cartId}`, {
+export async function updateCartItem(cartItemId: number, cartItem: UpdateCartItemRequest) {
+    const cart = await apiFetch<ReadCart>(`${url}/items/${cartItemId}`, {
         method: 'PUT',
         body: JSON.stringify(cartItem)
     });
