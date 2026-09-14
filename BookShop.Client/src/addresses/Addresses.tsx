@@ -5,6 +5,7 @@ import type { ReadAddress } from "./types/readAddress";
 
 export default function Addresses() {
     const { addresses, addressQueryStatus, addressQueryError } = useAddress();
+    const isSubmitting = false;  // TODO: remove it later
 
     function handleEditAddress(address: ReadAddress) {
         console.log("edit", address);
@@ -26,7 +27,14 @@ export default function Addresses() {
 
             {addressQueryStatus === 'error' && <p>{addressQueryError?.message ?? 'Error on loading addresses!'}</p>}
 
-            <AddressDialog />
+            <div className="mb-1.5">
+                <AddressDialog
+                    title="Add new address"
+                    isSubmitting={isSubmitting}
+                    submitLabel="Save"
+                    dialogButtonTitle="Add +"
+                />
+            </div>
 
             <AddressList
                 addresses={addresses}

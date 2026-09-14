@@ -37,7 +37,7 @@ export function AddressForm({
     });
 
     function onFormSubmit(data: AddressFormValues) {
-        console.log(data);
+        onSubmit(data as UpdateAddress);
     }
 
     return (
@@ -98,7 +98,7 @@ export function AddressForm({
                                     id="phone"
                                     type="tel"
                                     aria-invalid={fieldState.invalid}
-                                    placeholder="+1 555 000 0000"
+                                    placeholder="1234567890"
                                     autoComplete="tel"
                                 />
                                 {fieldState.invalid && (
@@ -167,7 +167,7 @@ export function AddressForm({
                                     {...field}
                                     id="city"
                                     aria-invalid={fieldState.invalid}
-                                    placeholder="New York"
+                                    placeholder="Haridwar"
                                     autoComplete="address-level2"
                                 />
                                 {fieldState.invalid && (
@@ -187,7 +187,7 @@ export function AddressForm({
                                     {...field}
                                     id="state"
                                     aria-invalid={fieldState.invalid}
-                                    placeholder="NY"
+                                    placeholder="Uttarkhand"
                                     autoComplete="address-level1"
                                 />
                                 {fieldState.invalid && (
@@ -229,7 +229,7 @@ export function AddressForm({
                                 {...field}
                                 id="country"
                                 aria-invalid={fieldState.invalid}
-                                placeholder="United States"
+                                placeholder="India"
                                 autoComplete="country-name"
                             />
                             {fieldState.invalid && (
