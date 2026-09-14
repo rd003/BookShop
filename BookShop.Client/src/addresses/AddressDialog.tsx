@@ -50,9 +50,6 @@ export default function AddressDialog({
                     submitLabel={submitLabel}
                 />
             </div>
-            <DialogFooter className="sm:justify-start">
-                <DialogClose render={<Button type="button">Close</Button>} />
-            </DialogFooter>
         </DialogContent>
     </Dialog >);
 }

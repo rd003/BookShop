@@ -6,10 +6,14 @@ import type { ReadAddress } from "./types/readAddress";
 import type { UpdateAddress } from "./types/updateAddress";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useAddAddress } from "./hooks/useAddressMutation";
+import type { CreateAddress } from "./types/createAddress";
 
 export default function Addresses() {
     const { addresses, addressQueryStatus, addressQueryError } = useAddress();
-    const isSubmitting = false;
+    const addAddressMutation = useAddAddress();
+
+    const isSubmitting = addAddressMutation.status === 'pending';
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<ReadAddress | null>(null);
@@ -29,16 +33,17 @@ export default function Addresses() {
             console.log("update", values);
         }
         else {
-            console.log("add", values);
+            const { id, ...newAddress } = values;
+            console.log(newAddress);
+            //addAddressMutation.mutate(newAddress);
         }
+    }
+    function handleChangeDefaultAddress(id: number) {
+        console.log("set default", id)
     }
 
     function handleDeleteAddress(id: number) {
         console.log("delete", id);
-    }
-
-    function handleChangeDefaultAddress(id: number) {
-        console.log("set default", id)
     }
 
     return (
