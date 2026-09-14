@@ -1,3 +1,4 @@
+import AddressDialog from "./AddressDialog";
 import { AddressList } from "./AddressList";
 import useAddress from "./hooks/useAddress";
 import type { ReadAddress } from "./types/readAddress";
@@ -24,6 +25,8 @@ export default function Addresses() {
             {addressQueryStatus === 'pending' && <p>Loading...</p>}
 
             {addressQueryStatus === 'error' && <p>{addressQueryError?.message ?? 'Error on loading addresses!'}</p>}
+
+            <AddressDialog />
 
             <AddressList
                 addresses={addresses}
