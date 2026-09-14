@@ -1,220 +1,297 @@
-import { z } from "zod";
-
-const addressSchema = z.object({
-    fullName: z.string().min(2, "Full name is required"),
-    phone: z.string().min(5, "Phone is required"),
-    line1: z.string().min(3, "Address line 1 is required"),
-    line2: z.string().optional().nullable(),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-    country: z.string().min(1, "Country is required"),
-    isDefault: z.boolean(),
-});
-
-type AddressFormValues = z.infer<typeof addressSchema>;
-
-import { useForm } from "react-hook-form";
+import type { UpdateAddress } from "./types/updateAddress";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-
+import { Controller, useForm } from "react-hook-form";
+import { addressSchema, type AddressFormValues } from "./types/addressSchema";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import type { ReadAddress } from "./types/readAddress";
 
 interface AddressFormProps {
-    defaultValues?: ReadAddress | null;
-    onSubmit: (values: AddressFormValues) => void;
+    defaultValues?: UpdateAddress | null;
+    onSubmit: (values: UpdateAddress) => void;
     isSubmitting?: boolean;
     submitLabel?: string;
 }
 
 export function AddressForm({
-    defaultValues,
+    defaultValues = null,
     onSubmit,
     isSubmitting = false,
     submitLabel = "Save",
 }: AddressFormProps) {
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
-        defaultValues: {
-            fullName: defaultValues?.fullName ?? "",
-            phone: defaultValues?.phone ?? "",
-            line1: defaultValues?.line1 ?? "",
-            line2: defaultValues?.line2 ?? "",
-            city: defaultValues?.city ?? "",
-            state: defaultValues?.state ?? "",
-            postalCode: defaultValues?.postalCode ?? "",
-            country: defaultValues?.country ?? "",
-            isDefault: defaultValues?.isDefault ?? false,
+        defaultValues: defaultValues ?? {
+            id: 0,
+            fullName: "",
+            phone: "",
+            line1: "",
+            line2: "",
+            city: "",
+            state: "",
+            postalCode: "",
+            country: "",
+            isDefault: false,
         },
     });
 
-    function handleSubmit(values: AddressFormValues) {
-        console.log("AddressForm submit", values);
-        onSubmit(values);
+    function onFormSubmit(data: AddressFormValues) {
+        console.log(data);
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <FormField
-                        control={form.control}
+        <form
+            onSubmit={form.handleSubmit(onFormSubmit)}
+            className="mx-auto w-full max-w-2xl space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8"
+        >
+            <div className="space-y-1">
+                <h2 className="text-xl font-semibold tracking-tight">
+                    Address Information
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                    Please enter your shipping address details below.
+                </p>
+            </div>
+
+            <FieldGroup className="space-y-5">
+                <Controller
+                    name="id"
+                    control={form.control}
+                    render={({ field }) => (
+                        <Field>
+                            <Input {...field} id="id" type="hidden" />
+                        </Field>
+                    )}
+                />
+
+                {/* Full Name & Phone */}
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <Controller
                         name="fullName"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Full name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="John Doe" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
                         control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Phone</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="+1 555-123-4567" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <FormField
-                    control={form.control}
-                    name="line1"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Address line 1</FormLabel>
-                            <FormControl>
-                                <Input placeholder="123 Main St" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="line2"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Address line 2{" "}
-                                <span className="text-muted-foreground">(optional)</span>
-                            </FormLabel>
-                            <FormControl>
+                        render={({ field, fieldState }) => (
+                            <Field>
+                                <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                                 <Input
-                                    placeholder="Apt, suite, etc."
                                     {...field}
-                                    value={field.value ?? ""}
+                                    id="fullName"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="John Doe"
+                                    autoComplete="name"
                                 />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+
+                    <Controller
+                        name="phone"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field>
+                                <FieldLabel htmlFor="phone">Phone</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id="phone"
+                                    type="tel"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="+1 555 000 0000"
+                                    autoComplete="tel"
+                                />
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+                </div>
+
+                {/* Address Line 1 */}
+                <Controller
+                    name="line1"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                            <FieldLabel htmlFor="line1">Address Line 1</FieldLabel>
+                            <Input
+                                {...field}
+                                id="line1"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="123 Main Street"
+                                autoComplete="address-line1"
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                        </Field>
                     )}
                 />
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <FormField
-                        control={form.control}
+                {/* Address Line 2 */}
+                <Controller
+                    name="line2"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                            <FieldLabel htmlFor="line2">
+                                Address Line 2{" "}
+                                <span className="text-muted-foreground">(optional)</span>
+                            </FieldLabel>
+                            <Input
+                                {...field}
+                                value={field.value ?? ""}
+                                id="line2"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="Apartment, suite, unit, etc."
+                                autoComplete="address-line2"
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                        </Field>
+                    )}
+                />
+
+                {/* City, State, Postal */}
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                    <Controller
                         name="city"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="San Francisco" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
                         control={form.control}
-                        name="state"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>State</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="CA" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="postalCode"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Postal code</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="94105" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Country</FormLabel>
-                            <FormControl>
-                                <Input placeholder="United States" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="isDefault"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                        render={({ field, fieldState }) => (
+                            <Field>
+                                <FieldLabel htmlFor="city">City</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id="city"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="New York"
+                                    autoComplete="address-level2"
                                 />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                                Set as default address
-                            </FormLabel>
-                        </FormItem>
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+
+                    <Controller
+                        name="state"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field>
+                                <FieldLabel htmlFor="state">State</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id="state"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="NY"
+                                    autoComplete="address-level1"
+                                />
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+
+                    <Controller
+                        name="postalCode"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field>
+                                <FieldLabel htmlFor="postalCode">Postal Code</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id="postalCode"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="10001"
+                                    autoComplete="postal-code"
+                                />
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </Field>
+                        )}
+                    />
+                </div>
+
+                {/* Country */}
+                <Controller
+                    name="country"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                            <FieldLabel htmlFor="country">Country</FieldLabel>
+                            <Input
+                                {...field}
+                                id="country"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="United States"
+                                autoComplete="country-name"
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                        </Field>
                     )}
                 />
 
-                <div className="flex justify-end pt-2">
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {submitLabel}
-                    </Button>
-                </div>
-            </form>
-        </Form>
+                {/* isDefault */}
+                <Controller
+                    name="isDefault"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-4">
+                                <Checkbox
+                                    id="isDefault"
+                                    checked={field.value}
+                                    onCheckedChange={(checked) =>
+                                        field.onChange(checked === true)
+                                    }
+                                />
+                                <div className="space-y-0.5">
+                                    <FieldLabel
+                                        htmlFor="isDefault"
+                                        className="cursor-pointer font-medium"
+                                    >
+                                        Set as default address
+                                    </FieldLabel>
+                                    <p className="text-xs text-muted-foreground">
+                                        Use this address by default at checkout.
+                                    </p>
+                                </div>
+                            </div>
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                        </Field>
+                    )}
+                />
+            </FieldGroup>
+
+            {/* Actions */}
+            <div className="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-end">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => form.reset()}
+                    disabled={isSubmitting}
+                    className="sm:w-auto"
+                >
+                    Clear
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="sm:w-auto"
+                >
+                    {isSubmitting ? "Saving..." : submitLabel}
+                </Button>
+            </div>
+        </form>
     );
 }
