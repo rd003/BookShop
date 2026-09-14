@@ -1,14 +1,36 @@
+import { useState } from "react";
 import AddressDialog from "./AddressDialog";
 import { AddressList } from "./AddressList";
 import useAddress from "./hooks/useAddress";
 import type { ReadAddress } from "./types/readAddress";
+import type { UpdateAddress } from "./types/updateAddress";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 export default function Addresses() {
     const { addresses, addressQueryStatus, addressQueryError } = useAddress();
-    const isSubmitting = false;  // TODO: remove it later
+    const isSubmitting = false;
+
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [editing, setEditing] = useState<ReadAddress | null>(null);
+
+    function handleAddAddress() {
+        setEditing(null);
+        setDialogOpen(true);
+    }
 
     function handleEditAddress(address: ReadAddress) {
-        console.log("edit", address);
+        setEditing(address);
+        setDialogOpen(true);
+    }
+
+    function handleSubmit(values: UpdateAddress) {
+        if (editing) {
+            console.log("update", values);
+        }
+        else {
+            console.log("add", values);
+        }
     }
 
     function handleDeleteAddress(id: number) {
@@ -28,12 +50,7 @@ export default function Addresses() {
             {addressQueryStatus === 'error' && <p>{addressQueryError?.message ?? 'Error on loading addresses!'}</p>}
 
             <div className="mb-1.5">
-                <AddressDialog
-                    title="Add new address"
-                    isSubmitting={isSubmitting}
-                    submitLabel="Save"
-                    dialogButtonTitle="Add +"
-                />
+                <Button variant="outline" onClick={handleAddAddress}>Add <Plus /> </Button>
             </div>
 
             <AddressList
@@ -41,6 +58,16 @@ export default function Addresses() {
                 onEdit={handleEditAddress}
                 onDelete={handleDeleteAddress}
                 onSetDefault={handleChangeDefaultAddress}
+            />
+
+            <AddressDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                title={editing ? "Edit address" : "Add new address"}
+                isSubmitting={isSubmitting}
+                submitLabel={editing ? "Save" : "Add"}
+                defaultValues={editing}
+                onSubmit={handleSubmit}
             />
         </div>
     )
