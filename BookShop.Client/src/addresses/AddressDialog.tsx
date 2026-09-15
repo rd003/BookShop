@@ -1,15 +1,14 @@
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { AddressForm } from "./AddressForm";
 import type { UpdateAddress } from "./types/updateAddress";
+import { Spinner } from "@/components/ui/spinner";
 
 interface AddressDialogProps {
     title: string;
@@ -19,7 +18,8 @@ interface AddressDialogProps {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     defaultValues?: UpdateAddress | null;
-    onSubmit: (values: UpdateAddress) => void
+    onSubmit: (values: UpdateAddress) => void,
+    isLoading: boolean,
 }
 
 export default function AddressDialog({
@@ -31,6 +31,7 @@ export default function AddressDialog({
     onOpenChange,
     defaultValues = null,
     onSubmit,
+    isLoading = false
 }: AddressDialogProps) {
     return (<Dialog open={open} onOpenChange={onOpenChange}>
         {dialogButtonTitle && (
@@ -49,6 +50,11 @@ export default function AddressDialog({
                     isSubmitting={isSubmitting}
                     submitLabel={submitLabel}
                 />
+                {/* {error && <p className="text-red-500">{error}</p>}
+
+                {successMessage && <p className="text-green-500">{successMessage}</p>} */}
+                {isLoading && <Spinner />}
+
             </div>
         </DialogContent>
     </Dialog >);

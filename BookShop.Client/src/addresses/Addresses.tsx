@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddressDialog from "./AddressDialog";
 import { AddressList } from "./AddressList";
 import useAddress from "./hooks/useAddress";
@@ -6,14 +6,30 @@ import type { ReadAddress } from "./types/readAddress";
 import type { UpdateAddress } from "./types/updateAddress";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useAddAddress } from "./hooks/useAddressMutation";
-import type { CreateAddress } from "./types/createAddress";
+import { useAddAddress, useDeleteAddress, useUpdateAddress } from "./hooks/useAddressMutation";
+import { getUserFacingError } from "@/lib/getUserFacingError";
+import { toast } from "@/components/ui/toast";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Addresses() {
     const { addresses, addressQueryStatus, addressQueryError } = useAddress();
     const addAddressMutation = useAddAddress();
+    const updateAddressMutation = useUpdateAddress();
+    const deleteAddressMutation = useDeleteAddress();
 
-    const isSubmitting = addAddressMutation.status === 'pending';
+    const isSubmitting = addAddressMutation.status === 'pending' || updateAddressMutation.status === 'pending';
+
+    const isLoading = addressQueryStatus === 'pending' || updateAddressMutation.status === 'pending' || deleteAddressMutation.status === 'pending';
+
+    useEffect(() => {
+        if (addressQueryStatus === 'error') {
+            toast.add({
+                type: 'error',
+                description: getUserFacingError(addressQueryError)
+            })
+        }
+    }
+        , [addressQueryStatus, addressQueryStatus])
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<ReadAddress | null>(null);
@@ -30,29 +46,61 @@ export default function Addresses() {
 
     function handleSubmit(values: UpdateAddress) {
         if (editing) {
-            console.log("update", values);
+            updateAddressMutation.mutate(values, {
+                onSuccess: () => toast.add(
+                    {
+                        type: 'success',
+                        description: 'Address is updated.'
+                    }),
+                onError: (err) => toast.add(
+                    {
+                        type: 'error',
+                        description: getUserFacingError(err.message)
+                    })
+            });
+
         }
         else {
             const { id, ...newAddress } = values;
-            console.log(newAddress);
-            //addAddressMutation.mutate(newAddress);
+            addAddressMutation.mutate(newAddress, {
+                onSuccess: () => toast.add(
+                    {
+                        type: 'success',
+                        description: 'Address is added.'
+                    }),
+                onError: (err) => toast.add(
+                    {
+                        type: 'error',
+                        description: getUserFacingError(err.message)
+                    })
+            });
         }
     }
+
     function handleChangeDefaultAddress(id: number) {
         console.log("set default", id)
     }
 
     function handleDeleteAddress(id: number) {
-        console.log("delete", id);
+        deleteAddressMutation.mutate(id, {
+            onSuccess: () => toast.add(
+                {
+                    type: 'success',
+                    description: 'Address is deleted.'
+                }),
+            onError: (err) => toast.add(
+                {
+                    type: 'error',
+                    description: getUserFacingError(err.message)
+                })
+        });
     }
 
     return (
         <div className="container mx-auto p-6">
             <h1 className="mb-6 text-2xl font-semibold">My Addresses</h1>
 
-            {addressQueryStatus === 'pending' && <p>Loading...</p>}
-
-            {addressQueryStatus === 'error' && <p>{addressQueryError?.message ?? 'Error on loading addresses!'}</p>}
+            {isLoading && <Spinner />}
 
             <div className="mb-1.5">
                 <Button variant="outline" onClick={handleAddAddress}>Add <Plus /> </Button>
@@ -73,6 +121,7 @@ export default function Addresses() {
                 submitLabel={editing ? "Save" : "Add"}
                 defaultValues={editing}
                 onSubmit={handleSubmit}
+                isLoading={isLoading}
             />
         </div>
     )

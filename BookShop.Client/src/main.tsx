@@ -6,6 +6,7 @@ import App from "./App.tsx"
 import { ThemeProvider } from "@/components/theme-provider.tsx"
 import { BrowserRouter } from "react-router-dom"
 import { queryClient } from "./lib/queryClient.ts"
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx"
 
 // const originalPushState = history.pushState;
 // history.pushState = function (...args) {
@@ -21,12 +22,14 @@ import { queryClient } from "./lib/queryClient.ts"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>
 )
