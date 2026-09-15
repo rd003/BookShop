@@ -10,6 +10,7 @@ import { useAddAddress, useDeleteAddress, useUpdateAddress } from "./hooks/useAd
 import { getUserFacingError } from "@/lib/getUserFacingError";
 import { toast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function Addresses() {
     const { addresses, addressQueryStatus, addressQueryError } = useAddress();
@@ -32,6 +33,7 @@ export default function Addresses() {
         , [addressQueryStatus, addressQueryStatus])
 
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
     const [editing, setEditing] = useState<ReadAddress | null>(null);
 
     function handleAddAddress() {
@@ -86,17 +88,18 @@ export default function Addresses() {
     }
 
     function handleDeleteAddress(id: number) {
-        deleteAddressMutation.mutate(id, {
-            onSuccess: () => toast.add(
-                {
-                    type: 'success',
-                    description: 'Address is deleted.'
-                }),
-            onError: (err) => toast.add(
-                {
-                    type: 'error',
-                    description: getUserFacingError(err.message)
-                })
+        setDeleteTargetId(id);
+    }
+
+    function confirmDeleteAddress() {
+        if (deleteTargetId === null) return;
+        deleteAddressMutation.mutate(deleteTargetId, {
+            onSuccess: () => {
+                toast.add({ type: 'success', description: 'Address is deleted.' });
+                setDeleteTargetId(null); // close dialog on success
+            },
+            onError: (err) => toast.add({ type: 'error', description: getUserFacingError(err) })
+            // dialog stays open on error, so user can retry or cancel
         });
     }
 
@@ -126,6 +129,15 @@ export default function Addresses() {
                 defaultValues={editing}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
+            />
+
+            <ConfirmDialog
+                open={deleteTargetId !== null}
+                onOpenChange={(open) => !open && setDeleteTargetId(null)}
+                title="Delete this address?"
+                description="This action cannot be undone."
+                isConfirming={deleteAddressMutation.status === 'pending'}
+                onConfirm={confirmDeleteAddress}
             />
         </div>
     )
