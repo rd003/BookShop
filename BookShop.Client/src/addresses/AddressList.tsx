@@ -7,7 +7,7 @@ interface AddressListProps {
     addresses: ReadAddress[];
     onEdit?: (address: ReadAddress) => void;
     onDelete?: (id: number) => void;
-    onSetDefault?: (id: number) => void;
+    onSetDefault?: (address: ReadAddress) => void;
     className?: string;
 }
 

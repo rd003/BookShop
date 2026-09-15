@@ -19,7 +19,7 @@ export async function createAddress(createAddress: CreateAddress): Promise<ReadA
 }
 
 export async function updateAddress(updateAddress: UpdateAddress): Promise<void> {
-    await apiFetch<ReadAddress>(url, {
+    await apiFetch<ReadAddress>(url + "/" + updateAddress.id, {
         method: 'PATCH',
         body: JSON.stringify(updateAddress)
     });

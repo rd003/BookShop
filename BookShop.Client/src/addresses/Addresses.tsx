@@ -44,21 +44,24 @@ export default function Addresses() {
         setDialogOpen(true);
     }
 
+    // This method is going to be used by handleSubmit and handleChangeDefaultAddress
+    function updateAddressMutate(values: UpdateAddress) {
+        updateAddressMutation.mutate(values, {
+            onSuccess: () => toast.add(
+                {
+                    type: 'success',
+                    description: 'Address is updated.'
+                }),
+            onError: (err) => toast.add(
+                {
+                    type: 'error',
+                    description: getUserFacingError(err.message)
+                })
+        });
+    }
     function handleSubmit(values: UpdateAddress) {
         if (editing) {
-            updateAddressMutation.mutate(values, {
-                onSuccess: () => toast.add(
-                    {
-                        type: 'success',
-                        description: 'Address is updated.'
-                    }),
-                onError: (err) => toast.add(
-                    {
-                        type: 'error',
-                        description: getUserFacingError(err.message)
-                    })
-            });
-
+            updateAddressMutate(values);
         }
         else {
             const { id, ...newAddress } = values;
@@ -77,8 +80,9 @@ export default function Addresses() {
         }
     }
 
-    function handleChangeDefaultAddress(id: number) {
-        console.log("set default", id)
+    function handleChangeDefaultAddress(readAddress: ReadAddress) {
+        const updateAddress: UpdateAddress = { ...readAddress, isDefault: !readAddress.isDefault };
+        updateAddressMutate(updateAddress);
     }
 
     function handleDeleteAddress(id: number) {

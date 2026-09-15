@@ -14,7 +14,7 @@ interface AddressCardProps {
     address: ReadAddress;
     onEdit?: (address: ReadAddress) => void;
     onDelete?: (id: number) => void;
-    onSetDefault?: (id: number) => void;
+    onSetDefault?: (address: ReadAddress) => void;
 }
 
 export default function AddressCard({
@@ -82,7 +82,7 @@ export default function AddressCard({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onSetDefault(id)}
+                        onClick={() => onSetDefault(address)}
                     >
                         Set as default
                     </Button>
