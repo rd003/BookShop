@@ -1,28 +1,31 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAddress, deleteAddress, updateAddress } from "../apis/addressApi";
 
-function useInvalidateCart() {
-    const query = useQueryClient();
-    return query.invalidateQueries({ queryKey: ['addresses'] });
+function useInvalidateAddress() {
+    const queryClient = useQueryClient();
+    return () => queryClient.invalidateQueries({ queryKey: ['addresses'] });
 }
 
 export function useAddAddress() {
+    const invalidateAddress = useInvalidateAddress();
     return useMutation({
         mutationFn: createAddress,
-        onSuccess: useInvalidateCart
+        onSuccess: invalidateAddress
     });
 }
 
 export function useUpdateAddress() {
+    const invalidateAddress = useInvalidateAddress();
     return useMutation({
         mutationFn: updateAddress,
-        onSuccess: useInvalidateCart
+        onSuccess: invalidateAddress
     });
 }
 
 export function useDeleteAddress() {
+    const invalidateAddress = useInvalidateAddress();
     return useMutation({
         mutationFn: deleteAddress,
-        onSuccess: useInvalidateCart
+        onSuccess: invalidateAddress
     })
 }
