@@ -14,7 +14,8 @@ import NotFound from "@/pages/NotFound";
 import Layout from "@/shared/ui/Layout";
 import Addresses from "@/addresses/Addresses";
 import ChangePassword from "@/auth/ChangePassword";
-import Orders from "@/orders/Orders";
+import Orders from "@/orders/Checkout";
+import Checkout from "@/orders/Checkout";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -34,6 +35,7 @@ export default function AppRoutes() {
                 <Route path="account/change-password" element={<ChangePassword />} />
                 <Route path="account/orders" element={<Orders />} />
                 <Route path="cart" element={<Cart />} />
+                <Route path="cart/checkout" element={<Checkout />} />
             </Route>
             <Route path="*" element={<NotFound />} />
         </Route>
