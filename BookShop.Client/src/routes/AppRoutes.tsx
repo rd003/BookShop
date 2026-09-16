@@ -16,6 +16,8 @@ import Addresses from "@/addresses/Addresses";
 import ChangePassword from "@/auth/ChangePassword";
 import Orders from "@/orders/Checkout";
 import Checkout from "@/orders/Checkout";
+import OrderSuccess from "@/orders/OrderSuccess";
+import Order from "@/orders/Order";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -36,6 +38,8 @@ export default function AppRoutes() {
                 <Route path="account/orders" element={<Orders />} />
                 <Route path="cart" element={<Cart />} />
                 <Route path="cart/checkout" element={<Checkout />} />
+                <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+                <Route path="/orders/:orderNumber" element={<Order />} />
             </Route>
             <Route path="*" element={<NotFound />} />
         </Route>
