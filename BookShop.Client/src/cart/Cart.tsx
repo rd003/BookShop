@@ -98,9 +98,9 @@ export default function Cart() {
             <div className="mt-8 flex flex-col items-end gap-1 border-t border-stone-200 pt-6">
                 <p className="text-sm text-stone-500">{cart ? cart.totalItems : 0} items</p>
                 <p className="text-lg font-medium text-stone-900">Total: ₹{cart ? cart.totalAmount : 0}</p>
-                <button className="mt-3 rounded-md bg-[#8A2E2E] px-6 py-2 text-sm font-medium text-white hover:bg-[#732626]">
+                <Link to="/cart/checkout" className="mt-3 rounded-md bg-[#8A2E2E] px-6 py-2 text-sm font-medium text-white hover:bg-[#732626]">
                     Proceed to checkout
-                </button>
+                </Link>
             </div>
         </div>
     );
