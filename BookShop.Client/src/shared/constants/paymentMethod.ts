@@ -1,5 +1,5 @@
 export const PaymentMethod = {
-    CashOnDelivery: "CashOnDelivery"
+    cashOnDelivery: "CashOnDelivery"
 }
 
 export type PaymentMethod = typeof PaymentMethod[keyof typeof PaymentMethod]
