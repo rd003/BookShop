@@ -8,8 +8,8 @@ export interface GetUserOrder {
     orderNumber: string;
     orderDate: string;
     orderStatus: OrderStatus;
-    pyamentMethod: PaymentMethod;
-    pyamentStatus: PaymentStatus;
+    paymentMethod: PaymentMethod;
+    paymentStatus: PaymentStatus;
     orderItems: ReadOrderItem[];
     shippingAddress: ReadAddress;
     orderTotal: number;

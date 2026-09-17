@@ -4,7 +4,7 @@ import type { GetUserOrder } from "../types/getUserOrder";
 
 export default function useOrder(orderNumber: string | undefined) {
     return useQuery<GetUserOrder>({
-        queryKey: ['orders'],
+        queryKey: ['orders', orderNumber],
         queryFn: () => getOrder(orderNumber ?? ""),
         enabled: !!orderNumber,
         retry: 1
