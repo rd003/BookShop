@@ -4,3 +4,5 @@ export interface QueryParameters {
     sortBy: string;
     searchTerm: string;
 }
+
+export type OrdersQueryParameters = Omit<QueryParameters, "searchTerm">;
