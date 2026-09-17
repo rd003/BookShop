@@ -1,6 +1,7 @@
 using BookShop.Api.Constants;
 using BookShop.Api.Exceptions;
 using BookShop.Api.Helpers;
+using BookShop.Api.Mappers;
 using BookShop.Api.Models;
 using BookShop.Api.Models.DTOs;
 using BookShop.Api.Models.Entities;
@@ -159,7 +160,8 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
 
         ordersQuery = ordersQuery
             .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookAuthors).ThenInclude(ba => ba.Author)
-            .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookGenres).ThenInclude(bg => bg.Genre);
+            .Include(o => o.OrderItems).ThenInclude(oi => oi.Book).ThenInclude(b => b!.BookGenres).ThenInclude(bg => bg.Genre)
+            .Include(o => o.ShippingAddress);
 
         var pagedOrders = await PagedList<Order>.ToPagedListAsync(ordersQuery, queryParameters.PageNumber, queryParameters.PageSize);
 
@@ -171,14 +173,17 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             OrderTotal = o.TotalAmount,
             PyamentMethod = o.PaymentMethod,
             PyamentStatus = o.PaymentStatus,
+            ShippingAddress = o.ShippingAddress!.ToDto(),
             OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
             {
+                Id = oi.Id,
                 BookId = oi.BookId,
                 BookTitle = oi.Book!.Title,
+                CoverImageUrl = oi.Book!.CoverImageUrl,
                 UnitPrice = oi.UnitPrice,
                 Quantity = oi.Quantity,
                 Authors = oi.Book!.BookAuthors.Select(ba => ba.Author!.Name).ToList(),
-                Genres = oi.Book.BookGenres.Select(bg => bg.Genre!.Name).ToList()
+                Genres = oi.Book.BookGenres.Select(bg => bg.Genre!.Name).ToList(),
             })
         });
 
@@ -198,10 +203,13 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
                         OrderStatus = o.Status,
                         OrderNumber = o.OrderNumber,
                         OrderTotal = o.TotalAmount,
+                        ShippingAddress = o.ShippingAddress!.ToDto(),
                         OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
                         {
+                            Id = oi.Id,
                             BookId = oi.BookId,
                             BookTitle = oi.Book!.Title,
+                            CoverImageUrl = oi.Book!.CoverImageUrl,
                             UnitPrice = oi.UnitPrice,
                             Quantity = oi.Quantity,
                             Authors = oi.Book.BookAuthors.Select(ba => ba.Author!.Name).ToList(),

@@ -9,6 +9,7 @@ public class GetUserOrderDto
     public OrderStatus OrderStatus { get; set; }
     public PaymentMethod PyamentMethod { get; set; }
     public PaymentStatus PyamentStatus { get; set; }
+    public ReadAddressDto ShippingAddress { get; set; } = null!;
     public IEnumerable<ReadOrderItemDto> OrderItems { get; set; } = [];
     public decimal OrderTotal { get; set; }
 }
