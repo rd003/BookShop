@@ -13,7 +13,7 @@ import {
     Package,
 } from "lucide-react";
 
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrency, formatDateTime } from "@/lib/format";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,14 +46,14 @@ export default function OrderSuccess() {
                     <MetaItem
                         icon={Calendar}
                         label="Order placed"
-                        value={formatDate(order.orderDate)}
+                        value={formatDateTime(order.orderDate)}
                     />
                     {/* <MetaItem
                         icon={Package}
                         label="Estimated delivery"
                         value={
                             order.estimatedDelivery
-                                ? formatDate(order.estimatedDelivery)
+                                ? formatDateTime(order.estimatedDelivery)
                                 : "Calculating…"
                         }
                     /> */}
@@ -83,12 +83,12 @@ export default function OrderSuccess() {
 
                 {/* Actions */}
                 <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
-                    <Button render={<Link to="/catalog" />} variant="outline" size="lg">
+                    <Button nativeButton={false} render={<Link to="/catalog" />} variant="outline" size="lg">
                         <ShoppingBag className="mr-2 h-4 w-4" />
                         Continue Shopping
 
                     </Button>
-                    <Button render={<Link to={`/orders/${order.orderNumber}`} />} size="lg">
+                    <Button nativeButton={false} render={<Link to={`/orders/${order.orderNumber}`} />} size="lg">
                         View Order Details
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -235,7 +235,7 @@ function ItemsCard({ items }: { items: ReadOrderItem[] }) {
                 {items.map((item) => (
                     <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
                         <img
-                            src={item.coverImageUrl}
+                            src={item.coverImageUrl || "https://placehold.co/300x440?text=Book"}
                             alt={item.bookTitle}
                             className="h-16 w-16 shrink-0 rounded-lg border object-cover"
                         />
@@ -322,10 +322,10 @@ function NotFoundState({ orderNumber }: { orderNumber?: string }) {
                         your confirmation email or contact support.
                     </p>
                     <div className="flex flex-wrap gap-2">
-                        <Button render={<Link to="/catalog" />} size="sm">
+                        <Button nativeButton={false} render={<Link to="/catalog" />} size="sm">
                             Continue Shopping
                         </Button>
-                        <Button render={<Link to="/orders" />} variant="outline" size="sm">
+                        <Button nativeButton={false} render={<Link to="/orders" />} variant="outline" size="sm">
                             My Orders
                         </Button>
                     </div>

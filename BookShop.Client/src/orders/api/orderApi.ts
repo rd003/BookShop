@@ -23,6 +23,6 @@ export async function getOrders(queryParams: QueryParameters, startDate: string 
 }
 
 export async function getOrder(orderNumber: string): Promise<GetUserOrder> {
-    const order = await apiFetch<GetUserOrder>(`${url}?orderNumber=${orderNumber}`);
+    const order = await apiFetch<GetUserOrder>(`${url}/${orderNumber}`);
     return order;
 }

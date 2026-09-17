@@ -1,7 +1,7 @@
 export const PaymentStatus = {
-    pending: "Pending",
-    paid: "Paid",
-    failed: "Failed"
+    Pending: "Pending",
+    Paid: "Paid",
+    Failed: "Failed"
 }
 
 export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus]

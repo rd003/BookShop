@@ -7,7 +7,7 @@ public class GetAdminOrderDto
     public int OrderId { get; set; }
     public string CustomerEmail { get; set; } = null!;
     public string OrderNumber { get; set; } = null!;
-    public DateTime OrderDate { get; set; }
+    public DateTimeOffset OrderDate { get; set; }
     public OrderStatus OrderStatus { get; set; }
     public PaymentMethod PyamentMethod { get; set; }
     public PaymentStatus PyamentStatus { get; set; }
