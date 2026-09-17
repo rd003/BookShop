@@ -1,5 +1,3 @@
-import type { ReadAddress } from "@/addresses/types/readAddress";
-
 export interface ReadOrderItem {
     id: number;
     bookId: number;

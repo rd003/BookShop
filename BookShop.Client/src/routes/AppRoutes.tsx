@@ -14,10 +14,10 @@ import NotFound from "@/pages/NotFound";
 import Layout from "@/shared/ui/Layout";
 import Addresses from "@/addresses/Addresses";
 import ChangePassword from "@/auth/ChangePassword";
-import Orders from "@/orders/Checkout";
 import Checkout from "@/orders/Checkout";
 import OrderSuccess from "@/orders/OrderSuccess";
 import Order from "@/orders/Order";
+import Orders from "@/orders/Orders";
 
 export default function AppRoutes() {
     return (<Routes>

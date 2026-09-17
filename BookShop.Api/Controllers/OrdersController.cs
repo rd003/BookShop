@@ -171,8 +171,8 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             OrderStatus = o.Status,
             OrderNumber = o.OrderNumber,
             OrderTotal = o.TotalAmount,
-            PyamentMethod = o.PaymentMethod,
-            PyamentStatus = o.PaymentStatus,
+            PaymentMethod = o.PaymentMethod,
+            PaymentStatus = o.PaymentStatus,
             ShippingAddress = o.ShippingAddress!.ToDto(),
             OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
             {
