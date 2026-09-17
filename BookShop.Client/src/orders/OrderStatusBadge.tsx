@@ -1,4 +1,3 @@
-// src/features/orders/components/OrderStatusBadge.tsx
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
@@ -10,6 +9,7 @@ const config: Record<OrderStatus, { label: string; className: string }> = {
     Shipped: { label: "Shipped", className: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300" },
     Delivered: { label: "Delivered", className: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300" },
     Cancelled: { label: "Cancelled", className: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300" },
+    Returned: { label: "Returned", className: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300" },
 };
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {

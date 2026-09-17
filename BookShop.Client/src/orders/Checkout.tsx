@@ -3,7 +3,7 @@ import type { ReadAddress } from "@/addresses/types/readAddress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { OrderFormValues } from "./types/createOrderSchema";
 import OrderForm from "./OrderForm";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import useCreateOrder from "./hooks/useCreateOrder";
 import type { CreateOrder } from "./types/createOrder";
 import { toast } from "../components/ui/toast";
@@ -41,14 +41,15 @@ export default function Checkout() {
     const createOrderMutation = useCreateOrder();
 
     async function handleSubmit(data: OrderFormValues) {
-        navigate(`/order-success/ord-1`);
+        navigate(`/order-success/ORD-20260916-33FB6
+`, { replace: true });
         // createOrderMutation.mutate(data as CreateOrder, {
         //     onSuccess: (createdOrder) => {
         //         toast.add({
         //             type: 'success',
         //             description: "Order is success full"
         //         });
-        //         navigate(`/order-success/${createdOrder.orderNumber}`);
+        //         navigate(`/order-success/${createdOrder.orderNumber}`,{replace:true});
         //     },
         //     onError: (err) => {
         //         toast.add({

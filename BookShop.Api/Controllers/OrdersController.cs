@@ -114,7 +114,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetOrders([FromQuery] QueryParameters queryParameters, [FromQuery] DateTime? startingOrderDate, [FromQuery] DateTime? endingOrderDate)
+    public async Task<IActionResult> GetOrders([FromQuery] QueryParameters queryParameters, [FromQuery] DateTimeOffset? startingOrderDate, [FromQuery] DateTimeOffset? endingOrderDate)
     {
         string[] allowedSortColumns = ["OrderDate"];
         var sortColumns = queryParameters.SortBy?.Trim().Split(',');
