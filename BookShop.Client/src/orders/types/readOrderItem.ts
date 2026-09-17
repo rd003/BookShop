@@ -1,9 +1,13 @@
+import type { ReadAddress } from "@/addresses/types/readAddress";
+
 export interface ReadOrderItem {
+    id: number;
     bookId: number;
     bookTitle: string;
+    coverImageUrl: string;
     authors: string[];
     genres: string[];
-    quantity: string[]
-    unitPrice: number
-    itemTotalPrice: number
+    quantity: number;
+    unitPrice: number;
+    itemTotalPrice: number;
 }
