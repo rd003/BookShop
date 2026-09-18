@@ -1,8 +1,18 @@
+import type { OrderStatus } from "../constants/orderStatus";
+
 export interface QueryParameters {
     pageSize: number;
     pageNumber: number;
-    sortBy: string;
-    searchTerm: string;
+    sortBy?: string | null;
+    searchTerm?: string | null;
 }
 
-export type OrdersQueryParameters = Omit<QueryParameters, "searchTerm">;
+export interface OrdersQueryParameters {
+    pageSize: number;
+    pageNumber: number;
+    sortBy?: string | null;
+    searchTerm: string;
+    orderStatus?: OrderStatus | null;
+    startDate?: string | null;
+    endDate?: string | null
+}

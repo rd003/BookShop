@@ -1,18 +1,20 @@
 import type { PagedList } from "@/shared/types/pagedList";
 import type { ReadBook } from "./types/readBook";
 import type { QueryParameters } from "@/shared/types/queryParameters";
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL + "/books";
+import { apiFetch } from "@/lib/apiClient";
 
 export async function fetchBooks(queryParams: QueryParameters, genreIds: number[]): Promise<PagedList<ReadBook>> {
-    let url = `${BASE_URL}?pageSize=${queryParams.pageSize}&pageNumber=${queryParams.pageNumber}&searchTerm=${queryParams.searchTerm}&sortBy=${queryParams.sortBy}`;
-    for (let genreId of genreIds) {
-        url += `&genreIds=${genreId}`;
-    }
-    const res = await fetch(url);
+    const params = new URLSearchParams({
+        pageNumber: String(queryParams.pageNumber),
+        pageSize: String(queryParams.pageSize)
+    });
 
-    if (!res.ok) {
-        throw new Error("Failed to fetch books.");
+    if (queryParams.sortBy) {
+        params.set("sortBy", queryParams.sortBy);
     }
-    return res.json();
+
+    for (let genreId of genreIds) {
+        params.append("genreIds", genreId.toString());
+    }
+    return apiFetch<PagedList<ReadBook>>(`/books?${params.toString()}`);
 }
