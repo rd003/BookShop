@@ -27,7 +27,7 @@ export default function Orders() {
 
     function handleOrderFilterClick(filterValues: OrderFilter) {
         const { dateFrom, dateTo, orderStatus } = filterValues;
-        // TODO: orders filter should be in query parameters  
+        TODO: orders filter should be in query parameters
         if (dateFrom) {
             setStartDate(dateFrom.toISOString());
         }
