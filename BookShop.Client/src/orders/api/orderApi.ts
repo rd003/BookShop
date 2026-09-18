@@ -33,7 +33,7 @@ export async function getOrders(queryParams: OrdersQueryParameters): Promise<Pag
     }
 
     if (queryParams.orderStatus) {
-        params.set("sortBy", queryParams.orderStatus);
+        params.set("orderStatus", queryParams.orderStatus);
     }
 
     return apiFetch<PagedList<GetUserOrder>>(`${url}?${params.toString()}`);

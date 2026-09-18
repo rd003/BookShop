@@ -1,37 +1,48 @@
 import type { OrdersQueryParameters } from "@/shared/types/queryParameters";
 import { useOrders } from "./hooks/useOrders"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getUserFacingError } from "@/lib/getUserFacingError";
-import { formatDateTime } from "@/lib/format";
+import { formatCurrency, formatDateTime } from "@/lib/format";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
+import type { OrderStatus } from "@/shared/constants/orderStatus";
 
 export default function Orders() {
-    const queryParams: OrdersQueryParameters = {
-        pageNumber: 1,
-        pageSize: 3,
-        sortBy: ""
-    }
     const [startDate, setStartDate] = useState<string | null>(null);
     const [endDate, setEndDate] = useState<string | null>(null);
-    const { data, status, error } = useOrders(queryParams, startDate, endDate);
+    const [pageNumber, setPageNumber] = useState<number | null>(null);
+    const [pageSize, setPageSize] = useState<number | null>(null);
+    const [sortBy, setSortBy] = useState<string | null>(null);
+    const [orderStatus, setOrderStatus] = useState<OrderStatus | null>(null);
 
-    useEffect(() => {
-        console.log({ startDate, endDate });
-    }, [startDate, endDate])
+    const queryParams: OrdersQueryParameters = {
+        pageNumber: pageNumber ?? 1,
+        pageSize: pageSize ?? 3,
+        sortBy,
+        startDate,
+        endDate,
+        orderStatus
+    }
+
+    const { data, status, error } = useOrders(queryParams);
 
     function handleOrderFilterClick(filterValues: OrderFilter) {
-        const { dateFrom, dateTo } = filterValues;
+        const { dateFrom, dateTo, orderStatus } = filterValues;
+        // TODO: orders filter should be in query parameters  
         if (dateFrom) {
             setStartDate(dateFrom.toISOString());
         }
         if (dateTo) {
             setEndDate(dateTo.toISOString());
         }
+        if (orderStatus) {
+            setOrderStatus(orderStatus);
+        }
     }
 
     function handleCrearFilter() {
         setStartDate(null);
         setEndDate(null);
+        setOrderStatus(null);
     }
 
     if (status === 'pending') {
@@ -54,7 +65,7 @@ export default function Orders() {
                 | {o.orderStatus}
                 | {o.paymentMethod}
                 | {o.paymentStatus}
-                | {o.orderTotal}
+                | {formatCurrency(o.orderTotal)}
             </li>)}
         </ul>
     </>)
