@@ -114,7 +114,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetOrders([FromQuery] QueryParameters queryParameters, [FromQuery] DateTimeOffset? startingOrderDate, [FromQuery] DateTimeOffset? endingOrderDate)
+    public async Task<IActionResult> GetOrders([FromQuery] OrderQueryParameters queryParameters)
     {
         string[] allowedSortColumns = ["OrderDate"];
         var sortColumns = queryParameters.SortBy?.Trim().Split(',');
@@ -128,10 +128,7 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             throw new BadRequestException($"Sorting not allowed on: {string.Join(", ", invalidColumns)}");
         }
 
-        // Reject an inverted range explicitly — feeding it straight to the query
-        // would just silently return zero rows, which reads as "no orders" rather
-        // than "you asked for something impossible"
-        if (startingOrderDate.HasValue && endingOrderDate.HasValue && startingOrderDate > endingOrderDate)
+        if (ValidateDateRange(queryParameters))
         {
             throw new BadRequestException("startingOrderDate cannot be after endingOrderDate");
         }
@@ -142,15 +139,19 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
             .Where(o => o.UserId == userId)
             .AsNoTracking();
 
-        // Each bound applied independently — supports open-ended ranges
-        // (only "from" or only "to") instead of requiring both
-        if (startingOrderDate.HasValue)
+        if (queryParameters.StartingOrderDate.HasValue)
         {
-            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date >= startingOrderDate.Value.Date);
+            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date >= queryParameters.StartingOrderDate.Value.Date);
+
         }
-        if (endingOrderDate.HasValue)
+        if (queryParameters.EndingOrderDate.HasValue)
         {
-            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date <= endingOrderDate.Value.Date);
+            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date <= queryParameters.EndingOrderDate.Value.Date);
+        }
+
+        if (queryParameters.OrderStatus is not null)
+        {
+            ordersQuery = ordersQuery.Where(o => o.Status == queryParameters.OrderStatus);
         }
 
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
@@ -188,6 +189,13 @@ public class OrdersController(AppDbContext context, UserManager<ApplicationUser>
         });
 
         return Ok(pagedOrderDtos);
+    }
+
+    private static bool ValidateDateRange(OrderQueryParameters queryParameters)
+    {
+        return queryParameters.StartingOrderDate.HasValue
+                && queryParameters.EndingOrderDate.HasValue
+                && queryParameters.StartingOrderDate > queryParameters.EndingOrderDate;
     }
 
     private async Task<GetUserOrderDto> GetUserOrderAsync(string orderNumber)
