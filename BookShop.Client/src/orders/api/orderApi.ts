@@ -14,14 +14,27 @@ export async function createOrder(createOrder: CreateOrder): Promise<GetUserOrde
     return data;
 }
 
-export async function getOrders(queryParams: OrdersQueryParameters, startDate: string | null, endDate: string | null): Promise<PagedList<GetUserOrder>> {
+export async function getOrders(queryParams: OrdersQueryParameters): Promise<PagedList<GetUserOrder>> {
     const params = new URLSearchParams({
         pageNumber: String(queryParams.pageNumber),
-        pageSize: String(queryParams.pageSize),
-        sortBy: queryParams.sortBy
+        pageSize: String(queryParams.pageSize)
     });
-    if (startDate) params.set("startingOrderDate", startDate);
-    if (endDate) params.set("endingOrderDate", endDate);
+
+    if (queryParams.startDate) {
+        params.set("startingOrderDate", queryParams.startDate);
+    }
+
+    if (queryParams.endDate) {
+        params.set("endingOrderDate", queryParams.endDate);
+    }
+
+    if (queryParams.sortBy) {
+        params.set("sortBy", queryParams.sortBy);
+    }
+
+    if (queryParams.orderStatus) {
+        params.set("sortBy", queryParams.orderStatus);
+    }
 
     return apiFetch<PagedList<GetUserOrder>>(`${url}?${params.toString()}`);
 }
