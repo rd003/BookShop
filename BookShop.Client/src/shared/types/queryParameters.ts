@@ -11,7 +11,6 @@ export interface OrdersQueryParameters {
     pageSize: number;
     pageNumber: number;
     sortBy?: string | null;
-    searchTerm: string;
     orderStatus?: OrderStatus | null;
     startDate?: string | null;
     endDate?: string | null
