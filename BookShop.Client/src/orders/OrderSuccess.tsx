@@ -22,7 +22,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useOrder from "./hooks/useOrder";
 import type { ReadOrderItem } from "./types/readOrderItem";
 import type { ReadAddress } from "@/addresses/types/readAddress";
-import { StatusBadge } from "@/components/StatusBadge";
+import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 
 export default function OrderSuccess() {
@@ -144,7 +144,7 @@ function SuccessHeader({
                         )}
                     </button>
                 </div>
-                <StatusBadge status={status as OrderStatus} />
+                <OrderStatusBadge status={status as OrderStatus} />
             </div>
         </div>
     );

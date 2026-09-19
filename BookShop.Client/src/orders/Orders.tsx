@@ -8,7 +8,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import Paginator from "../components/Paginator";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/StatusBadge";
+import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -94,7 +94,7 @@ export default function Orders() {
             {data.items.map(o => <li key={o.orderNumber}>
                 {formatDateTime(o.orderDate)}
                 | {o.orderNumber}
-                | <StatusBadge status={o.orderStatus} />
+                | <OrderStatusBadge status={o.orderStatus} />
                 | {o.paymentMethod}
                 | {o.paymentStatus}
                 | {formatCurrency(o.orderTotal)}

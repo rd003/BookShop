@@ -12,7 +12,7 @@ import useOrder from "./hooks/useOrder";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import {
     StatusBadge
-} from "@/components/StatusBadge";
+} from "@/components/OrderStatusBadge";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 
 const FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
