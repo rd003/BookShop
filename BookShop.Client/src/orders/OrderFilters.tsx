@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Search, RotateCcw } from "lucide-react"
 import type { OrderStatus } from "@/shared/constants/orderStatus";
-import { orderStatuses, orderStatusSelectItems } from "@/shared/constants/orderStatus";
+import { orderStatusSelectItems } from "@/shared/constants/orderStatus";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import SelectBasic from "@/components/SelectBasic";
 
 export interface OrderFilter {
     dateFrom: Date | undefined;
@@ -45,20 +46,12 @@ export default function OrderFilters({
                 </div>
 
                 <div className="min-w-35 flex-1">
-                    <Select items={orderStatusSelectItems} onValueChange={(val) => setOrderStatus(val)} value={orderStatus}>
-                        <SelectTrigger className="w-45">
-                            <SelectValue placeholder="Order Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                {orderStatusSelectItems.map((item) => (
-                                    <SelectItem key={item.value} value={item.value}>
-                                        {item.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    <SelectBasic
+                        items={orderStatusSelectItems}
+                        value={orderStatus}
+                        onChange={(val) => setOrderStatus(val)}
+                        placeHolder="Order Status"
+                    />
                 </div>
 
                 <Button
