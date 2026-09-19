@@ -1,48 +1,44 @@
 import type { OrdersQueryParameters } from "@/shared/types/queryParameters";
 import { useOrders } from "./hooks/useOrders"
-import { useState } from "react";
 import { getUserFacingError } from "@/lib/getUserFacingError";
 import { formatCurrency, formatDateTime } from "@/lib/format";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
+import { useSearchParams } from "react-router-dom";
 
 export default function Orders() {
-    const [startDate, setStartDate] = useState<string | null>(null);
-    const [endDate, setEndDate] = useState<string | null>(null);
-    const [pageNumber, setPageNumber] = useState<number | null>(null);
-    const [pageSize, setPageSize] = useState<number | null>(null);
-    const [sortBy, setSortBy] = useState<string | null>(null);
-    const [orderStatus, setOrderStatus] = useState<OrderStatus | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const queryParams: OrdersQueryParameters = {
-        pageNumber: pageNumber ?? 1,
-        pageSize: pageSize ?? 3,
-        sortBy,
-        startDate,
-        endDate,
-        orderStatus
+        pageNumber: Number(searchParams.get("pageNumber")) || 1,
+        pageSize: Number(searchParams.get("pageSize")) || 3,
+        sortBy: searchParams.get("sortBy"),
+        startDate: searchParams.get("startDate"),
+        endDate: searchParams.get("endDate"),
+        orderStatus: searchParams.get("orderStatus") as OrderStatus | null
     }
 
     const { data, status, error } = useOrders(queryParams);
 
     function handleOrderFilterClick(filterValues: OrderFilter) {
         const { dateFrom, dateTo, orderStatus } = filterValues;
-        TODO: orders filter should be in query parameters
-        if (dateFrom) {
-            setStartDate(dateFrom.toISOString());
-        }
-        if (dateTo) {
-            setEndDate(dateTo.toISOString());
-        }
-        if (orderStatus) {
-            setOrderStatus(orderStatus);
-        }
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            if (dateFrom) next.set("startDate", dateFrom.toISOString());
+            if (dateTo) next.set("endDate", dateTo.toISOString());
+            if (orderStatus) next.set("orderStatus", orderStatus);
+            return next;
+        })
     }
 
     function handleCrearFilter() {
-        setStartDate(null);
-        setEndDate(null);
-        setOrderStatus(null);
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.delete("startDate");
+            next.delete("endDate");
+            next.delete("orderStatus");
+            return next;
+        })
     }
 
     if (status === 'pending') {
