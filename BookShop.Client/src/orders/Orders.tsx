@@ -9,6 +9,7 @@ import Paginator from "../components/Paginator";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
+import PaymentStatusBadge from "@/components/PaymentStatusBadge";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -96,7 +97,7 @@ export default function Orders() {
                 | {o.orderNumber}
                 | <OrderStatusBadge status={o.orderStatus} />
                 | {o.paymentMethod}
-                | {o.paymentStatus}
+                | <PaymentStatusBadge status={o.paymentStatus} />
                 | {formatCurrency(o.orderTotal)}
                 | <Button variant="outline" nativeButton={false}
                     render={<Link to={`/orders/${o.orderNumber}`}>Detail</Link>} />
