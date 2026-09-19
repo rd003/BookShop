@@ -10,23 +10,10 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import useOrder from "./hooks/useOrder";
 import { formatCurrency, formatDateTime } from "@/lib/format";
+import {
+    StatusBadge
+} from "@/components/StatusBadge";
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
-
-const statusStyles: Record<string, { variant: BadgeVariant; className?: string }> = {
-    PENDING: { variant: "secondary" },
-    PROCESSING: { variant: "default" },
-    SHIPPED: { variant: "default", className: "bg-blue-600 hover:bg-blue-600 text-white" },
-    DELIVERED: { variant: "outline", className: "border-green-600 bg-green-600/10 text-green-700 hover:bg-green-600/10" },
-    CANCELLED: { variant: "destructive" },
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-    const s = statusStyles[status] ?? { variant: "outline" as const };
-    return <Badge variant={s.variant} className={s.className}>{status}</Badge>;
-};
-
-/* ---------- order progress timeline ---------- */
 
 const FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
 
