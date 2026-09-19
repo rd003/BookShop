@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import PaymentStatusBadge from "@/components/PaymentStatusBadge";
+import PaymentMethodBadge from "@/components/PaymentMethodBadge";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -96,7 +97,7 @@ export default function Orders() {
                 {formatDateTime(o.orderDate)}
                 | {o.orderNumber}
                 | <OrderStatusBadge status={o.orderStatus} />
-                | {o.paymentMethod}
+                | <PaymentMethodBadge paymentMethod={o.paymentMethod} />
                 | <PaymentStatusBadge status={o.paymentStatus} />
                 | {formatCurrency(o.orderTotal)}
                 | <Button variant="outline" nativeButton={false}
