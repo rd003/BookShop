@@ -5,6 +5,7 @@ import { formatCurrency, formatDateTime } from "@/lib/format";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 import { useSearchParams } from "react-router-dom";
+import PaginationSection from "./PaginationSection";
 
 export default function Orders() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -64,5 +65,9 @@ export default function Orders() {
                 | {formatCurrency(o.orderTotal)}
             </li>)}
         </ul>
+
+        <br />
+        <PaginationSection />
+        {/* TODO: how to append classes for my-2 */}
     </>)
 }

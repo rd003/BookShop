@@ -1,6 +1,6 @@
-import type { OrderStatus } from "@/shared/constants/orderStatus";
+// import type { OrderStatus } from "@/shared/constants/orderStatus";
 
-export interface OrderStatusSelectItem {
-    label: string;
-    value: OrderStatus
-}
+// export interface OrderStatusSelectItem {
+//     label: string;
+//     value: OrderStatus
+// }

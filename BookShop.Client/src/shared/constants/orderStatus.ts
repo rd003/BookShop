@@ -1,5 +1,4 @@
-import type { OrderStatusSelectItem } from "@/orders/types/orderStatusSelectItem";
-import { object } from "zod";
+import type { ISelectItem } from "../types/ISelectItem";
 
 export const orderStatuses = {
     Pending: "Pending",
@@ -13,7 +12,7 @@ export const orderStatuses = {
 
 export type OrderStatus = typeof orderStatuses[keyof typeof orderStatuses];
 
-export const orderStatusSelectItems: OrderStatusSelectItem[] = Object.values(orderStatuses).map(status => ({
+export const orderStatusSelectItems: ISelectItem<OrderStatus>[] = Object.values(orderStatuses).map(status => ({
     label: status,
     value: status
 }))
