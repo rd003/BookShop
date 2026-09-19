@@ -13,7 +13,7 @@ import { formatCurrency, formatDateTime } from "@/lib/format";
 import {
     StatusBadge
 } from "@/components/StatusBadge";
-
+import type { OrderStatus } from "@/shared/constants/orderStatus";
 
 const FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
 
@@ -229,7 +229,7 @@ export default function Order() {
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Status</span>
-                                <StatusBadge status={order.paymentStatus} />
+                                <StatusBadge status={order.paymentStatus as OrderStatus} />
                             </div>
                         </CardContent>
                     </Card>

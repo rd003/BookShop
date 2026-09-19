@@ -22,7 +22,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useOrder from "./hooks/useOrder";
 import type { ReadOrderItem } from "./types/readOrderItem";
 import type { ReadAddress } from "@/addresses/types/readAddress";
-import { OrderStatusBadge } from "./OrderStatusBadge";
+import { StatusBadge } from "@/components/StatusBadge";
+import type { OrderStatus } from "@/shared/constants/orderStatus";
 
 export default function OrderSuccess() {
     const { orderNumber } = useParams<{ orderNumber: string }>();
@@ -143,7 +144,7 @@ function SuccessHeader({
                         )}
                     </button>
                 </div>
-                <OrderStatusBadge status={status as any} />
+                <StatusBadge status={status as OrderStatus} />
             </div>
         </div>
     );
