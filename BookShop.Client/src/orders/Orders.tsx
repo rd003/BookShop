@@ -5,7 +5,7 @@ import { formatCurrency, formatDateTime } from "@/lib/format";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 import { useSearchParams } from "react-router-dom";
-import PaginationSection from "./PaginationSection";
+import Paginator from "../components/Paginator";
 
 export default function Orders() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -28,6 +28,22 @@ export default function Orders() {
             if (dateFrom) next.set("startDate", dateFrom.toISOString());
             if (dateTo) next.set("endDate", dateTo.toISOString());
             if (orderStatus) next.set("orderStatus", orderStatus);
+            return next;
+        })
+    }
+
+    function handlePageSelect(page: number) {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set("pageNumber", page.toString());
+            return next;
+        })
+    }
+
+    function handleLimitSelect(limit: number) {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set("pageSize", limit.toString());
             return next;
         })
     }
@@ -67,7 +83,16 @@ export default function Orders() {
         </ul>
 
         <br />
-        <PaginationSection />
+        <Paginator
+            currentPage={queryParams.pageNumber}
+            currentPageLimit={queryParams.pageSize}
+            hasNext={data.hasNext}
+            hasPrevious={data.hasPrevious}
+            totalPages={data.totalPages}
+            onPageSelect={handlePageSelect}
+            onLimitSelect={handleLimitSelect}
+        />
+        {/* TODO: pre selected pageNumber and pageSize in url */}
         {/* TODO: how to append classes for my-2 */}
     </>)
 }
