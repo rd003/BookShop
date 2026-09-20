@@ -6,6 +6,7 @@ import type { OrderStatus } from "@/shared/constants/orderStatus";
 import { useSearchParams } from "react-router-dom";
 import Paginator from "../components/Paginator";
 import { useEffect } from "react";
+import OrderList from "./OrderList";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -80,14 +81,15 @@ export default function Orders() {
     if (status === 'error') {
         return (<p>{getUserFacingError({ error })}</p>)
     }
-    return (<>
-        <h1 className="text-3xl">Orders</h1>
+    return (<div>
+        <h1 className="text-xl">My orders</h1>
 
         <OrderFilters
             onClick={handleOrderFilterClick}
             onClearFilter={handleCrearFilter}
         />
 
+        <OrderList orders={data.items} className="mt-2" />
 
         <Paginator
             currentPage={queryParams.pageNumber}
@@ -100,5 +102,5 @@ export default function Orders() {
             className="my-2"
         />
 
-    </>)
+    </div>)
 }
