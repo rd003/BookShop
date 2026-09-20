@@ -10,10 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import useOrder from "./hooks/useOrder";
 import { formatCurrency, formatDateTime } from "@/lib/format";
-import {
-    StatusBadge
-} from "@/components/OrderStatusBadge";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
+import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 
 const FLOW = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED"];
 
@@ -87,7 +85,7 @@ function OrderSkeleton() {
 export default function Order() {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const { data: order, error, status } = useOrder(orderNumber);
-
+    const backUrl = "/account/orders";
     if (status === "pending") return <OrderSkeleton />;
 
     if (status === "error") {
@@ -98,7 +96,7 @@ export default function Order() {
                 <p className="text-muted-foreground">
                     {error instanceof Error ? error.message : "Something went wrong."}
                 </p>
-                <Button nativeButton={false} variant="outline" render={<Link to="/account/orders" />}>
+                <Button nativeButton={false} variant="outline" render={<Link to={backUrl} />}>
                     Back to orders
                 </Button>
             </div >
@@ -114,7 +112,7 @@ export default function Order() {
             {/* header */}
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-1">
-                    <Button variant="ghost" size="sm" nativeButton={false} className="-ml-2 mb-1" render={<Link to="/account/orders" />}>
+                    <Button variant="ghost" size="sm" nativeButton={false} className="-ml-2 mb-1" render={<Link to={backUrl} />}>
                         <ArrowLeft className="mr-1 h-4 w-4" /> Back to orders
                     </Button>
                     <h1 className="text-2xl font-bold tracking-tight">
@@ -125,7 +123,7 @@ export default function Order() {
                         Placed on {formatDateTime(order.orderDate)}
                     </p>
                 </div>
-                <StatusBadge status={order.orderStatus} />
+                <OrderStatusBadge status={order.orderStatus} />
             </div>
 
             {/* timeline */}
@@ -229,7 +227,7 @@ export default function Order() {
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Status</span>
-                                <StatusBadge status={order.paymentStatus as OrderStatus} />
+                                <OrderStatusBadge status={order.paymentStatus as OrderStatus} />
                             </div>
                         </CardContent>
                     </Card>
