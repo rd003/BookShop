@@ -1,16 +1,11 @@
 import type { OrdersQueryParameters } from "@/shared/types/queryParameters";
 import { useOrders } from "./hooks/useOrders"
 import { getUserFacingError } from "@/lib/getUserFacingError";
-import { formatCurrency, formatDateTime } from "@/lib/format";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Paginator from "../components/Paginator";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { OrderStatusBadge } from "@/components/OrderStatusBadge";
-import PaymentStatusBadge from "@/components/PaymentStatusBadge";
-import PaymentMethodBadge from "@/components/PaymentMethodBadge";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -92,20 +87,8 @@ export default function Orders() {
             onClick={handleOrderFilterClick}
             onClearFilter={handleCrearFilter}
         />
-        <ul>
-            {data.items.map(o => <li key={o.orderNumber}>
-                {formatDateTime(o.orderDate)}
-                | {o.orderNumber}
-                | <OrderStatusBadge status={o.orderStatus} />
-                | <PaymentMethodBadge paymentMethod={o.paymentMethod} />
-                | <PaymentStatusBadge status={o.paymentStatus} />
-                | {formatCurrency(o.orderTotal)}
-                | <Button variant="outline" nativeButton={false}
-                    render={<Link to={`/orders/${o.orderNumber}`}>Detail</Link>} />
-            </li>)}
-        </ul>
 
-        <br />
+
         <Paginator
             currentPage={queryParams.pageNumber}
             currentPageLimit={queryParams.pageSize}
