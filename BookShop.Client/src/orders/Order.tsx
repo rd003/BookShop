@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
     ArrowLeft, CalendarDays, CreditCard, MapPin, Package,
     Truck, XCircle
@@ -18,7 +18,10 @@ import OrderTimeline from "./OrderTimeLine";
 export default function Order() {
     const { orderNumber } = useParams<{ orderNumber: string }>();
     const { data: order, error, status } = useOrder(orderNumber);
-    const backUrl = "/account/orders";
+    const location = useLocation();
+    const from = (location.state as { from?: string } | null)?.from;
+    const backUrl = from?.startsWith("/account/orders") ? from : "/account/orders";
+
     if (status === "pending") return <OrderSkeleton />;
 
     if (status === "error") {

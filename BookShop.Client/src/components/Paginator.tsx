@@ -38,7 +38,7 @@ export default function Paginator({
         { label: "100", value: 100 }
     ];
 
-    return (<div className={cn("flex justify-start items-center gap-4", className)}>
+    return (<div className={cn("flex justify-end items-center gap-4 p-2", className)}>
         <div className="flex gap-1 items-center" >
             <span>Per page: </span>
             <SelectBasic
