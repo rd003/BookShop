@@ -10,17 +10,25 @@ import EmptyOrders from "./orders-ui/EmptyOrders";
 import OrderListSkeleton from "./orders-ui/OrderListSkeleton";
 import QueryState from "@/components/QueryState";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/constants/pagination";
 
-const DEFAULT_PAGE_NUMBER = 1;
-const DEFAULT_PAGE_SIZE = 3;
+const DEFAULT_SORT = "orderDate desc"
+
+function parsePositiveInt(value: string | null, fallback: number) {
+    const n = Number(value);
+    return Number.isInteger(n) && n > 0 ? n : fallback;
+}
 
 export default function Orders() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const queryParams: OrdersQueryParameters = {
-        pageNumber: Number(searchParams.get("pageNumber")) || DEFAULT_PAGE_NUMBER,
-        pageSize: Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE,
-        sortBy: searchParams.get("sortBy"),
+        pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
+        pageSize: (() => {
+            const s = parsePositiveInt(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE);
+            return PAGE_SIZES.includes(s) ? s : DEFAULT_PAGE_SIZE;
+        })(),
+        sortBy: searchParams.get("sortBy") ?? DEFAULT_SORT,
         startDate: searchParams.get("startDate"),
         endDate: searchParams.get("endDate"),
         orderStatus: searchParams.get("orderStatus") as OrderStatus | null
@@ -32,16 +40,16 @@ export default function Orders() {
 
     const sortItems = parseSort(queryParams.sortBy);
 
-    useEffect(() => {
-        if (!searchParams.has("pageNumber") || !searchParams.has("pageSize")) {
-            setSearchParams(prev => {
-                const next = new URLSearchParams(prev);
-                if (!next.has("pageNumber")) next.set("pageNumber", String(DEFAULT_PAGE_NUMBER));
-                if (!next.has("pageSize")) next.set("pageSize", String(DEFAULT_PAGE_SIZE));
-                return next;
-            }, { replace: true })
-        }
-    }, [searchParams, setSearchParams])
+    // useEffect(() => {
+    //     if (!searchParams.has("pageNumber") || !searchParams.has("pageSize")) {
+    //         setSearchParams(prev => {
+    //             const next = new URLSearchParams(prev);
+    //             if (!next.has("pageNumber")) next.set("pageNumber", String(DEFAULT_PAGE_NUMBER));
+    //             if (!next.has("pageSize")) next.set("pageSize", String(DEFAULT_PAGE_SIZE));
+    //             return next;
+    //         }, { replace: true })
+    //     }
+    // }, [searchParams, setSearchParams])
 
     useEffect(() => {
         if (data && data.totalPages > 0 && queryParams.pageNumber > data.totalPages) {
@@ -75,32 +83,30 @@ export default function Orders() {
     }
 
     function handlePageSelect(page: number) {
-        setSearchParams(prev => {
-            const next = new URLSearchParams(prev);
-            next.set("pageNumber", page.toString());
-            return next;
-        })
+        updateParams(p => p.set("pageNumber", String(page)));
     }
 
     function handleLimitSelect(limit: number) {
-        setSearchParams(prev => {
-            const next = new URLSearchParams(prev);
-            next.set("pageSize", limit.toString());
-            next.set("pageNumber", "1"); // reset current page
-            return next;
-        })
+        updateParams(p => {
+            p.set("pageSize", String(limit));
+            p.set("pageNumber", "1");
+        });
     }
 
     function handleClearFilter() {
-        setSearchParams(prev => {
-            const next = new URLSearchParams(prev);
-            next.delete("startDate");
-            next.delete("endDate");
-            next.delete("orderStatus");
-            return next;
-        })
+        updateParams(p => {
+            ["startDate", "endDate", "orderStatus"].forEach(k => p.delete(k));
+            p.set("pageNumber", "1");
+        });
     }
 
+    function updateParams(mutate: (p: URLSearchParams) => void, options?: { replace?: boolean }) {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        }, options);
+    }
 
     return (
         <div>
@@ -131,6 +137,7 @@ export default function Orders() {
                     hasNext={data.hasNext && !isPlaceholderData}
                     hasPrevious={data.hasPrevious && !isPlaceholderData}
                     totalPages={data.totalPages}
+                    pageSizes={PAGE_SIZES}
                     onPageSelect={handlePageSelect}
                     onLimitSelect={handleLimitSelect}
                 />
