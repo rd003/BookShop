@@ -2,6 +2,7 @@ import SelectBasic from "@/components/SelectBasic"
 import {
     Pagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
@@ -9,16 +10,28 @@ import {
 } from "@/components/ui/pagination"
 import type { ISelectItem } from "@/shared/types/ISelectItem"
 import { cn } from "cn";
+import { PAGE_SIZES } from "@/shared/constants/pagination";
 
 interface PaginatorProps {
     hasNext: boolean;
     hasPrevious: boolean;
     totalPages: number;
     currentPage: number;
+    pageSizes?: number[];
     currentPageLimit: number;
     onPageSelect: (page: number) => void;
     onLimitSelect: (limit: number) => void;
     className?: string
+}
+function getPageWindow(current: number, total: number): (number | "ellipsis")[] {
+    const pages = new Set([1, total, current - 1, current, current + 1]);
+    const sorted = [...pages].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
+    const result: (number | "ellipsis")[] = [];
+    sorted.forEach((p, i) => {
+        if (i > 0 && p - sorted[i - 1] > 1) result.push("ellipsis");
+        result.push(p);
+    });
+    return result;
 }
 
 export default function Paginator({
@@ -27,16 +40,12 @@ export default function Paginator({
     totalPages,
     currentPage,
     currentPageLimit,
+    pageSizes = PAGE_SIZES,
     onPageSelect,
     onLimitSelect,
     className = "w-full"
 }: PaginatorProps) {
-    const pageLimitItems: ISelectItem<number>[] = [
-        { label: "3", value: 3 },
-        { label: "10", value: 10 },
-        { label: "20", value: 20 },
-        { label: "100", value: 100 }
-    ];
+    const pageLimitItems: ISelectItem<number>[] = pageSizes.map(p => ({ label: String(p), value: p }));
 
     return (<div className={cn("flex justify-end items-center gap-4 p-2", className)}>
         <div className="flex gap-1 items-center" >
@@ -57,13 +66,16 @@ export default function Paginator({
                         <PaginationPrevious onClick={() => onPageSelect(currentPage - 1)} />
                     </PaginationItem>}
 
-                    {Array.from({ length: totalPages }, (_, v) => v + 1).map((page) => (<PaginationItem key={page}>
-                        <PaginationLink isActive={currentPage === page} onClick={() => onPageSelect(page)} >{page}</PaginationLink>
-                    </PaginationItem>))}
+                    {getPageWindow(currentPage, totalPages).map((page, i) =>
+                        page === "ellipsis" ? (
+                            <PaginationItem key={`e${i}`}><PaginationEllipsis /></PaginationItem>
+                        ) : (
+                            <PaginationItem key={page}>
+                                <PaginationLink isActive={currentPage === page} onClick={() => onPageSelect(page)}>{page}</PaginationLink>
+                            </PaginationItem>
+                        )
+                    )}
 
-                    {/* <PaginationItem>
-                        <PaginationEllipsis />
-                    </PaginationItem> */}
                     {
                         hasNext &&
                         <PaginationItem>
