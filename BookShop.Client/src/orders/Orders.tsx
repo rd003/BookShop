@@ -7,6 +7,10 @@ import { useSearchParams } from "react-router-dom";
 import Paginator from "../components/Paginator";
 import { useEffect } from "react";
 import OrderList from "./OrderList";
+import EmptyOrders from "./orders-ui/EmptyOrders";
+import ListError from "../components/ListError";
+import OrderListSkeleton from "./orders-ui/OrderListSkeleton";
+import QueryState from "@/components/QueryState";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -22,6 +26,10 @@ export default function Orders() {
         endDate: searchParams.get("endDate"),
         orderStatus: searchParams.get("orderStatus") as OrderStatus | null
     }
+    const ordersQuery = useOrders(queryParams);
+    const { data, status, isFetching, isPlaceholderData } = ordersQuery;
+
+    const hasFilters = !!(queryParams.startDate || queryParams.endDate || queryParams.orderStatus);
 
     useEffect(() => {
         if (!searchParams.has("pageNumber") || !searchParams.has("pageSize")) {
@@ -34,8 +42,15 @@ export default function Orders() {
         }
     }, [searchParams, setSearchParams])
 
-    const { data, status, error } = useOrders(queryParams);
-
+    useEffect(() => {
+        if (data && data.totalPages > 0 && queryParams.pageNumber > data.totalPages) {
+            setSearchParams(prev => {
+                const next = new URLSearchParams(prev);
+                next.set("pageNumber", String(data.totalPages));
+                return next;
+            }, { replace: true });
+        }
+    }, [data, queryParams.pageNumber, setSearchParams]);
 
     function handleOrderFilterClick(filterValues: OrderFilter) {
         const { dateFrom, dateTo, orderStatus } = filterValues;
@@ -66,7 +81,7 @@ export default function Orders() {
         })
     }
 
-    function handleCrearFilter() {
+    function handleClearFilter() {
         setSearchParams(prev => {
             const next = new URLSearchParams(prev);
             next.delete("startDate");
@@ -76,31 +91,36 @@ export default function Orders() {
         })
     }
 
-    if (status === 'pending') {
-        return (<p>Loadin</p>)
-    }
-    if (status === 'error') {
-        return (<p>{getUserFacingError({ error })}</p>)
-    }
-    return (<div>
-        <h1 className="text-xl">My orders</h1>
 
-        <OrderFilters
-            onClick={handleOrderFilterClick}
-            onClearFilter={handleCrearFilter}
-        />
+    return (
+        <div>
+            <h1 className="text-xl">My orders</h1>
 
-        <OrderList orders={data.items} className="mt-2" />
+            <OrderFilters onClick={handleOrderFilterClick} onClearFilter={handleClearFilter} />
 
-        <Paginator
-            currentPage={queryParams.pageNumber}
-            currentPageLimit={queryParams.pageSize}
-            hasNext={data.hasNext}
-            hasPrevious={data.hasPrevious}
-            totalPages={data.totalPages}
-            onPageSelect={handlePageSelect}
-            onLimitSelect={handleLimitSelect}
-        />
+            {/* List region: the only part that switches state */}
+            <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+                <QueryState
+                    query={ordersQuery}
+                    isEmpty={d => d.items.length === 0}
+                    skeleton={<OrderListSkeleton rows={queryParams.pageSize} />}
+                    empty={<EmptyOrders filtered={hasFilters} onClear={handleClearFilter} />}
+                >
+                    {d => <OrderList orders={d.items} className="mt-2" />}
+                </QueryState>
+            </div>
 
-    </div>)
+            {status === "success" && data.items.length > 0 && (
+                <Paginator
+                    currentPage={queryParams.pageNumber}
+                    currentPageLimit={queryParams.pageSize}
+                    hasNext={data.hasNext && !isPlaceholderData}
+                    hasPrevious={data.hasPrevious && !isPlaceholderData}
+                    totalPages={data.totalPages}
+                    onPageSelect={handlePageSelect}
+                    onLimitSelect={handleLimitSelect}
+                />
+            )}
+        </div>
+    );
 }
