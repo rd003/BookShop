@@ -1,6 +1,5 @@
 import type { OrdersQueryParameters } from "@/shared/types/queryParameters";
 import { useOrders } from "./hooks/useOrders"
-import { getUserFacingError } from "@/lib/getUserFacingError";
 import OrderFilters, { type OrderFilter } from "./OrderFilters";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 import { useSearchParams } from "react-router-dom";
@@ -8,9 +7,9 @@ import Paginator from "../components/Paginator";
 import { useEffect } from "react";
 import OrderList from "./OrderList";
 import EmptyOrders from "./orders-ui/EmptyOrders";
-import ListError from "../components/ListError";
 import OrderListSkeleton from "./orders-ui/OrderListSkeleton";
 import QueryState from "@/components/QueryState";
+import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 3;
@@ -30,6 +29,8 @@ export default function Orders() {
     const { data, status, isFetching, isPlaceholderData } = ordersQuery;
 
     const hasFilters = !!(queryParams.startDate || queryParams.endDate || queryParams.orderStatus);
+
+    const sortItems = parseSort(queryParams.sortBy);
 
     useEffect(() => {
         if (!searchParams.has("pageNumber") || !searchParams.has("pageSize")) {
@@ -62,6 +63,15 @@ export default function Orders() {
             next.set("pageNumber", "1");
             return next;
         })
+    }
+
+    function handleSortToggle(column: string, multi = false) {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+            next.set("pageNumber", "1");
+            return next;
+        });
     }
 
     function handlePageSelect(page: number) {
@@ -106,7 +116,11 @@ export default function Orders() {
                     skeleton={<OrderListSkeleton rows={queryParams.pageSize} />}
                     empty={<EmptyOrders filtered={hasFilters} onClear={handleClearFilter} />}
                 >
-                    {d => <OrderList orders={d.items} className="mt-2" />}
+                    {d => <OrderList
+                        orders={d.items}
+                        sort={sortItems}
+                        onSortToggle={handleSortToggle}
+                        className="mt-2" />}
                 </QueryState>
             </div>
 

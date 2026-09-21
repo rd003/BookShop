@@ -13,9 +13,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { getDirection, type SortItem } from "@/lib/sort";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
+import type { SortDirection } from "@/shared/types/SortDirection";
+import SortableHead from "./orders-ui/SortableHead";
 
-export default function OrderList({ orders, className }: { orders: GetUserOrder[], className?: string }) {
+interface OrderListProps {
+    orders: GetUserOrder[];
+    className?: string;
+    sort: SortItem[];
+    onSortToggle: (column: string, multi?: boolean) => void;
+}
+
+export default function OrderList({ orders, className, sort, onSortToggle }: OrderListProps) {
     const location = useLocation();
     return (
         <Table className={className}>
@@ -23,7 +33,11 @@ export default function OrderList({ orders, className }: { orders: GetUserOrder[
             <TableHeader>
                 <TableRow>
                     <TableHead className="w-25">Order#</TableHead>
-                    <TableHead>Order Date</TableHead>
+                    <SortableHead
+                        label="Order Date"
+                        direction={getDirection(sort, "orderDate")}
+                        onToggle={multi => onSortToggle("orderDate", multi)}
+                    />
                     <TableHead>Order Status</TableHead>
                     <TableHead>Payment Method</TableHead>
                     <TableHead>Payment Status</TableHead>
@@ -33,8 +47,8 @@ export default function OrderList({ orders, className }: { orders: GetUserOrder[
             </TableHeader>
 
             <TableBody>
-                {orders.map(o => <TableRow>
-                    <TableCell key={o.orderNumber} className="font-medium">{o.orderNumber}</TableCell>
+                {orders.map(o => <TableRow key={o.orderNumber}>
+                    <TableCell className="font-medium">{o.orderNumber}</TableCell>
                     <TableCell>{formatDateTime(o.orderDate)}</TableCell>
                     <TableCell>
                         <OrderStatusBadge status={o.orderStatus} />
