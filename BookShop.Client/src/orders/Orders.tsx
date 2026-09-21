@@ -36,6 +36,7 @@ export default function Orders() {
 
     const { data, status, error } = useOrders(queryParams);
 
+
     function handleOrderFilterClick(filterValues: OrderFilter) {
         const { dateFrom, dateTo, orderStatus } = filterValues;
         setSearchParams(prev => {
@@ -99,7 +100,6 @@ export default function Orders() {
             totalPages={data.totalPages}
             onPageSelect={handlePageSelect}
             onLimitSelect={handleLimitSelect}
-            className="my-2"
         />
 
     </div>)

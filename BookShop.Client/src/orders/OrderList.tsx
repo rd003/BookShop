@@ -2,7 +2,7 @@ import { formatCurrency, formatDateTime } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import PaymentStatusBadge from "@/components/PaymentStatusBadge";
 import PaymentMethodBadge from "@/components/PaymentMethodBadge";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { GetUserOrder } from "./types/getUserOrder";
 import {
     Table,
@@ -16,6 +16,7 @@ import {
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 
 export default function OrderList({ orders, className }: { orders: GetUserOrder[], className?: string }) {
+    const location = useLocation();
     return (
         <Table className={className}>
             <TableCaption>A list of your recent orders</TableCaption>
@@ -49,7 +50,11 @@ export default function OrderList({ orders, className }: { orders: GetUserOrder[
                     </TableCell>
                     <TableCell>
                         <Button variant="outline" nativeButton={false}
-                            render={<Link to={`/orders/${o.orderNumber}`}>Detail</Link>} />
+                            render={
+                                <Link
+                                    to={`/orders/${o.orderNumber}`}
+                                    state={{ from: `${location.pathname}${location.search}` }}
+                                >Detail</Link>} />
                     </TableCell>
 
                 </TableRow>)
