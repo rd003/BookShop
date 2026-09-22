@@ -7,6 +7,7 @@ import { z } from "zod";
 // Login.tsx — add these imports at top, alongside existing ones
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UserInfo } from "./types/UserInfo";
 
 const schema = z.object({
     username: z.string()
@@ -37,9 +38,12 @@ export default function Login() {
 
     const loginMutation = useMutation({
         mutationFn: login,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-            const from = location.state?.from?.pathname || '/';
+        onSuccess: async () => {
+            const result = await queryClient.query<UserInfo | undefined>({ queryKey: ['user'] }); // imperative fetch, bypasses stale useUser() snapshot
+            const normalizedRoles = result?.roles?.map(r => r.toLowerCase());
+            const isAdmin = !!normalizedRoles?.includes("admin");
+            const defaultPath = isAdmin ? "/admin" : "/";
+            const from = location.state?.from?.pathname || defaultPath;
             navigate(from, { replace: true });
         }
     })
