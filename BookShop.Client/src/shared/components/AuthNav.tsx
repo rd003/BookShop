@@ -17,7 +17,11 @@ export default function AuthNav() {
     const logoutMutation = useLogout();
 
     function handleLogoutClick() {
-        logoutMutation.mutate();
+        logoutMutation.mutate(undefined, {
+            onSuccess: () => {
+                navigate("/")
+            }
+        });
     }
 
     if (isLoading) return null;
