@@ -22,6 +22,7 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import useLogout from "@/auth/hooks/useLogout";
 
 const menuItems = [
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard, end: true },
@@ -34,10 +35,13 @@ const menuItems = [
 
 export function AdminSidebar() {
     const navigate = useNavigate();
-
+    const logoutMutation = useLogout();
     const handleLogout = () => {
-        // TODO: clear auth token / session here
-        navigate("/login");
+        logoutMutation.mutate(undefined, {
+            onSuccess: () => {
+                navigate("/login");
+            }
+        })
     };
 
     return (

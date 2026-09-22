@@ -8,7 +8,6 @@ export default function useLogout() {
         mutationFn: logout,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user'] });
-            console.trace("Logout onSuccess navigate ('/') firing");
         }
     });
 }
