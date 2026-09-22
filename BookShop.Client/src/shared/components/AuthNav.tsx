@@ -2,8 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import { useUser } from "@/auth/hooks/useUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { logout } from "@/auth/api/authApi";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -11,19 +9,12 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import useLogout from "@/auth/hooks/useLogout";
 
 export default function AuthNav() {
     const { data: user, isLoading } = useUser();
-    const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const logoutMutation = useMutation({
-        mutationFn: logout,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-            console.trace("Logout onSuccess navigate ('/') firing");
-            navigate('/');
-        }
-    })
+    const logoutMutation = useLogout();
 
     function handleLogoutClick() {
         logoutMutation.mutate();
