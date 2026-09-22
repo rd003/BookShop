@@ -19,6 +19,7 @@ export default function AuthNav() {
     function handleLogoutClick() {
         logoutMutation.mutate(undefined, {
             onSuccess: () => {
+                console.trace("Logout onSuccess navigate ('/') firing");
                 navigate("/")
             }
         });
