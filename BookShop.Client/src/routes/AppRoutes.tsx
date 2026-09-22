@@ -25,6 +25,7 @@ import AuthorPage from "@/author/AuthorPage";
 import PublisherPage from "@/publisher/PublisherPage";
 import ManageBookPage from "@/book-entry/ManageBookPage";
 import AdminOrdersPage from "@/reports/AdminOrdersPage";
+import RequireRole from "@/RequiredRole";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -52,7 +53,7 @@ export default function AppRoutes() {
         </Route>
 
         <Route element={<AdminLayout />}>
-            <Route element={<RequireAuth />}>
+            <Route element={<RequireRole roles={["admin"]} />}>
                 <Route path="/admin" element={<DashboardPage />} />
                 <Route path="/admin/genres" element={<GenrePage />} />
                 <Route path="/admin/authors" element={<AuthorPage />} />
