@@ -40,17 +40,6 @@ export default function Orders() {
 
     const sortItems = parseSort(queryParams.sortBy);
 
-    // useEffect(() => {
-    //     if (!searchParams.has("pageNumber") || !searchParams.has("pageSize")) {
-    //         setSearchParams(prev => {
-    //             const next = new URLSearchParams(prev);
-    //             if (!next.has("pageNumber")) next.set("pageNumber", String(DEFAULT_PAGE_NUMBER));
-    //             if (!next.has("pageSize")) next.set("pageSize", String(DEFAULT_PAGE_SIZE));
-    //             return next;
-    //         }, { replace: true })
-    //     }
-    // }, [searchParams, setSearchParams])
-
     useEffect(() => {
         if (data && data.totalPages > 0 && queryParams.pageNumber > data.totalPages) {
             setSearchParams(prev => {
