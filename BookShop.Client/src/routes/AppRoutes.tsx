@@ -18,6 +18,13 @@ import Checkout from "@/orders/Checkout";
 import OrderSuccess from "@/orders/OrderSuccess";
 import Order from "@/orders/Order";
 import Orders from "@/orders/Orders";
+import { AdminLayout } from "@/shared/ui/AdminLayout";
+import DashboardPage from "@/dashboard/DashboardPage";
+import GenrePage from "@/genres/GenrePage";
+import AuthorPage from "@/author/AuthorPage";
+import PublisherPage from "@/publisher/PublisherPage";
+import ManageBookPage from "@/book-entry/ManageBookPage";
+import AdminOrdersPage from "@/reports/AdminOrdersPage";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -42,6 +49,19 @@ export default function AppRoutes() {
                 <Route path="/orders/:orderNumber" element={<Order />} />
             </Route>
             <Route path="*" element={<NotFound />} />
+        </Route>
+
+        <Route element={<AdminLayout />}>
+            <Route element={<RequireAuth />}>
+                <Route path="/admin" element={<DashboardPage />} />
+                <Route path="/admin/genres" element={<GenrePage />} />
+                <Route path="/admin/authors" element={<AuthorPage />} />
+                <Route path="/admin/publishers" element={<PublisherPage />} />
+                <Route path="/admin/books" element={<ManageBookPage />} />
+                <Route path="/admin/orders" element={<AdminOrdersPage />} />
+                <Route path="/admin/change-password" element={<ChangePassword />} />
+                <Route path="*" element={<NotFound />} />
+            </Route>
         </Route>
     </Routes>);
 }
