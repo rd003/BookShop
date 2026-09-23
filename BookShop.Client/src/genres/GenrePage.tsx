@@ -3,10 +3,13 @@ import type { UpdateGenre } from "./types/updateGenre";
 import GenreForm from "./ui/GenreForm";
 import type { ReadGenre } from "./types/readGenre";
 import GenreList from "./ui/GenreList";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
     const [resetSignal, setResetSignal] = useState<number>(0);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
     const genres: ReadGenre[] = [
         { id: 1, name: "Genre1" },
         { id: 2, name: "Genre2" },
@@ -25,8 +28,12 @@ export default function GenrePage() {
         setSelectedGenre(genre as UpdateGenre);
     }
 
-    function handleDelete(genre: ReadGenre) {
-        console.log('delete', genre);
+    function handleDelete(genreId: number) {
+        setDeleteTargetId(genreId);
+    }
+
+    function confirmDeleteGenre() {
+        console.log(`deleted: ${deleteTargetId}`)
     }
 
     return (<div>
@@ -44,6 +51,15 @@ export default function GenrePage() {
             onEdit={handleFormEdit}
             onDelete={handleDelete}
             className="mt-4"
+        />
+
+        <ConfirmDialog
+            open={deleteTargetId !== null}
+            onOpenChange={(open) => !open && setDeleteTargetId(null)}
+            title="Delete this genre?"
+            description="This action cannot be undone."
+            isConfirming={false}
+            onConfirm={confirmDeleteGenre}
         />
     </div>)
 }
