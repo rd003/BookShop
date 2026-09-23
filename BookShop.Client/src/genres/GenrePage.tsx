@@ -131,6 +131,7 @@ export default function GenrePage() {
         />
 
         <hr />
+        Define skeleton, handle error
         <GenreFilter
             onSearch={handleOnSearch}
             onClear={handleClearFilter}
