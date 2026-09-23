@@ -14,7 +14,7 @@ import { Pencil, Trash2 } from "lucide-react";
 interface Props {
     genres: ReadGenre[];
     onEdit: (genre: ReadGenre) => void;
-    onDelete: (genre: ReadGenre) => void;
+    onDelete: (genreId: number) => void;
     className?: string;
 }
 
@@ -38,7 +38,7 @@ export default function GenreList({
                         <TableCell>{g.name}</TableCell>
                         <TableCell>
                             <Button variant="default" onClick={() => onEdit(g)}><Pencil /></Button>
-                            <Button variant="destructive" onClick={() => onDelete(g)}><Trash2 /></Button>
+                            <Button variant="destructive" onClick={() => onDelete(g.id)}><Trash2 /></Button>
                         </TableCell>
                     </TableRow>
                 )}
