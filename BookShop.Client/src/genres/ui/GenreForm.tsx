@@ -6,29 +6,30 @@ import type { UpdateGenre } from "../types/updateGenre";
 interface Props {
     selectedGenre: UpdateGenre | null,
     onSubmit: (genre: UpdateGenre) => void,
-    submitting: boolean
+    submitting: boolean;
+    resetSignal: number;
 }
 
 export default function GenreForm({
     selectedGenre = null,
     onSubmit,
-    submitting = false
+    submitting = false,
+    resetSignal
 }: Props) {
     const [name, setName] = useState<string>('');
     const [validationError, setValidationError] = useState<string | null>();
     const [id, setId] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        console.log("use effect in genreForm");
-        console.log(selectedGenre);
         if (selectedGenre) {
             setId(selectedGenre.id);
             setName(selectedGenre.name);
         }
-        else {
-            handleReset();
-        }
     }, [selectedGenre])
+
+    useEffect(() => {
+        handleReset();
+    }, [resetSignal])
 
     function handleReset() {
         setName('');
