@@ -4,18 +4,17 @@ import GenreForm from "./ui/GenreForm";
 import type { ReadGenre } from "./types/readGenre";
 import GenreList from "./ui/GenreList";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import useGenreQuery from "./hooks/useGenreQuery";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
     const [resetSignal, setResetSignal] = useState<number>(0);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-    const genres: ReadGenre[] = [
-        { id: 1, name: "Genre1" },
-        { id: 2, name: "Genre2" },
-        { id: 3, name: "Genre3" },
-        { id: 4, name: "Genre4" }
-    ];
+    const { allGenres, genreStatus, genreError } = useGenreQuery();
+
+    const isLoading = genreStatus === 'pending';
+
     const submitting: boolean = false;
 
     function handleSubmit(genre: UpdateGenre) {
@@ -47,7 +46,7 @@ export default function GenrePage() {
         />
 
         <GenreList
-            genres={genres}
+            genres={allGenres}
             onEdit={handleFormEdit}
             onDelete={handleDelete}
             className="mt-4"
