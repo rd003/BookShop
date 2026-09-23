@@ -18,7 +18,16 @@ export default function Books() {
         sortBy: null,
         searchTerm: null
     };
-    const { allGenres, genreError, genreStatus } = useGenreQuery(queryParameters);
+    const genreQuery = useGenreQuery(queryParameters);
+
+    const {
+        data,
+        status: genreStatus,
+        error: genreError,
+    } = genreQuery;
+
+    const allGenres = data?.items ?? [];
+
     const [searchParams] = useSearchParams();
 
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
