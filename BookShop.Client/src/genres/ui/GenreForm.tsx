@@ -2,23 +2,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import type { UpdateGenre } from "../types/updateGenre";
+import { cn } from "cn";
 
 interface Props {
     selectedGenre: UpdateGenre | null,
     onSubmit: (genre: UpdateGenre) => void,
     submitting: boolean;
     resetSignal: number;
+    className?: string
 }
 
 export default function GenreForm({
     selectedGenre = null,
     onSubmit,
     submitting = false,
-    resetSignal
+    resetSignal,
+    className
 }: Props) {
     const [name, setName] = useState<string>('');
     const [validationError, setValidationError] = useState<string | null>();
-    const [id, setId] = useState<number | undefined>(undefined);
+    const [id, setId] = useState<number>(0);
 
     useEffect(() => {
         if (selectedGenre) {
@@ -33,13 +36,15 @@ export default function GenreForm({
 
     function handleReset() {
         setName('');
-        setId(undefined);
+        setId(0);
+        setValidationError(null);
     }
 
     function handleSubmit(e: React.SubmitEvent) {
         e.preventDefault();
         if (!isNameValid(name)) return;
         onSubmit({ id, name } as UpdateGenre)
+        setValidationError(null);
     }
 
     function isNameValid(val: string): boolean {
@@ -55,7 +60,7 @@ export default function GenreForm({
     }
 
     return (
-        <form className="flex gap-1" onSubmit={(e) => handleSubmit(e)}>
+        <form className={cn("flex gap-1", className)} onSubmit={(e) => handleSubmit(e)}>
             <input type="hidden" value={id} />
             <div className="flex gap-1">
                 <label htmlFor="name">Name</label>
