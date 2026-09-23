@@ -32,14 +32,20 @@ export default function GenrePage() {
     }
     const sortItems = parseSort(queryParams.sortBy);
 
+    const genreQuery = useGenreQuery(queryParams);
+
     const {
-        allGenres,
-        genreStatus,
-        genreError,
-        hasNext,
-        hasPrev,
-        totalPages
-    } = useGenreQuery(queryParams);
+        data,
+        status: genreStatus,
+        error: genreError,
+        isFetching,
+        isPlaceholderData
+    } = genreQuery;
+
+    const allGenres = data?.items ?? [];
+    const hasNext = data?.hasNext;
+    const hasPrev = data?.hasPrevious;
+    const totalPages = data?.totalPages;
 
     const isLoading = genreStatus === 'pending';
 
@@ -145,8 +151,8 @@ export default function GenrePage() {
                 currentPage={queryParams.pageNumber}
                 currentPageLimit={queryParams.pageSize}
                 pageSizes={PAGE_SIZES}
-                hasNext={hasNext!}
-                hasPrevious={hasPrev!}
+                hasNext={hasNext! && !isPlaceholderData}
+                hasPrevious={hasPrev! && !isPlaceholderData}
                 totalPages={totalPages!}
                 onPageSelect={handlePageSelect}
                 onLimitSelect={handleLimitSelect}
