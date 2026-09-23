@@ -11,6 +11,7 @@ import type { QueryParameters } from "@/shared/types/queryParameters";
 import { useSearchParams } from "react-router-dom";
 import { parsePositiveInt } from "@/lib/parsePositiveInt";
 import GenreFilter from "./ui/GenreFilter";
+import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
@@ -29,6 +30,7 @@ export default function GenrePage() {
         searchTerm: searchParams.get("searchTerm"),
         sortBy: searchParams.get("sortBy") ?? DEFAULT_SORT
     }
+    const sortItems = parseSort(queryParams.sortBy);
 
     const {
         allGenres,
@@ -101,6 +103,16 @@ export default function GenrePage() {
         }, options)
     }
 
+    function handleSortToggle(column: string, multi = false) {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+            next.set("pageNumber", "1");
+            return next;
+        });
+    }
+
+
     return (<div>
         <h1 className="text-2xl">Manage Genres</h1>
 
@@ -124,6 +136,8 @@ export default function GenrePage() {
             onEdit={handleFormEdit}
             onDelete={handleDelete}
             className="mt-2"
+            sort={sortItems}
+            onSortToggle={handleSortToggle}
         />
 
         {genreStatus !== 'pending' && allGenres.length > 0 &&
