@@ -9,9 +9,16 @@ import { useInfiniteScroll } from "./hooks/useInfinitScroll";
 import type { AddCartItemRequest } from "@/cart/types/addCartItemRequest";
 import { useAddCartItem } from "./hooks/useCartMutation";
 import { toast } from "@/components/ui/toast";
+import type { QueryParameters } from "@/shared/types/queryParameters";
 
 export default function Books() {
-    const { allGenres, genreError, genreStatus } = useGenreQuery();
+    const queryParameters: QueryParameters = {
+        pageNumber: 1,
+        pageSize: 1000,
+        sortBy: null,
+        searchTerm: null
+    };
+    const { allGenres, genreError, genreStatus } = useGenreQuery(queryParameters);
     const [searchParams] = useSearchParams();
 
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);

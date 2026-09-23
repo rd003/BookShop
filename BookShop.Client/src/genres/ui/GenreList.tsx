@@ -36,7 +36,7 @@ export default function GenreList({
                 {genres.map(g =>
                     <TableRow key={g.id}>
                         <TableCell>{g.name}</TableCell>
-                        <TableCell>
+                        <TableCell className="flex gap-1">
                             <Button variant="default" onClick={() => onEdit(g)}><Pencil /></Button>
                             <Button variant="destructive" onClick={() => onDelete(g.id)}><Trash2 /></Button>
                         </TableCell>

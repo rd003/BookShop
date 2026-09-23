@@ -5,17 +5,42 @@ import type { ReadGenre } from "./types/readGenre";
 import GenreList from "./ui/GenreList";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import useGenreQuery from "./hooks/useGenreQuery";
+import Paginator from "@/components/Paginator";
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/constants/pagination";
+import type { QueryParameters } from "@/shared/types/queryParameters";
+import { useSearchParams } from "react-router-dom";
+import { parsePositiveInt } from "@/lib/parsePositiveInt";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
     const [resetSignal, setResetSignal] = useState<number>(0);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const { allGenres, genreStatus, genreError } = useGenreQuery();
+    const DEFAULT_SORT = "name";
+
+    const queryParams: QueryParameters = {
+        pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
+        pageSize: (() => {
+            const s = parsePositiveInt(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE);
+            return PAGE_SIZES.includes(s) ? s : DEFAULT_PAGE_SIZE;
+        })(),
+        searchTerm: searchParams.get("searchTerm"),
+        sortBy: searchParams.get("sortBy") ?? DEFAULT_SORT
+    }
+
+    const {
+        allGenres,
+        genreStatus,
+        genreError,
+        hasNext,
+        hasPrev,
+        totalPages
+    } = useGenreQuery(queryParams);
 
     const isLoading = genreStatus === 'pending';
 
-    const submitting: boolean = false;
+    const submitting: boolean = false; // TODO: derive it from mutation status
 
     function handleSubmit(genre: UpdateGenre) {
         console.log(genre);
@@ -35,6 +60,45 @@ export default function GenrePage() {
         console.log(`deleted: ${deleteTargetId}`)
     }
 
+    function handlePageSelect(page: number) {
+        updateSearchParams(p => {
+            p.set("pageNumber", page.toString())
+        })
+    }
+
+    function handleLimitSelect(limit: number) {
+        updateSearchParams((p) => {
+            p.set("pageSize", limit.toString());
+            p.set("pageNumber", "1");
+        })
+    }
+
+    function handleOnSearch(term: string) {
+        if (term && term.trim().length > 0) {
+            updateSearchParams((p) => {
+                p.set("searchTerm", term);
+                p.set("pageNumber", "1");
+            })
+        }
+    }
+
+    function handleClearFilter() {
+        updateSearchParams((p) => {
+            p.delete("searchTerm");
+            p.set("pageNumber", "1");
+        });
+    }
+
+    function updateSearchParams(mutate: (p: URLSearchParams) => void, options?: {
+        replace?: boolean
+    }) {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        }, options)
+    }
+
     return (<div>
         <h1 className="text-2xl">Genres</h1>
 
@@ -51,6 +115,19 @@ export default function GenrePage() {
             onDelete={handleDelete}
             className="mt-4"
         />
+
+        {genreStatus !== 'pending' && allGenres.length > 0 &&
+            <Paginator
+                currentPage={queryParams.pageNumber}
+                currentPageLimit={queryParams.pageSize}
+                pageSizes={PAGE_SIZES}
+                hasNext={hasNext!}
+                hasPrevious={hasPrev!}
+                totalPages={totalPages!}
+                onPageSelect={handlePageSelect}
+                onLimitSelect={handleLimitSelect}
+                className="mt-2"
+            />}
 
         <ConfirmDialog
             open={deleteTargetId !== null}
