@@ -16,6 +16,10 @@ export async function getGenres(queryParams: QueryParameters): Promise<PagedList
         params.set("sortBy", queryParams.sortBy);
     }
 
+    if (queryParams.searchTerm) {
+        params.set("searchTerm", queryParams.searchTerm)
+    }
+
     return await apiFetch<PagedList<ReadGenre>>(`${url}?${params.toString()}`);
 }
 

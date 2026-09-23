@@ -11,13 +11,9 @@ import OrderListSkeleton from "./orders-ui/OrderListSkeleton";
 import QueryState from "@/components/QueryState";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/constants/pagination";
+import { parsePositiveInt } from "@/lib/parsePositiveInt";
 
 const DEFAULT_SORT = "orderDate desc"
-
-function parsePositiveInt(value: string | null, fallback: number) {
-    const n = Number(value);
-    return Number.isInteger(n) && n > 0 ? n : fallback;
-}
 
 export default function Orders() {
     const [searchParams, setSearchParams] = useSearchParams();
