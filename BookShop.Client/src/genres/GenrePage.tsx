@@ -10,6 +10,7 @@ import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/con
 import type { QueryParameters } from "@/shared/types/queryParameters";
 import { useSearchParams } from "react-router-dom";
 import { parsePositiveInt } from "@/lib/parsePositiveInt";
+import GenreFilter from "./ui/GenreFilter";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
@@ -43,7 +44,7 @@ export default function GenrePage() {
     const submitting: boolean = false; // TODO: derive it from mutation status
 
     function handleSubmit(genre: UpdateGenre) {
-        console.log(genre);
+        // console.log(genre);
         setResetSignal(prev => prev + 1);
         setSelectedGenre(null);
     }
@@ -74,6 +75,7 @@ export default function GenrePage() {
     }
 
     function handleOnSearch(term: string) {
+        console.log({ term });
         if (term && term.trim().length > 0) {
             updateSearchParams((p) => {
                 p.set("searchTerm", term);
@@ -100,20 +102,28 @@ export default function GenrePage() {
     }
 
     return (<div>
-        <h1 className="text-2xl">Genres</h1>
+        <h1 className="text-2xl">Manage Genres</h1>
 
         <GenreForm
             selectedGenre={selectedGenre}
             onSubmit={handleSubmit}
             submitting={submitting}
             resetSignal={resetSignal}
+            className="mt-2 mb-4"
+        />
+
+        <hr />
+        <GenreFilter
+            onSearch={handleOnSearch}
+            onClear={handleClearFilter}
+            className="mt-4"
         />
 
         <GenreList
             genres={allGenres}
             onEdit={handleFormEdit}
             onDelete={handleDelete}
-            className="mt-4"
+            className="mt-2"
         />
 
         {genreStatus !== 'pending' && allGenres.length > 0 &&
