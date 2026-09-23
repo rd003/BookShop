@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/table";
 import { getDirection, type SortItem } from "@/lib/sort";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
-import type { SortDirection } from "@/shared/types/SortDirection";
 import SortableHead from "./orders-ui/SortableHead";
 
 interface OrderListProps {
