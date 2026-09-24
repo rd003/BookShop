@@ -66,12 +66,15 @@ export default function GenrePage() {
 
     function handleSubmit(genre: UpdateGenre) {
         console.log(genre);
-        if (genre.id === 0) createGenre(genre);
-        else updateGenre(genre)
+        if (genre.id === 0) {
+            createGenre(genre);
+        }
+        else {
+            updateGenre(genre)
+        }
     }
 
     function createGenre(genre: UpdateGenre) {
-        console.log("create");
         const createGenre: CreateGenre = { name: genre.name };
         addGenreMutation.mutate(createGenre, {
             onSuccess: () => {
@@ -84,7 +87,6 @@ export default function GenrePage() {
     }
 
     function updateGenre(genre: UpdateGenre) {
-        console.log("create");
         updateGenreMutation.mutate(genre, {
             onSuccess: () => {
                 setResetSignal(prev => prev + 1);
