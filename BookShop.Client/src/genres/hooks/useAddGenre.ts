@@ -3,10 +3,10 @@ import { createGenre } from "../genreApi";
 import type { CreateGenre } from "../types/createGenre";
 
 export function useAddGenre() {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (genre: CreateGenre) => createGenre(genre),
         onSuccess: () => {
-            const queryClient = useQueryClient();
             queryClient.invalidateQueries({ queryKey: ['genres'] })
         }
     })

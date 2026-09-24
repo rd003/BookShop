@@ -65,11 +65,13 @@ export default function GenrePage() {
     const submitting: boolean = addGenreMutation.status === 'pending';
 
     function handleSubmit(genre: UpdateGenre) {
+        console.log(genre);
         if (genre.id === 0) createGenre(genre);
         else updateGenre(genre)
     }
 
     function createGenre(genre: UpdateGenre) {
+        console.log("create");
         const createGenre: CreateGenre = { name: genre.name };
         addGenreMutation.mutate(createGenre, {
             onSuccess: () => {
@@ -77,11 +79,12 @@ export default function GenrePage() {
                 setSelectedGenre(null);
                 toastSuccess("Record is added!");
             },
-            onError: () => console.log("Record could not added!")
+            onError: () => toastError("Record could not added!")
         });
     }
 
     function updateGenre(genre: UpdateGenre) {
+        console.log("create");
         updateGenreMutation.mutate(genre, {
             onSuccess: () => {
                 setResetSignal(prev => prev + 1);
@@ -105,7 +108,10 @@ export default function GenrePage() {
     function confirmDeleteGenre() {
         if (deleteTargetId) {
             deleteGenreMutation.mutate(deleteTargetId, {
-                onSuccess: () => toastSuccess("Record is deleted successfully!"),
+                onSuccess: () => {
+                    toastSuccess("Record is deleted successfully!");
+                    setDeleteTargetId(null);
+                },
                 onError: () => toastError("Record could not deleted!")
             })
         }

@@ -3,10 +3,10 @@ import { updateGenre } from "../genreApi";
 import type { UpdateGenre } from "../types/updateGenre";
 
 export function useUpdateGenre() {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (genre: UpdateGenre) => updateGenre(genre),
         onSuccess: () => {
-            const queryClient = useQueryClient();
             queryClient.invalidateQueries({ queryKey: ['genres'] })
         }
     })
