@@ -13,6 +13,8 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
         .HasMaxLength(100)
         .UseCollation(DbCollations.CaseInsensitive);
 
-        builder.HasIndex(g => g.Name, "IX_GenreName").IsUnique();
+        builder.HasIndex(g => g.Name, "IX_GenreName")
+        .IsUnique()
+        .HasFilter("\"Deleted\" IS NULL"); ;
     }
 }

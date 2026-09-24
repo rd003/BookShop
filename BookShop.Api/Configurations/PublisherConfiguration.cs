@@ -13,6 +13,8 @@ public class PublisherConfiguration : IEntityTypeConfiguration<Publisher>
         .HasMaxLength(200)
         .UseCollation(DbCollations.CaseInsensitive);
 
-        builder.HasIndex(p => p.Name).IsUnique();
+        builder.HasIndex(p => p.Name)
+        .IsUnique()
+        .HasFilter("\"Deleted\" IS NULL"); ;
     }
 }
