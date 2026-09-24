@@ -15,10 +15,16 @@ import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 import QueryState from "@/components/QueryState";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
+import { useAddGenre } from "./hooks/useAddGenre";
+import type { CreateGenre } from "./types/createGenre";
+import { useUpdateGenre } from "./hooks/useUpdateGenre";
+import useDeleteGenre from "./hooks/useDeleteGenre";
+import { toast } from "@/components/ui/toast";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
     const [resetSignal, setResetSignal] = useState<number>(0);
+    const [resetFilterSignal, setResetFilterSignal] = useState<number>(0);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -40,7 +46,6 @@ export default function GenrePage() {
     const {
         data,
         status: genreStatus,
-        error: genreError,
         isFetching,
         isPlaceholderData
     } = genresQuery;
@@ -53,12 +58,40 @@ export default function GenrePage() {
     // const isLoading = genreStatus === 'pending';
     const hasFilters = !!(queryParams.searchTerm);
 
-    const submitting: boolean = false; // TODO: derive it from mutation status
+    const addGenreMutation = useAddGenre();
+    const updateGenreMutation = useUpdateGenre();
+    const deleteGenreMutation = useDeleteGenre();
+
+    const submitting: boolean = addGenreMutation.status === 'pending';
 
     function handleSubmit(genre: UpdateGenre) {
-        // console.log(genre);
-        setResetSignal(prev => prev + 1);
-        setSelectedGenre(null);
+        if (genre.id === 0) createGenre(genre);
+        else updateGenre(genre)
+    }
+
+    function createGenre(genre: UpdateGenre) {
+        const createGenre: CreateGenre = { name: genre.name };
+        addGenreMutation.mutate(createGenre, {
+            onSuccess: () => {
+                setResetSignal(prev => prev + 1);
+                setSelectedGenre(null);
+                toastSuccess("Record is added!");
+            },
+            onError: () => console.log("Record could not added!")
+        });
+    }
+
+    function updateGenre(genre: UpdateGenre) {
+        updateGenreMutation.mutate(genre, {
+            onSuccess: () => {
+                setResetSignal(prev => prev + 1);
+                setSelectedGenre(null);
+                toastSuccess("Record is updated!");
+            },
+            onError: () => {
+                toastError("Record could not updated!");
+            }
+        })
     }
 
     function handleFormEdit(genre: ReadGenre) {
@@ -70,7 +103,12 @@ export default function GenrePage() {
     }
 
     function confirmDeleteGenre() {
-        console.log(`deleted: ${deleteTargetId}`)
+        if (deleteTargetId) {
+            deleteGenreMutation.mutate(deleteTargetId, {
+                onSuccess: () => toastSuccess("Record is deleted successfully!"),
+                onError: () => toastError("Record could not deleted!")
+            })
+        }
     }
 
     function handlePageSelect(page: number) {
@@ -103,14 +141,9 @@ export default function GenrePage() {
         });
     }
 
-    function updateSearchParams(mutate: (p: URLSearchParams) => void, options?: {
-        replace?: boolean
-    }) {
-        setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            mutate(next);
-            return next;
-        }, options)
+    function hadleResetGenreFilter() {
+        setResetFilterSignal(s => s + 1);
+        handleClearFilter();
     }
 
     function handleSortToggle(column: string, multi = false) {
@@ -121,7 +154,28 @@ export default function GenrePage() {
             return next;
         });
     }
+    function updateSearchParams(mutate: (p: URLSearchParams) => void, options?: {
+        replace?: boolean
+    }) {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        }, options)
+    }
+    function toastSuccess(description: string) {
+        toast.add({
+            type: "success",
+            description
+        })
+    }
 
+    function toastError(description: string) {
+        toast.add({
+            type: 'error',
+            description
+        })
+    }
 
     return (<div>
         <h1 className="text-2xl">Manage Genres</h1>
@@ -140,14 +194,18 @@ export default function GenrePage() {
             onSearch={handleOnSearch}
             onClear={handleClearFilter}
             className="mt-4"
+            resetSignal={resetFilterSignal}
         />
         <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
             <QueryState
                 query={genresQuery}
                 isEmpty={d => d.items.length === 0}
                 skeleton={<LoadingSkeleton label="Loading genres" rows={queryParams.pageSize} />}
-                empty={<EmptyRecords filtered={hasFilters} onClear={handleClearFilter} />}
-            >
+                empty={<EmptyRecords
+                    filtered={hasFilters}
+                    onClear={hadleResetGenreFilter}
+                    message="No genres match the selected filters"
+                />}>
                 {d => <GenreList
                     genres={allGenres}
                     onEdit={handleFormEdit}
