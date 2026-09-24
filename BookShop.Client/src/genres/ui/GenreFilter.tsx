@@ -1,19 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
     className?: string;
     onSearch: (term: string) => void;
     onClear: () => void;
+    resetSignal: number;
 }
 export default function GenreFilter({
     className,
     onSearch,
-    onClear
+    onClear,
+    resetSignal
 }: Props) {
     const [term, setTerm] = useState<string>('');
+
+    useEffect(() => {
+        setTerm('');
+    }, [resetSignal])
 
     function handleSubmit(e: React.SubmitEvent) {
         e.preventDefault();
