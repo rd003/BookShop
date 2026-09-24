@@ -12,6 +12,9 @@ import { useSearchParams } from "react-router-dom";
 import { parsePositiveInt } from "@/lib/parsePositiveInt";
 import GenreFilter from "./ui/GenreFilter";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
+import QueryState from "@/components/QueryState";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import EmptyRecords from "@/components/EmptyRecords";
 
 export default function GenrePage() {
     const [selectedGenre, setSelectedGenre] = useState<UpdateGenre | null>(null);
@@ -32,7 +35,7 @@ export default function GenrePage() {
     }
     const sortItems = parseSort(queryParams.sortBy);
 
-    const genreQuery = useGenreQuery(queryParams);
+    const genresQuery = useGenreQuery(queryParams);
 
     const {
         data,
@@ -40,14 +43,15 @@ export default function GenrePage() {
         error: genreError,
         isFetching,
         isPlaceholderData
-    } = genreQuery;
+    } = genresQuery;
 
     const allGenres = data?.items ?? [];
     const hasNext = data?.hasNext;
     const hasPrev = data?.hasPrevious;
     const totalPages = data?.totalPages;
 
-    const isLoading = genreStatus === 'pending';
+    // const isLoading = genreStatus === 'pending';
+    const hasFilters = !!(queryParams.searchTerm);
 
     const submitting: boolean = false; // TODO: derive it from mutation status
 
@@ -131,21 +135,30 @@ export default function GenrePage() {
         />
 
         <hr />
-        Define skeleton, handle error
+
         <GenreFilter
             onSearch={handleOnSearch}
             onClear={handleClearFilter}
             className="mt-4"
         />
+        <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+            <QueryState
+                query={genresQuery}
+                isEmpty={d => d.items.length === 0}
+                skeleton={<LoadingSkeleton label="Loading genres" rows={queryParams.pageSize} />}
+                empty={<EmptyRecords filtered={hasFilters} onClear={handleClearFilter} />}
+            >
+                {d => <GenreList
+                    genres={allGenres}
+                    onEdit={handleFormEdit}
+                    onDelete={handleDelete}
+                    className="mt-2"
+                    sort={sortItems}
+                    onSortToggle={handleSortToggle}
+                />}
+            </QueryState>
+        </div>
 
-        <GenreList
-            genres={allGenres}
-            onEdit={handleFormEdit}
-            onDelete={handleDelete}
-            className="mt-2"
-            sort={sortItems}
-            onSortToggle={handleSortToggle}
-        />
 
         {genreStatus !== 'pending' && allGenres.length > 0 &&
             <Paginator
