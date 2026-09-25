@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@base-ui/react";
+import { Input } from "@/components/ui/input";
 import { cn } from "cn";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ export default function AuthorFilter({
     }
 
     return (<form onSubmit={handleSubmit} className={cn("flex gap-2", className)}>
-        <Input placeholder="search author" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <Input placeholder="search author" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-57" />
 
         <Button variant="default" type="submit"><Search /> Search</Button>
         <Button variant="outline" type="button" onClick={handleClear}>Clear</Button>
