@@ -3,6 +3,10 @@ import AuthorFilter from "./ui/AuthorFilter";
 import { useSearchParams } from "react-router-dom";
 import type { ReadAuthor } from "./types/readAuthor";
 import AuthorList from "./ui/AuthorList";
+import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
+import { toast } from "@/components/ui/toast";
+
+const DEFAULT_SORT = "name";
 
 export default function AuthorPage() {
     const [resetFilterSignal, setResetFilterSignal] = useState(0);
@@ -13,6 +17,9 @@ export default function AuthorPage() {
         { id: 2, name: 'naveen', bio: 'bahut saari kitab likhi hai isne.....12345678901234567890   1234567890 213123 234234234' },
         { id: 3, name: 'John doe', bio: null },
     ];
+
+    // const sortItems = parseSort(queryParams.sortBy);  
+    const sortItems = parseSort(DEFAULT_SORT);  // TODO: remove hardcoded
 
     function handleSearch(searchTerm: string): void {
         if (!searchTerm || searchTerm.trim().length === 0) {
@@ -39,6 +46,13 @@ export default function AuthorPage() {
         console.log(id);
     }
 
+    function handleSortToggle(column: string, multi = false) {
+        updateParams((p) => {
+            p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+            p.set("pageNumber", "1");
+        })
+    }
+
     function updateParams(mutate: (params: URLSearchParams) => void, options?: {
         replace?: boolean
     }) {
@@ -47,6 +61,20 @@ export default function AuthorPage() {
             mutate(next);
             return next;
         }, options)
+    }
+
+    function toastSuccess(description: string) {
+        toast.add({
+            type: "success",
+            description
+        })
+    }
+
+    function toastError(description: string) {
+        toast.add({
+            type: 'error',
+            description
+        })
     }
 
     return (<>
@@ -64,6 +92,8 @@ export default function AuthorPage() {
             authors={authors}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            sort={sortItems}
+            onSortToggle={handleSortToggle}
         />
     </>)
 }
