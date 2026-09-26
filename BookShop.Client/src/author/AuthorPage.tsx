@@ -5,13 +5,28 @@ import type { ReadAuthor } from "./types/readAuthor";
 import AuthorList from "./ui/AuthorList";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 import { toast } from "@/components/ui/toast";
+import AuthorForm from "./ui/AuthorForm";
+import type { UpdateAuthor } from "./types/updateAuthor";
+import AuthorDialog from "./ui/AuthorDialog";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const DEFAULT_SORT = "name";
 
 export default function AuthorPage() {
     const [resetFilterSignal, setResetFilterSignal] = useState(0);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [editing, setEditing] = useState<ReadAuthor | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
+    const submitting = false; //Todo: remove this hardcode
+    const isLoading = false; //Todo: remove this hardcode
+
+    function handleSubmit(author: UpdateAuthor) {
+        console.log(author);
+    }
+
+    // Todo: remove this hardcode
     const authors: ReadAuthor[] = [
         { id: 1, name: 'Satyendra', bio: 'tagda author' },
         { id: 2, name: 'naveen', bio: 'bahut saari kitab likhi hai isne.....12345678901234567890   1234567890 213123 234234234' },
@@ -38,8 +53,14 @@ export default function AuthorPage() {
         })
     }
 
+    function handleAddAuthor() {
+        setEditing(null);
+        setDialogOpen(true);
+    }
+
     function handleEdit(author: ReadAuthor) {
-        console.log(author);
+        setEditing(author);
+        setDialogOpen(true);
     }
 
     function handleDelete(id: number) {
@@ -78,7 +99,11 @@ export default function AuthorPage() {
     }
 
     return (<>
-        <h1 className="text-2xl">Manage Authors</h1>
+        <h1 className="text-2xl my-2">Manage Authors</h1>
+
+        <div className="mb-1.5">
+            <Button variant="outline" onClick={handleAddAuthor}>Add <Plus /> </Button>
+        </div>
 
         <AuthorFilter
             className="mt-2"
@@ -94,6 +119,17 @@ export default function AuthorPage() {
             onDelete={handleDelete}
             sort={sortItems}
             onSortToggle={handleSortToggle}
+        />
+
+        <AuthorDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            title={editing ? "Edit address" : "Add new address"}
+            submitting={submitting}
+            submitLabel={editing ? "Save" : "Add"}
+            defaultValues={editing as UpdateAuthor | null}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
         />
     </>)
 }
