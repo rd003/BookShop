@@ -3,25 +3,34 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Pencil, Trash2Icon } from "lucide-react";
 import type { ReadAuthor } from "../types/readAuthor";
 import { cn } from "cn";
-import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import SortableHead from "@/components/SortableHead";
+import { getDirection, type SortItem } from "@/lib/sort";
 
 interface Props {
     authors: ReadAuthor[],
     onEdit: (author: ReadAuthor) => void,
     onDelete: (authorId: number) => void,
-    className?: string
+    className?: string,
+    onSortToggle: (column: string, multi?: boolean) => void;
+    sort: SortItem[];
 }
 export default function AuthorList({
     authors,
     onEdit,
     onDelete,
-    className
+    className,
+    onSortToggle,
+    sort
 }: Props) {
     return (<Table className={cn("", className)}>
         <TableHeader>
             <TableRow>
-                <TableHead>Author</TableHead>
+                <SortableHead
+                    label="Name"
+                    direction={getDirection(sort, "name")}
+                    onToggle={multi => onSortToggle("name", multi)}
+                />
                 <TableHead>Bio</TableHead>
                 <TableHead>Actions</TableHead>
 

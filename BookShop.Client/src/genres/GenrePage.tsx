@@ -155,12 +155,10 @@ export default function GenrePage() {
     }
 
     function handleSortToggle(column: string, multi = false) {
-        setSearchParams(prev => {
-            const next = new URLSearchParams(prev);
-            next.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
-            next.set("pageNumber", "1");
-            return next;
-        });
+        updateSearchParams((p) => {
+            p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+            p.set("pageNumber", "1");
+        })
     }
     function updateSearchParams(mutate: (p: URLSearchParams) => void, options?: {
         replace?: boolean
