@@ -5,11 +5,12 @@ import type { ReadAuthor } from "./types/readAuthor";
 import AuthorList from "./ui/AuthorList";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 import { toast } from "@/components/ui/toast";
-import AuthorForm from "./ui/AuthorForm";
 import type { UpdateAuthor } from "./types/updateAuthor";
 import AuthorDialog from "./ui/AuthorDialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import Paginator from "@/components/Paginator";
 
 const DEFAULT_SORT = "name";
 
@@ -18,9 +19,11 @@ export default function AuthorPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [editing, setEditing] = useState<ReadAuthor | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
     const submitting = false; //Todo: remove this hardcode
     const isLoading = false; //Todo: remove this hardcode
+    const authorStatus: string = ''; // TODO: calculate it from authorQuery.status
 
     function handleSubmit(author: UpdateAuthor) {
         console.log(author);
@@ -64,7 +67,24 @@ export default function AuthorPage() {
     }
 
     function handleDelete(id: number) {
-        console.log(id);
+        setDeleteTargetId(id);
+    }
+
+    function confirmDelete() {
+        // delete author with id: deleteTargeId
+    }
+
+    function handlePageSelect(page: number) {
+        updateParams(p => {
+            p.set("pageNumber", page.toString())
+        })
+    }
+
+    function handleLimitSelect(limit: number) {
+        updateParams((p) => {
+            p.set("pageSize", limit.toString());
+            p.set("pageNumber", "1");
+        })
     }
 
     function handleSortToggle(column: string, multi = false) {
@@ -121,6 +141,19 @@ export default function AuthorPage() {
             onSortToggle={handleSortToggle}
         />
 
+        {authorStatus !== 'pending' && authors.length > 0 &&
+            <Paginator
+                currentPage={1}
+                currentPageLimit={2}
+                pageSizes={[2, 5, 10, 15]}
+                hasNext={false}
+                hasPrevious={false}
+                totalPages={3}
+                onPageSelect={handlePageSelect}
+                onLimitSelect={handleLimitSelect}
+                className="mt-2"
+            />}
+
         <AuthorDialog
             open={dialogOpen}
             onOpenChange={setDialogOpen}
@@ -130,6 +163,15 @@ export default function AuthorPage() {
             defaultValues={editing as UpdateAuthor | null}
             onSubmit={handleSubmit}
             isLoading={isLoading}
+        />
+
+        <ConfirmDialog
+            open={deleteTargetId !== null}
+            onOpenChange={(open) => !open && setDeleteTargetId(null)}
+            title="Delete this author?"
+            description="This action cannot be undone."
+            isConfirming={false}
+            onConfirm={confirmDelete}
         />
     </>)
 }
