@@ -10,6 +10,7 @@ interface Props{
     onClear: ()=>void,
     className:string
 }
+
 export default function PublisherFilter({onSubmit,resetSignal,onClear,className}:Props) {
     const [searchTerm, setSearchTerm] = useState("");
 
