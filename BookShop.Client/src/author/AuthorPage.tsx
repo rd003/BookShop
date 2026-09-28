@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import Paginator from "@/components/Paginator";
+import type { QueryParameters } from "@/shared/types/queryParameters";
+import { parsePositiveInt } from "@/lib/parsePositiveInt";
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/constants/pagination";
+import useAuthors from "./hooks/useAuthors";
+import QueryState from "@/components/QueryState";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import EmptyRecords from "@/components/EmptyRecords";
 
 const DEFAULT_SORT = "name";
 
@@ -21,23 +28,34 @@ export default function AuthorPage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
-    const submitting = false; //Todo: remove this hardcode
-    const isLoading = false; //Todo: remove this hardcode
-    const authorStatus: string = ''; // TODO: calculate it from authorQuery.status
+    const queryParams:QueryParameters = {
+        pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
+                pageSize: (() => {
+                    const s = parsePositiveInt(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE);
+                    return PAGE_SIZES.includes(s) ? s : DEFAULT_PAGE_SIZE;
+                })(),
+                searchTerm: searchParams.get("searchTerm"),
+                sortBy: searchParams.get("sortBy") ?? DEFAULT_SORT
+    }
+
+    const authorQuery = useAuthors(queryParams);
+    const {isFetching,isPlaceholderData} = authorQuery;
+
+    const isLoading = authorQuery.isPending;
+    const authors:ReadAuthor[] = authorQuery.data?.items || [];
+    const hasNext = authorQuery.data?.hasNext;
+    const hasPrev = authorQuery.data?.hasPrevious;
+    const totalPages = authorQuery.data?.totalPages;
+    const authorStatus: string = authorQuery.status;
+    const hasFilters = !!(queryParams.searchTerm);
+
+    const submitting = false; //Todo: calculate it from author add/update mutation
 
     function handleSubmit(author: UpdateAuthor) {
         console.log(author);
     }
 
-    // Todo: remove this hardcode
-    const authors: ReadAuthor[] = [
-        { id: 1, name: 'Satyendra', bio: 'tagda author' },
-        { id: 2, name: 'naveen', bio: 'bahut saari kitab likhi hai isne.....12345678901234567890   1234567890 213123 234234234' },
-        { id: 3, name: 'John doe', bio: null },
-    ];
-
-    // const sortItems = parseSort(queryParams.sortBy);  
-    const sortItems = parseSort(DEFAULT_SORT);  // TODO: remove hardcoded
+    const sortItems = parseSort(queryParams.sortBy);
 
     function handleSearch(searchTerm: string): void {
         if (!searchTerm || searchTerm.trim().length === 0) {
@@ -50,6 +68,7 @@ export default function AuthorPage() {
     }
 
     function handleFilterClear(): void {
+        setResetFilterSignal(s => s + 1);
         updateParams((p) => {
             p.delete("searchTerm");
             p.set("pageNumber", "1");
@@ -132,7 +151,17 @@ export default function AuthorPage() {
             resetSignal={resetFilterSignal}
         />
 
-        <AuthorList
+<div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+            <QueryState
+                query={authorQuery}
+                isEmpty={d => d.items.length === 0}
+                skeleton={<LoadingSkeleton label="Loading genres" rows={queryParams.pageSize} />}
+                empty={<EmptyRecords
+                    filtered={hasFilters}
+                    onClear={handleFilterClear}
+                    message="No genres match the selected filters"
+                />}>
+                {d => <AuthorList
             className="mt-2"
             authors={authors}
             onEdit={handleEdit}
@@ -140,15 +169,18 @@ export default function AuthorPage() {
             sort={sortItems}
             onSortToggle={handleSortToggle}
         />
+}
+            </QueryState>
+        </div>
 
         {authorStatus !== 'pending' && authors.length > 0 &&
             <Paginator
-                currentPage={1}
-                currentPageLimit={2}
-                pageSizes={[2, 5, 10, 15]}
-                hasNext={false}
-                hasPrevious={false}
-                totalPages={3}
+                currentPage={queryParams.pageNumber}
+                currentPageLimit={queryParams.pageSize}
+                pageSizes={PAGE_SIZES}
+                hasNext={hasNext!}
+                hasPrevious={hasPrev!}
+                totalPages={totalPages!}
                 onPageSelect={handlePageSelect}
                 onLimitSelect={handleLimitSelect}
                 className="mt-2"
