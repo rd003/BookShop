@@ -11,12 +11,14 @@ import QueryState from "@/components/QueryState";
 import Paginator from "@/components/Paginator";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 const DEFAULT_SORTBY = 'name';
 
 export default function PublisherPage() {
     const [resetFilterSignal, setResetFilterSignal]= useState(0);
     const [searchParams,setSearchParams] = useSearchParams();
+    const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
 
      const queryParams: QueryParameters = {
             pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
@@ -40,7 +42,7 @@ export default function PublisherPage() {
     }
 
     function handleDelete(id:number){
-        console.log(id);
+        setDeleteTargetId(id);
     }
 
     function handleSetFilter(searchTerm:string){
@@ -80,6 +82,10 @@ export default function PublisherPage() {
        })
     }
 
+    function confirmDelete(): void {
+       // deleteTargetId
+    }
+
     return (<>
       <h1 className="text-2xl">Publishers</h1>
 
@@ -109,7 +115,6 @@ export default function PublisherPage() {
             </QueryState>
         </div>
 
-
         {publisherQuery.status !== 'pending' && publishers.length > 0 &&
             <Paginator
                 currentPage={queryParams.pageNumber}
@@ -122,5 +127,14 @@ export default function PublisherPage() {
                 onLimitSelect={handleLimitSelect}
                 className="mt-2"
             />}
+
+       <ConfirmDialog
+                   open={deleteTargetId !== null}
+                   onOpenChange={(open) => !open && setDeleteTargetId(null)}
+                   title="Delete this publisher?"
+                   description="This action cannot be undone."
+                   isConfirming={false}
+                   onConfirm={confirmDelete}
+        />
     </>)
 }
