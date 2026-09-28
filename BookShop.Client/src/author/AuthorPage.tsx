@@ -18,6 +18,10 @@ import useAuthors from "./hooks/useAuthors";
 import QueryState from "@/components/QueryState";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
+import type { CreateAuthor } from "./types/createAuthor";
+import useAddAuthor from "./hooks/useAddAuthor";
+import useUpdateAuthor from "./hooks/useUpdateAuthor";
+import useDeleteAuthor from "./hooks/useDeleteAuthor";
 
 const DEFAULT_SORT = "name";
 
@@ -49,10 +53,42 @@ export default function AuthorPage() {
     const authorStatus: string = authorQuery.status;
     const hasFilters = !!(queryParams.searchTerm);
 
-    const submitting = false; //Todo: calculate it from author add/update mutation
+    const addAuthorMutation = useAddAuthor();
+    const updateAuthorMutation = useUpdateAuthor();
+    const deleteAuthorMutation = useDeleteAuthor();
+
+    const submitting = addAuthorMutation.status==='pending' || updateAuthorMutation.status==='pending';
 
     function handleSubmit(author: UpdateAuthor) {
-        console.log(author);
+        if(author.id===0) {
+            const {id, ...createPaylaod} = author;
+            createAuthor(createPaylaod);
+        }
+        else updateAuthor(author);
+    }
+
+    function createAuthor(author:CreateAuthor){
+        addAuthorMutation.mutate(author,{
+            onSuccess:()=>{
+                toastSuccess("Author is created");
+                setDialogOpen(false);
+            },
+            onError:()=>{
+                toastError("Error while creating an author");
+            }
+        })
+    }
+
+    function updateAuthor(author:UpdateAuthor){
+        updateAuthorMutation.mutate(author,{
+            onSuccess:()=>{
+                toastSuccess("Author is updated");
+                setDialogOpen(false);
+            },
+            onError:()=>{
+                toastError("Error while updating an author");
+            }
+        })
     }
 
     const sortItems = parseSort(queryParams.sortBy);
@@ -90,7 +126,17 @@ export default function AuthorPage() {
     }
 
     function confirmDelete() {
-        // delete author with id: deleteTargeId
+        if(deleteTargetId===null) return;
+
+        deleteAuthorMutation.mutate(deleteTargetId,{
+            onSuccess:()=>{
+                toastSuccess("Author is deleted");
+                setDeleteTargetId(null);
+            },
+            onError:()=>{
+                toastError("Error while deleting an author");
+            }
+        })
     }
 
     function handlePageSelect(page: number) {
