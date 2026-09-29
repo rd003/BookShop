@@ -1,10 +1,11 @@
 import { cn } from "cn";
 import type { UpdatePublisher } from "../types/updatePublisher";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { X } from "lucide-react";
 
 interface Props{
   resetSignal:number;
@@ -31,14 +32,24 @@ export default function PublisherForm({
   }
 
   function resetForm(){
-    setName("");
-    setId(0);
+    setFormValues(0,"");
+  }
+
+  function setFormValues(id:number, name:string){
+    setId(id);
+    setName(name);
   }
 
   useEffect(()=>{
     resetForm();
     clearValidation();
   },[resetSignal]);
+
+  useEffect(()=>{
+    if(editingValues){
+      setFormValues(editingValues.id, editingValues.name);
+    }
+  },[editingValues])
 
   function handleSubmit(e:React.SubmitEvent){
     e.preventDefault();
@@ -52,7 +63,6 @@ export default function PublisherForm({
   }
 
   function validateName(name:string):boolean{
-    console.log("name: ",name);
     if(name.trim().length===0){
         setNameValidation("Name is required");
         return false;
@@ -65,13 +75,18 @@ export default function PublisherForm({
     return true;
   }
 
-    return (<form onSubmit={handleSubmit} className={cn("shadow shadow-stone-200",className)}>
+    return (<form onSubmit={handleSubmit} className={cn("",className)}>
         <input type="hidden" value={id}/>
         <Card>
+            <CardHeader className="pb-2">
+               <CardTitle className="text-lg">
+                   {editingValues ? "Edit publisher" : "Add publisher"}
+               </CardTitle>
+            </CardHeader>
             <CardContent className="flex gap-2">
                 <div className="">
                     <div className="flex gap-2">
-                <Label htmlFor="name">Name*</Label>
+                <Label htmlFor="name">Name<span className="text-destructive">*</span></Label>
                 <Input
                 type="text" id="name" className="w-75"
                 placeholder="Name" value={name}
@@ -80,7 +95,7 @@ export default function PublisherForm({
                 onChange={(e)=>setName(e.target.value)}/>
                 </div>
 
-                {nameValidation && <p id="name-error" role="alert" className="text-red-500 py-2">
+                {nameValidation && <p id="name-error" role="alert" className="text-destructive">
                     {nameValidation}
                 </p>}
                 </div>
@@ -96,7 +111,7 @@ export default function PublisherForm({
                     </Button>
 
                 <Button variant="outline" type="button" disabled={submitting} onClick={onClear}
-                >Clear</Button>
+                ><X className="size-4"/>Clear</Button>
             </CardContent>
         </Card>
     </form>

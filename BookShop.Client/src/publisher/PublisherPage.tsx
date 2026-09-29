@@ -15,6 +15,11 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import PublisherForm from "./ui/PublisherForm";
 import type { UpdatePublisher } from "./types/updatePublisher";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
+import useAddPublisher from "./hooks/useAddPublisher";
+import useUpdatePublisher from "./hooks/useUpdatePublisher";
+import useDeletePublisher from "./hooks/useDeletePublisher";
+import type { CreatePublisher } from "./types/createPublisher";
+import { toast } from "@/components/ui/toast";
 
 const DEFAULT_SORTBY = 'name';
 
@@ -44,10 +49,46 @@ export default function PublisherPage() {
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
 
-    const submitting = false; //TODO: calulate it from mutation state
+    const addPublisherMutation = useAddPublisher();
+    const updatePublisherMutation = useUpdatePublisher();
+    const deletePublisherMutation = useDeletePublisher();
+
+    const submitting = addPublisherMutation.status==='pending' || updatePublisherMutation.status==='pending';
+
+    function handleFormSubmit(data: UpdatePublisher) {
+        if(data.id===0){
+            const {id, ...createPayload} = data;
+            addPublisher(createPayload);
+        }
+        else updatePublisher(data);
+    }
+
+    function addPublisher(data:CreatePublisher){
+        addPublisherMutation.mutate(data,{
+          onSuccess:()=>{
+             toastSuccess("Publisher is created.");
+             setResetFormSignal(s=>s+1);
+          },
+          onError:()=>{
+              toastError("Error on creating publisher");
+          }
+        });
+    }
+
+    function updatePublisher(data:UpdatePublisher){
+        updatePublisherMutation.mutate(data,{
+          onSuccess:()=>{
+             toastSuccess("Publisher is updated.");
+             setResetFormSignal(s=>s+1);
+          },
+          onError:()=>{
+              toastError("Error on updating publisher");
+          }
+        });
+    }
 
     function handleEdit(data:ReadPublisher){
-        console.log(data);
+        setEditingValues(data as UpdatePublisher);
     }
 
     function handleDelete(id:number){
@@ -84,16 +125,22 @@ export default function PublisherPage() {
     }
 
     function confirmDelete(): void {
-       // deleteTargetId
+        if(deleteTargetId === null) return;
+
+        deletePublisherMutation.mutate(deleteTargetId,{
+            onSuccess:()=>{
+                toastSuccess("Publisher is deleted.");
+                setDeleteTargetId(null);
+            },
+            onError:()=>{
+                toastError("Error on deleting publisher");
+            }
+        });
     }
 
     function handleFormClear() {
         setEditingValues(null);
         setResetFormSignal(s=>s+1);
-    }
-
-    function handleFormSubmit(data: UpdatePublisher) {
-        console.log(data);
     }
 
     function handleSortToggle(column: string, multi = false) {
@@ -111,17 +158,42 @@ export default function PublisherPage() {
         },options)
     }
 
-    return (<>
-      <h1 className="text-2xl">Publishers</h1>
+    function toastSuccess(description: string) {
+        toast.add({
+            type: "success",
+            description
+        })
+    }
 
-<PublisherForm
-className="mt-2"
-editingValues={editingValues}
-onClear={handleFormClear}
-onSubmit={handleFormSubmit}
-resetSignal={resetFormSignal}
-submitting={submitting}
-/>
+    function toastError(description: string) {
+        toast.add({
+            type: 'error',
+            description
+        })
+    }
+
+    return (<>
+
+    <div className="flex items-end justify-between">
+        <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Publishers</h1>
+            <p className="text-sm text-muted-foreground">Manage the publishers available in your catalog.</p>
+        </div>
+        {data?.totalCount !== undefined && (
+            <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium">
+                {data.totalCount} total
+            </span>
+        )}
+    </div>
+
+    <PublisherForm
+    className="my-2"
+    editingValues={editingValues}
+    onClear={handleFormClear}
+    onSubmit={handleFormSubmit}
+    resetSignal={resetFormSignal}
+    submitting={submitting}
+    />
 
      <PublisherFilter
      className="mt-2"
@@ -134,10 +206,10 @@ submitting={submitting}
             <QueryState
                 query={publisherQuery}
                 isEmpty={d => d.items.length === 0}
-                skeleton={<LoadingSkeleton label="Loading genres" rows={queryParams.pageSize} />}
+                skeleton={<LoadingSkeleton label="Loading publishers" rows={queryParams.pageSize} />}
                 empty={<EmptyRecords
                     filtered={hasFilters}
-                    onClear={()=> setResetFilterSignal(s=>s+1)}
+                    onClear={()=>{handleClearFilter();setResetFilterSignal(s=>s+1)}}
                     message="No publishers match the selected filters"
                 />}>
                 {d => <PublisherList
