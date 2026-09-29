@@ -4,12 +4,12 @@ import { useSearchParams } from "react-router-dom";
 import GenreSidebar from "./GenreSidebar";
 import BookGrid from "./BookGrid";
 import useGenreQuery from "../genres/hooks/useGenreQuery";
-import { useBooksQuery } from "./hooks/useBooksQuery";
 import { useInfiniteScroll } from "./hooks/useInfinitScroll";
 import type { AddCartItemRequest } from "@/cart/types/addCartItemRequest";
 import { useAddCartItem } from "./hooks/useCartMutation";
 import { toast } from "@/components/ui/toast";
 import type { QueryParameters } from "@/shared/types/queryParameters";
+import { useBooksQuery } from "@/book/hooks/useBooksQuery";
 
 export default function Books() {
     const queryParameters: QueryParameters = {

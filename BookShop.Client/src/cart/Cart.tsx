@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "./hooks/useCart";
-import { useUpdateCartItem, type UpdateCartItemVariables } from "@/books/hooks/useCartMutation";
+import { useUpdateCartItem, type UpdateCartItemVariables } from "@/catalog/hooks/useCartMutation";
 
 
 export default function Cart() {

@@ -1,5 +1,5 @@
 import BookList from "./BookList";
-import type { ReadBook } from "./types/readBook";
+import type { ReadBook } from "../book/types/readBook";
 
 type BookGridProps = {
     books: ReadBook[],
