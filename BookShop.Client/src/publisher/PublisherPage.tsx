@@ -12,6 +12,8 @@ import Paginator from "@/components/Paginator";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import PublisherForm from "./ui/PublisherForm";
+import type { UpdatePublisher } from "./types/updatePublisher";
 
 const DEFAULT_SORTBY = 'name';
 
@@ -19,6 +21,8 @@ export default function PublisherPage() {
     const [resetFilterSignal, setResetFilterSignal]= useState(0);
     const [searchParams,setSearchParams] = useSearchParams();
     const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
+    const [resetFormSignal, setResetFormSignal] = useState<number>(0);
+    const [editingValues, setEditingValues] = useState<UpdatePublisher|null>(null);
 
      const queryParams: QueryParameters = {
             pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
@@ -36,6 +40,8 @@ export default function PublisherPage() {
     const hasNext = data?.hasNext;
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
+
+    const submitting = false; //TODO: calulate it from mutation state
 
     function handleEdit(data:ReadPublisher){
         console.log(data);
@@ -86,8 +92,26 @@ export default function PublisherPage() {
        // deleteTargetId
     }
 
+    function handleFormClear() {
+        setEditingValues(null);
+        setResetFormSignal(s=>s+1);
+    }
+
+    function handleFormSubmit(data: UpdatePublisher) {
+        console.log(data);
+    }
+
     return (<>
       <h1 className="text-2xl">Publishers</h1>
+
+<PublisherForm
+className="mt-2"
+editingValues={editingValues}
+onClear={handleFormClear}
+onSubmit={handleFormSubmit}
+resetSignal={resetFormSignal}
+submitting={submitting}
+/>
 
      <PublisherFilter
      className="mt-2"
