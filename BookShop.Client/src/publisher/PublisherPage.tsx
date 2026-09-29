@@ -20,6 +20,9 @@ import useUpdatePublisher from "./hooks/useUpdatePublisher";
 import useDeletePublisher from "./hooks/useDeletePublisher";
 import type { CreatePublisher } from "./types/createPublisher";
 import { toast } from "@/components/ui/toast";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const DEFAULT_SORTBY = 'name';
 
@@ -29,8 +32,9 @@ export default function PublisherPage() {
     const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
     const [resetFormSignal, setResetFormSignal] = useState<number>(0);
     const [editingValues, setEditingValues] = useState<UpdatePublisher|null>(null);
+    const [sheetOpen,setSheetOpen] = useState(false);
 
-     const queryParams: QueryParameters = {
+    const queryParams: QueryParameters = {
             pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
             pageSize: (() => {
                 const s = parsePositiveInt(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE);
@@ -55,6 +59,10 @@ export default function PublisherPage() {
 
     const submitting = addPublisherMutation.status==='pending' || updatePublisherMutation.status==='pending';
 
+    function onSheetOpenChange(){
+          setSheetOpen(false);
+    }
+
     function handleFormSubmit(data: UpdatePublisher) {
         if(data.id===0){
             const {id, ...createPayload} = data;
@@ -68,6 +76,7 @@ export default function PublisherPage() {
           onSuccess:()=>{
              toastSuccess("Publisher is created.");
              setResetFormSignal(s=>s+1);
+             setSheetOpen(false);
           },
           onError:()=>{
               toastError("Error on creating publisher");
@@ -80,6 +89,7 @@ export default function PublisherPage() {
           onSuccess:()=>{
              toastSuccess("Publisher is updated.");
              setResetFormSignal(s=>s+1);
+             setSheetOpen(false);
           },
           onError:()=>{
               toastError("Error on updating publisher");
@@ -89,6 +99,7 @@ export default function PublisherPage() {
 
     function handleEdit(data:ReadPublisher){
         setEditingValues(data as UpdatePublisher);
+        setSheetOpen(true);
     }
 
     function handleDelete(id:number){
@@ -186,14 +197,7 @@ export default function PublisherPage() {
         )}
     </div>
 
-    <PublisherForm
-    className="my-2"
-    editingValues={editingValues}
-    onClear={handleFormClear}
-    onSubmit={handleFormSubmit}
-    resetSignal={resetFormSignal}
-    submitting={submitting}
-    />
+    <Button variant="default" className="mt-2" onClick={()=>{setEditingValues(null);setSheetOpen(true);}}><Plus className="size-4"/> Add</Button>
 
      <PublisherFilter
      className="mt-2"
@@ -244,5 +248,17 @@ export default function PublisherPage() {
                    isConfirming={false}
                    onConfirm={confirmDelete}
         />
+
+        <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
+            <SheetContent>
+               <PublisherForm
+                editingValues={editingValues}
+                onClear={handleFormClear}
+                onSubmit={handleFormSubmit}
+                resetSignal={resetFormSignal}
+                submitting={submitting}
+              />
+            </SheetContent>
+        </Sheet>
     </>)
 }

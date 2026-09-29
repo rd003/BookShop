@@ -1,6 +1,5 @@
 import { cn } from "cn";
 import type { UpdatePublisher } from "../types/updatePublisher";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -75,15 +74,12 @@ export default function PublisherForm({
     return true;
   }
 
-    return (<form onSubmit={handleSubmit} className={cn("",className)}>
+    return (<form onSubmit={handleSubmit} className={cn("p-3",className)}>
         <input type="hidden" value={id}/>
-        <Card>
-            <CardHeader className="pb-2">
-               <CardTitle className="text-lg">
-                   {editingValues ? "Edit publisher" : "Add publisher"}
-               </CardTitle>
-            </CardHeader>
-            <CardContent className="flex gap-2">
+
+        <h1 className="text-xl mb-2">{editingValues ? "Edit publisher" : "Add publisher"}</h1>
+
+        <div className="flex flex-col gap-2">
                 <div className="">
                     <div className="flex gap-2">
                 <Label htmlFor="name">Name<span className="text-destructive">*</span></Label>
@@ -100,7 +96,8 @@ export default function PublisherForm({
                 </p>}
                 </div>
 
-                <Button
+                <div className="flex gap-2">
+                  <Button
                 variant="default"
                 type="submit"
                 disabled={submitting}
@@ -112,8 +109,8 @@ export default function PublisherForm({
 
                 <Button variant="outline" type="button" disabled={submitting} onClick={onClear}
                 ><X className="size-4"/>Clear</Button>
-            </CardContent>
-        </Card>
+                </div>
+            </div>
     </form>
   )
 }
