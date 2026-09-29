@@ -11,7 +11,6 @@ import QueryState from "@/components/QueryState";
 import Paginator from "@/components/Paginator";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import PublisherForm from "./ui/PublisherForm";
 import type { UpdatePublisher } from "./types/updatePublisher";
 import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
@@ -29,7 +28,7 @@ const DEFAULT_SORTBY = 'name';
 export default function PublisherPage() {
     const [resetFilterSignal, setResetFilterSignal]= useState(0);
     const [searchParams,setSearchParams] = useSearchParams();
-    const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
+    // const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
     const [resetFormSignal, setResetFormSignal] = useState<number>(0);
     const [editingValues, setEditingValues] = useState<UpdatePublisher|null>(null);
     const [sheetOpen,setSheetOpen] = useState(false);
@@ -103,7 +102,27 @@ export default function PublisherPage() {
     }
 
     function handleDelete(id:number){
-        setDeleteTargetId(id);
+        const toastId = toast.add({
+        type: "warning",
+        title: "Delete this publisher?",
+        description: "This action cannot be undone.",
+        timeout: 0,
+        actionProps: {
+            children: "Delete",
+            onClick: () => {
+                toast.close(toastId);
+                confirmDelete(id);
+            },
+        },
+    });
+
+    }
+
+    function confirmDelete(id: number) {
+        deletePublisherMutation.mutate(id, {
+            onSuccess: () => toastSuccess("Publisher is deleted."),
+            onError: () => toastError("Error on deleting publisher"),
+        });
     }
 
     function handleSetFilter(searchTerm:string){
@@ -135,19 +154,6 @@ export default function PublisherPage() {
        })
     }
 
-    function confirmDelete(): void {
-        if(deleteTargetId === null) return;
-
-        deletePublisherMutation.mutate(deleteTargetId,{
-            onSuccess:()=>{
-                toastSuccess("Publisher is deleted.");
-                setDeleteTargetId(null);
-            },
-            onError:()=>{
-                toastError("Error on deleting publisher");
-            }
-        });
-    }
 
     function handleFormClear() {
         setEditingValues(null);
@@ -239,15 +245,6 @@ export default function PublisherPage() {
                 onLimitSelect={handleLimitSelect}
                 className="mt-2"
             />}
-
-       <ConfirmDialog
-                   open={deleteTargetId !== null}
-                   onOpenChange={(open) => !open && setDeleteTargetId(null)}
-                   title="Delete this publisher?"
-                   description="This action cannot be undone."
-                   isConfirming={false}
-                   onConfirm={confirmDelete}
-        />
 
         <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
             <SheetContent>
