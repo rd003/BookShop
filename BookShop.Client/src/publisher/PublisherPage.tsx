@@ -14,6 +14,7 @@ import EmptyRecords from "@/components/EmptyRecords";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import PublisherForm from "./ui/PublisherForm";
 import type { UpdatePublisher } from "./types/updatePublisher";
+import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 
 const DEFAULT_SORTBY = 'name';
 
@@ -33,6 +34,8 @@ export default function PublisherPage() {
             searchTerm: searchParams.get("searchTerm"),
             sortBy: searchParams.get("sortBy") ?? DEFAULT_SORTBY
         }
+
+    const sortItems = parseSort(queryParams.sortBy);
     const hasFilters = !!(queryParams.searchTerm);
     const publisherQuery = usePublishers(queryParams);
     const {data,isFetching,isPlaceholderData} = publisherQuery;
@@ -67,14 +70,6 @@ export default function PublisherPage() {
           })
     }
 
-    function updateSearchParams(mutate:(searchParam:URLSearchParams)=>void, options?:{replace?:boolean}){
-        setSearchParams((prev)=>{
-            const next = new URLSearchParams(prev);
-            mutate(next);
-            return next;
-        },options)
-    }
-
     function handlePageSelect(page: number): void {
        updateSearchParams(p=>{
         p.set("pageNumber",String(page))
@@ -99,6 +94,21 @@ export default function PublisherPage() {
 
     function handleFormSubmit(data: UpdatePublisher) {
         console.log(data);
+    }
+
+    function handleSortToggle(column: string, multi = false) {
+            updateSearchParams((p) => {
+                p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+                p.set("pageNumber", "1");
+            })
+    }
+
+    function updateSearchParams(mutate:(searchParam:URLSearchParams)=>void, options?:{replace?:boolean}){
+        setSearchParams((prev)=>{
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        },options)
     }
 
     return (<>
@@ -135,6 +145,8 @@ submitting={submitting}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         className="mt-2"
+                        sort={sortItems}
+                        onSortToggle={handleSortToggle}
                     />}
             </QueryState>
         </div>
