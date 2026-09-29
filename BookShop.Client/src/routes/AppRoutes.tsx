@@ -7,7 +7,7 @@ import ContactUs from "@/pages/ContactUs";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Careers from "@/pages/Careers";
 import Signup from "@/pages/Signup";
-import Books from "@/books/Books";
+import Catalog from "@/catalog/Catalog";
 import Login from "@/auth/Login";
 import Cart from "@/cart/Cart";
 import NotFound from "@/pages/NotFound";
@@ -23,15 +23,15 @@ import DashboardPage from "@/dashboard/DashboardPage";
 import GenrePage from "@/genres/GenrePage";
 import AuthorPage from "@/author/AuthorPage";
 import PublisherPage from "@/publisher/PublisherPage";
-import ManageBookPage from "@/book-entry/ManageBookPage";
+import ManageBookPage from "@/book/ManageBookPage";
 import AdminOrdersPage from "@/reports/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
 
 export default function AppRoutes() {
     return (<Routes>
         <Route element={<Layout />}>
-            <Route index element={<Books />} />
-            <Route path="catalog" element={<Books />} />
+            <Route index element={<Catalog />} />
+            <Route path="catalog" element={<Catalog />} />
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />
             <Route path="privacy" element={<PrivacyPolicy />} />
