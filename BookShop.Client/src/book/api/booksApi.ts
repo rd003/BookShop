@@ -1,15 +1,14 @@
 import type { PagedList } from "@/shared/types/pagedList"
 import type { ReadBook } from "../types/readBook"
-import type { QueryParameters } from "@/shared/types/queryParameters"
 import { apiFetch } from "@/lib/apiClient"
 import type { CreateBook } from "../types/createBook"
 import type { UpdateBook } from "../types/updateBook"
+import type { BookQueryParameters } from "../types/bookQueryParameters"
 
 const url = "/books"
 
 export async function fetchBooks(
-  queryParams: QueryParameters,
-  genreIds: number[]
+  queryParams: BookQueryParameters
 ): Promise<PagedList<ReadBook>> {
   const params = new URLSearchParams({
     pageNumber: String(queryParams.pageNumber),
@@ -20,9 +19,10 @@ export async function fetchBooks(
     params.set("sortBy", queryParams.sortBy)
   }
 
-  for (let genreId of genreIds) {
+  for (let genreId of queryParams.genreIds ?? []) {
     params.append("genreIds", genreId.toString())
   }
+
   return apiFetch<PagedList<ReadBook>>(`${url}?${params.toString()}`)
 }
 

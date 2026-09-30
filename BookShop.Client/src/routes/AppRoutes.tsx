@@ -23,7 +23,7 @@ import DashboardPage from "@/dashboard/DashboardPage";
 import GenrePage from "@/genres/GenrePage";
 import AuthorPage from "@/author/AuthorPage";
 import PublisherPage from "@/publisher/PublisherPage";
-import ManageBookPage from "@/book/ManageBookPage";
+import ManageBookPage from "@/book/BookPage";
 import AdminOrdersPage from "@/reports/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
 

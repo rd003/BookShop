@@ -11,7 +11,7 @@ export function useBooksQuery(bookQueryParam: BookQueryParameters) {
     error,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
+    isFetchingNextPage, remove this infinite query
   } = useInfiniteQuery<PagedList<ReadBook>, Error>({
     queryKey: ["books", bookQueryParam, bookQueryParam.genreIds],
     queryFn: () => fetchBooks(bookQueryParam),
