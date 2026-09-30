@@ -2,6 +2,10 @@ import type { PagedList } from "@/shared/types/pagedList"
 import type { ReadBook } from "../types/readBook"
 import type { QueryParameters } from "@/shared/types/queryParameters"
 import { apiFetch } from "@/lib/apiClient"
+import type { CreateBook } from "../types/createBook"
+import type { UpdateBook } from "../types/updateBook"
+
+const url = "/books"
 
 export async function fetchBooks(
   queryParams: QueryParameters,
@@ -19,5 +23,25 @@ export async function fetchBooks(
   for (let genreId of genreIds) {
     params.append("genreIds", genreId.toString())
   }
-  return apiFetch<PagedList<ReadBook>>(`/books?${params.toString()}`)
+  return apiFetch<PagedList<ReadBook>>(`${url}?${params.toString()}`)
+}
+
+export function addBook(book: CreateBook) {
+  return apiFetch<ReadBook>(url, {
+    method: "POST",
+    body: JSON.stringify(book),
+  })
+}
+
+export function updateBook(id: number, book: UpdateBook) {
+  return apiFetch<ReadBook>(`${url}/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(book),
+  })
+}
+
+export function deleteBook(id: number) {
+  apiFetch<void>(`${url}/${id}`, {
+    method: "DELETE",
+  })
 }
