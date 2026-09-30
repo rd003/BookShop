@@ -26,22 +26,22 @@ export async function fetchBooks(
   return apiFetch<PagedList<ReadBook>>(`${url}?${params.toString()}`)
 }
 
-export function addBook(book: CreateBook) {
-  return apiFetch<ReadBook>(url, {
+export async function addBook(book: CreateBook) {
+  return await apiFetch<ReadBook>(url, {
     method: "POST",
     body: JSON.stringify(book),
   })
 }
 
-export function updateBook(id: number, book: UpdateBook) {
-  return apiFetch<ReadBook>(`${url}/${id}`, {
+export async function updateBook(id: number, book: UpdateBook) {
+  return await apiFetch<ReadBook>(`${url}/${id}`, {
     method: "PATCH",
     body: JSON.stringify(book),
   })
 }
 
-export function deleteBook(id: number) {
-  apiFetch<void>(`${url}/${id}`, {
+export async function deleteBook(id: number) {
+  await apiFetch<void>(`${url}/${id}`, {
     method: "DELETE",
   })
 }
