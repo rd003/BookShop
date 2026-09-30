@@ -10,15 +10,16 @@ import { useAddCartItem } from "./hooks/useCartMutation";
 import { toast } from "@/components/ui/toast";
 import type { QueryParameters } from "@/shared/types/queryParameters";
 import { useBooksQuery } from "@/book/hooks/useBooksQuery";
+import type { BookQueryParameters } from "@/book/types/bookQueryParameters";
 
 export default function Books() {
-    const queryParameters: QueryParameters = {
+    const genreQueryParameters: QueryParameters = {
         pageNumber: 1,
         pageSize: 1000,
         sortBy: null,
         searchTerm: null
     };
-    const genreQuery = useGenreQuery(queryParameters);
+    const genreQuery = useGenreQuery(genreQueryParameters);
 
     const {
         data,
@@ -33,14 +34,20 @@ export default function Books() {
     const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
     const genreIds = selectedGenres.map(g => g.id);
 
-    const searchTerm = searchParams.get('search') ?? '';
+    const bookQueryParam: BookQueryParameters = {
+        pageNumber: 1,
+        pageSize: 1000,
+        sortBy: null,
+        searchTerm: searchParams.get('search') ?? null,
+        genreIds
+    };
 
     const { books,
         status,
         error,
         fetchNextPage,
         hasNextPage,
-        isFetchingNextPage } = useBooksQuery(searchTerm, genreIds);
+        isFetchingNextPage } = useBooksQuery(bookQueryParam);
 
     const loadMoreRef = useInfiniteScroll({ hasNextPage, isFetchingNextPage, fetchNextPage });
 
