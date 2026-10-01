@@ -6,7 +6,7 @@ import { getDirection, type SortItem } from "@/lib/sort";
 import SortableHead from "@/components/SortableHead";
 import { Pencil, Trash } from "lucide-react";
 import { formatCurrency } from "@/lib/format";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface Props{
   books:ReadBook[];
@@ -24,6 +24,7 @@ export default function BookList({
     onSortToggle,
     sort
 }:Props){
+    const location = useLocation();
   return(<Table className={cn("",className)}>
         <TableHeader>
             <TableRow>
@@ -51,9 +52,20 @@ export default function BookList({
                 <TableCell>{b.stockQuantity}</TableCell>
                 <TableCell className="flex justify-end">
                       <Button type="button" variant="ghost" aria-label="Edit book"><Pencil className="s-4" onClick={()=>onEdit(b)}/></Button>
+
                       <Button type="button" variant="ghost" onClick={()=>onDelete(b.id)}
                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"><Trash className="s-4"/></Button>
-                      <Button type="button" render={<Link to={`/admin/books/${b.id}`}/>}>Detail</Button>
+
+                      <Button
+                      type="button"
+                      nativeButton={false}
+                      render={<Link to={`/admin/books/${b.id}`}
+                         state={{from:`${location.pathname}/${location.search}`}}
+                      />}
+
+                      >
+                        Detail
+                      </Button>
                 </TableCell>
             </TableRow>)}
         </TableBody>
