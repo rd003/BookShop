@@ -23,9 +23,10 @@ import DashboardPage from "@/dashboard/DashboardPage";
 import GenrePage from "@/genres/GenrePage";
 import AuthorPage from "@/author/AuthorPage";
 import PublisherPage from "@/publisher/PublisherPage";
-import ManageBookPage from "@/book/BookPage";
+import BookPage from "@/book/BookPage";
 import AdminOrdersPage from "@/reports/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
+import BookDetail from "@/book/ui/BookDetail";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -58,7 +59,8 @@ export default function AppRoutes() {
                 <Route path="/admin/genres" element={<GenrePage />} />
                 <Route path="/admin/authors" element={<AuthorPage />} />
                 <Route path="/admin/publishers" element={<PublisherPage />} />
-                <Route path="/admin/books" element={<ManageBookPage />} />
+                <Route path="/admin/books" element={<BookPage />} />
+                <Route path="/admin/books/:id" element={<BookDetail />} />
                 <Route path="/admin/orders" element={<AdminOrdersPage />} />
                 <Route path="/admin/change-password" element={<ChangePassword />} />
                 <Route path="*" element={<NotFound />} />

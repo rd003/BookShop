@@ -28,7 +28,6 @@ const DEFAULT_SORTBY = 'name';
 export default function PublisherPage() {
     const [resetFilterSignal, setResetFilterSignal]= useState(0);
     const [searchParams,setSearchParams] = useSearchParams();
-    // const [deleteTargetId, setDeleteTargetId] = useState<number|null>(null);
     const [resetFormSignal, setResetFormSignal] = useState<number>(0);
     const [editingValues, setEditingValues] = useState<UpdatePublisher|null>(null);
     const [sheetOpen,setSheetOpen] = useState(false);

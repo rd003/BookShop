@@ -26,6 +26,10 @@ export async function fetchBooks(
   return apiFetch<PagedList<ReadBook>>(`${url}?${params.toString()}`)
 }
 
+export async function getBook(id: number) {
+  return apiFetch<ReadBook>(`${url}/${id}`)
+}
+
 export async function addBook(book: CreateBook) {
   return await apiFetch<ReadBook>(url, {
     method: "POST",
