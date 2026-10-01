@@ -9,11 +9,17 @@ import useBooks from "./hooks/useBooks";
 import BookList from "./ui/BookList";
 import { toast } from "@/components/ui/toast";
 import type { ReadBook } from "./types/readBook";
+import QueryState from "@/components/QueryState";
+import Paginator from "@/components/Paginator";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import EmptyRecords from "@/components/EmptyRecords";
+import { useState } from "react";
 
 const DEFAULT_SORTBY = "title";
 
 export default function BookPage() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [resetFilterSignal,setResetFilterSignal] = useState(0);
 
     const queryParams: QueryParameters = {
                 pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
@@ -28,9 +34,9 @@ export default function BookPage() {
     const sortItems = parseSort(queryParams.sortBy);
     const hasFilters = !!(queryParams.searchTerm);
 
-    const publisherQuery = useBooks(queryParams);
+    const bookQuery = useBooks(queryParams);
 
-    const {data,isFetching,isPlaceholderData} = publisherQuery;
+    const {data,isFetching,isPlaceholderData} = bookQuery;
     const books = data?.items || [];
     const hasNext = data?.hasNext;
     const hasPrev  = data?.hasPrevious;
@@ -76,6 +82,18 @@ export default function BookPage() {
     }
 
 
+    function handleClearFilter() {
+        throw new Error("Function not implemented.");
+    }
+
+    function handlePageSelect(page: number): void {
+        throw new Error("Function not implemented.");
+    }
+
+    function handleLimitSelect(limit: number): void {
+        throw new Error("Function not implemented.");
+    }
+
     return (<>
 
     <div className="flex items-end justify-between">
@@ -94,13 +112,39 @@ export default function BookPage() {
 
     <Button variant="default" className="mt-2"><Plus className="size-4"/> Add</Button>
 
-
-    <BookList
+    <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+                <QueryState
+                    query={bookQuery}
+                    isEmpty={d => d.items.length === 0}
+                    skeleton={<LoadingSkeleton label="Loading publishers" rows={queryParams.pageSize} />}
+                    empty={<EmptyRecords
+                        filtered={hasFilters}
+                        onClear={()=>{handleClearFilter();setResetFilterSignal(s=>s+1)}}
+                        message="No publishers match the selected filters"
+                    />}>
+                    {d => <BookList
         books={books}
         onDelete={handleDelete}
         onEdit={handleEdit}
         sort={sortItems}
         onSortToggle={handleSortToggle}
-        />
+        />}
+                </QueryState>
+            </div>
+
+            {bookQuery.status !== 'pending' && books.length > 0 &&
+                <Paginator
+                    currentPage={queryParams.pageNumber}
+                    currentPageLimit={queryParams.pageSize}
+                    pageSizes={PAGE_SIZES}
+                    hasNext={hasNext! && !isPlaceholderData}
+                    hasPrevious={hasPrev! && !isPlaceholderData}
+                    totalPages={totalPages!}
+                    onPageSelect={handlePageSelect}
+                    onLimitSelect={handleLimitSelect}
+                    className="mt-2"
+                />}
+
+
     </>)
 }
