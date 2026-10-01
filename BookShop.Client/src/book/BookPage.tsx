@@ -14,6 +14,7 @@ import Paginator from "@/components/Paginator";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
 import { useState } from "react";
+import BookFilter from "./ui/BookFilter";
 
 const DEFAULT_SORTBY = "title";
 
@@ -42,8 +43,6 @@ export default function BookPage() {
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
 
-
-
     function handleEdit(publisher: ReadBook): void {
        console.log(publisher);
     }
@@ -59,12 +58,33 @@ export default function BookPage() {
             })
     }
 
-    function updateSearchParams(mutate: (param:URLSearchParams)=>void, options?:{replace?:boolean}){
-        setSearchParams((prev)=>{
-         const next = new URLSearchParams(prev);
-         mutate(next);
-         return next;
-        },options)
+    function handleSearch(searchTerm:string){
+        if(searchTerm.trim().length===0) return;
+        updateSearchParams((p)=>{
+            p.set("searchTerm",searchTerm),
+            p.set("pageNumber","1")
+        })
+    }
+
+    function handleClearFilter() {
+        setResetFilterSignal(s=>s+1);
+        updateSearchParams((p)=>{
+            p.delete("searchTerm");
+            p.set("pageNumber","1");
+        })
+    }
+
+    function handlePageSelect(page: number): void {
+        updateSearchParams((p)=>{
+            p.set("pageNumber",page.toString());
+        })
+    }
+
+    function handleLimitSelect(limit: number): void {
+        updateSearchParams((p)=>{
+            p.set("pageSize",limit.toString());
+            p.set("pageNumber","1");
+        })
     }
 
     function toastSuccess(description: string) {
@@ -81,39 +101,39 @@ export default function BookPage() {
         })
     }
 
-
-    function handleClearFilter() {
-        throw new Error("Function not implemented.");
-    }
-
-    function handlePageSelect(page: number): void {
-        throw new Error("Function not implemented.");
-    }
-
-    function handleLimitSelect(limit: number): void {
-        throw new Error("Function not implemented.");
+    function updateSearchParams(mutate: (param:URLSearchParams)=>void, options?:{replace?:boolean}){
+        setSearchParams((prev)=>{
+         const next = new URLSearchParams(prev);
+         mutate(next);
+         return next;
+        },options)
     }
 
     return (<>
 
     <div className="flex items-end justify-between">
         <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Publishers</h1>
-            <p className="text-sm text-muted-foreground">Manage the publishers available in your catalog.</p>
+            <h1 className="text-3xl font-semibold tracking-tight">Books</h1>
+            <p className="text-sm text-muted-foreground">Manage the books available in your catalog.</p>
         </div>
         {data?.totalCount !== undefined && (
             <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium">
                 {data.totalCount} total
             </span>
         )}
-
-
     </div>
 
     <Button variant="default" className="mt-2"><Plus className="size-4"/> Add</Button>
 
+    <BookFilter
+    className="mt-2"
+    resetSignal={resetFilterSignal}
+    onClear={handleClearFilter}
+    onSearch={handleSearch}
+    />
+
     <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
-                <QueryState
+        <QueryState
                     query={bookQuery}
                     isEmpty={d => d.items.length === 0}
                     skeleton={<LoadingSkeleton label="Loading publishers" rows={queryParams.pageSize} />}
@@ -129,11 +149,11 @@ export default function BookPage() {
         sort={sortItems}
         onSortToggle={handleSortToggle}
         />}
-                </QueryState>
-            </div>
+       </QueryState>
+      </div>
 
-            {bookQuery.status !== 'pending' && books.length > 0 &&
-                <Paginator
+        {bookQuery.status !== 'pending' && books.length > 0 &&
+            <Paginator
                     currentPage={queryParams.pageNumber}
                     currentPageLimit={queryParams.pageSize}
                     pageSizes={PAGE_SIZES}
@@ -144,7 +164,5 @@ export default function BookPage() {
                     onLimitSelect={handleLimitSelect}
                     className="mt-2"
                 />}
-
-
     </>)
 }

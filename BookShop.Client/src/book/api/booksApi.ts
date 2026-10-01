@@ -15,6 +15,10 @@ export async function fetchBooks(
     pageSize: String(queryParams.pageSize),
   })
 
+  if (queryParams.searchTerm && queryParams.searchTerm.trim().length > 0) {
+    params.set("searchTerm", queryParams.searchTerm)
+  }
+
   if (queryParams.sortBy) {
     params.set("sortBy", queryParams.sortBy)
   }
