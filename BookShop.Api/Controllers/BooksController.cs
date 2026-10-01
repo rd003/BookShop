@@ -16,11 +16,24 @@ namespace BookShop.Api.Controllers;
 [Route("/api/[controller]")]
 public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) : ControllerBase
 {
-    // Filter available: genreIds[] and searchTerm for title and authros 
+    // Filter available: genreIds[] and searchTerm for title and authros
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetBooks([FromQuery] QueryParameters queryParameters, [FromQuery] int[] genreIds)
     {
+        string[] allowedSortColumns = ["title"];
+        var sortColumns = queryParameters.SortBy?.Trim().Split(',');
+        var invalidColumns = sortColumns?
+            .Select(s => s.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[0])
+            .Where(col => !allowedSortColumns.Contains(col, StringComparer.OrdinalIgnoreCase))
+            .ToList() ?? [];
+
+        if (invalidColumns.Count > 0)
+        {
+            throw new BadRequestException($"Sorting not allowed on: {string.Join(", ", invalidColumns)}");
+        }
+
+
         IQueryable<Book> booksQuery = context.Books
         .Include(b => b.Publisher)
         .Include(b => b.BookAuthors)
@@ -314,7 +327,7 @@ public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) 
                 .Select(gid => new BookGenre { BookId = id, GenreId = gid }));
         }
 
-        // Authors 
+        // Authors
         if (updateBookDto.AuthorIds is not null || (updateBookDto.NewAuthorNames?.Any() ?? false))
         {
             var finalAuthorIds = new HashSet<int>(updateBookDto.AuthorIds ?? []);

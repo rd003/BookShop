@@ -1,33 +1,19 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
-import type { PagedList } from "@/shared/types/pagedList"
-import type { ReadBook } from "../types/readBook"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { fetchBooks } from "../api/booksApi"
 import type { BookQueryParameters } from "../types/bookQueryParameters"
+import { bookKeys } from "../types/bookKeys"
 
-export function useBooksQuery(bookQueryParam: BookQueryParameters) {
-  const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage, remove this infinite query
-  } = useInfiniteQuery<PagedList<ReadBook>, Error>({
-    queryKey: ["books", bookQueryParam, bookQueryParam.genreIds],
+export default function useBooks(bookQueryParam: BookQueryParameters) {
+  return useQuery({
     queryFn: () => fetchBooks(bookQueryParam),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.pageNumber + 1 : undefined,
-    staleTime: 30_000,
+    queryKey: bookKeys.list(bookQueryParam),
     gcTime: 5 * 60_000,
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+    retry: (failureCount, error) => {
+      const s = (error as { response?: { status?: number } })?.response?.status
+      if (s && s < 500) return false // never retry 4xx
+      return failureCount < 2 // retry network and 5xx twice
+    },
   })
-  const books: ReadBook[] = data?.pages.flatMap((page) => page.items) ?? []
-  return {
-    books,
-    status,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  }
 }
