@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getAllGenres } from "../genreApi"
 
-export function useAllAuthors() {
+export function useAllGenres() {
   return useQuery({
     queryFn: getAllGenres,
     queryKey: ["genres", "all"],
