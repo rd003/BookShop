@@ -15,6 +15,12 @@ import LoadingSkeleton from "@/components/LoadingSkeleton";
 import EmptyRecords from "@/components/EmptyRecords";
 import { useState } from "react";
 import BookFilter from "./ui/BookFilter";
+import { useAllPublishers } from "@/publisher/hooks/useAllPublishers";
+import BookForm from "./ui/BookForm";
+import type { UpdateBook } from "./types/updateBook";
+import type { BookFormValues } from "./types/bookSchema";
+import { useAllGenres } from "@/genres/hooks/useAllGenres";
+import { useAllAuthors } from "@/author/hooks/useAllAuthors";
 
 const DEFAULT_SORTBY = "title";
 
@@ -31,6 +37,9 @@ export default function BookPage() {
                 searchTerm: searchParams.get("searchTerm"),
                 sortBy: searchParams.get("sortBy") ?? DEFAULT_SORTBY
             }
+    const allPublishersQuery = useAllPublishers();
+    const allGenresQuery = useAllGenres();
+    const allAuthorsQuery = useAllAuthors();
 
     const sortItems = parseSort(queryParams.sortBy);
     const hasFilters = !!(queryParams.searchTerm);
@@ -42,9 +51,30 @@ export default function BookPage() {
     const hasNext = data?.hasNext;
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
+    const isSubmitting = false; // Todo: calculate it
+    const [editingBook,setEditingBook] =  useState<UpdateBook | null>(null);
 
-    function handleEdit(publisher: ReadBook): void {
-       console.log(publisher);
+    function handlOnBookSubmit(bookValues: BookFormValues){
+      console.log(bookValues);
+    }
+
+    function handleEdit(book: ReadBook): void {
+       const updateBook:UpdateBook = {
+        id: book.id,
+        title: book.title,
+        isbn: book.isbn,
+        coverImageUrl: book.coverImageUrl,
+        price: book.price,
+        description: book.description,
+        publisherId: book.publisherId,
+        stockQuantity: book.stockQuantity,
+        authorIds:[],
+        genreIds:[],
+        newAuthorNames: [],
+        newPublisherName:"",
+        newGenreNames:[],
+       };
+       setEditingBook(updateBook);
     }
 
     function handleDelete(id: number): void {
@@ -124,6 +154,17 @@ export default function BookPage() {
     </div>
 
     <Button variant="default" className="mt-2"><Plus className="size-4"/> Add</Button>
+
+    <BookForm
+    defaultValues={editingBook}
+    onSubmit={handlOnBookSubmit}
+    publishers={allPublishersQuery.data??[]}
+    authors={allAuthorsQuery.data ?? []}
+    genres={allGenresQuery.data ?? []}
+    isSubmitting={isSubmitting}
+    submitLabel={editingBook ? 'Edit': 'add'}
+
+    />
 
     <BookFilter
     className="mt-2"

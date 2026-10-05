@@ -5,17 +5,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 import type { ReadAuthor } from "@/author/types/readAuthor";
 import { Button } from "@/components/ui/button";
+import type { ReadPublisher } from "@/publisher/types/readPublisher";
+import type { ReadGenre } from "@/genres/types/readGenre";
 
 interface Props {
     defaultValues?: UpdateBook | null;
     onSubmit: (values: BookFormValues) => void;
     isSubmitting?: boolean;
     submitLabel?: string;
-    authors: ReadAuthor[]
+    publishers: ReadPublisher[],
+    genres: ReadGenre[],
+    authors: ReadAuthor[],
 }
 
 const toFormValues = (book: UpdateBook): BookFormValues => ({
@@ -35,11 +38,13 @@ const toFormValues = (book: UpdateBook): BookFormValues => ({
 });
 
 export default function BookForm({
-  defaultValues = null,
+    defaultValues = null,
     onSubmit,
     isSubmitting = false,
     submitLabel = "Save",
-    authors,
+    publishers,
+    genres,
+    authors
 }:Props) {
   const form = useForm<BookFormValues>({
     resolver:zodResolver(bookSchema),
@@ -80,26 +85,6 @@ export default function BookForm({
                 ({field,fieldState})=>(
                   <Field>
                   <FieldLabel>Title *</FieldLabel>
-                  <Input
-                  {...field}
-                  id="title"
-                  aria-invalid={fieldState.invalid}
-                  placeholder="Clean Code"
-                  autoComplete="off"
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
-                </Field>
-                )
-              }
-               />
-
-               <Controller
-               name="title"
-               control={form.control}
-               render={
-                ({field,fieldState})=>(
-                  <Field>
-                  <FieldLabel htmlFor="isbn">Title *</FieldLabel>
                   <Input
                   {...field}
                   id="title"
@@ -179,15 +164,32 @@ export default function BookForm({
              name="publisherId"
              control={form.control}
              render={({field,fieldState})=>(<Field>
-              <FieldLabel htmlFor="stockQuantity">Publisher</FieldLabel>
-              <Select
-               {...field}
-               autoComplete="off"
-               id="publisherId"
-               aria-invalid={fieldState.invalid}
-              >
-                <option value="">Select or enter the publisher</option>
-              </Select>
+              <FieldLabel htmlFor="publisherId">Publisher (Enter new publisher below if you don't find it here)</FieldLabel>
+              <Combobox
+               items={publishers}
+               value= {publishers.find(p=>p.id===field.value)?? null}
+               onValueChange={(item: ReadPublisher | null) => field.onChange(item?.id ?? 0)}
+               itemToStringLabel={(item: ReadPublisher) => item.name}
+               isItemEqualToValue={(a: ReadPublisher, b: ReadPublisher) => a.id === b.id}
+               >
+                  <ComboboxInput
+                  id="publisherId"
+                  placeholder="Select the publisher"
+                  aria-invalid={fieldState.invalid}
+                  onBlur={field.onBlur}
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>No items found.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(item:ReadPublisher) => (
+                        <ComboboxItem key={item.id} value={item}>
+                          {item.name}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+              </Combobox>
+
               {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
              </Field>)}
             />
@@ -196,25 +198,14 @@ export default function BookForm({
              name="newPublisherName"
              control={form.control}
              render={({field,fieldState})=>(<Field>
-              <FieldLabel htmlFor="newPublisherName">Enter publisher if not on list</FieldLabel>
-              <Combobox
-               id="newPublisherName"
-               {...field}
-               aria-invalid={fieldState.invalid}
-               items={authors} >
-                  <ComboboxInput placeholder="Select the author" />
-                  <ComboboxContent>
-                    <ComboboxEmpty>No items found.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(item:ReadAuthor) => (
-                        <ComboboxItem key={item.id} value={item.name}>
-                          {item.name}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-              </Combobox>
-
+              <FieldLabel htmlFor="newPublisherName">New publisher (if not on above list)</FieldLabel>
+              <Input
+                  {...field}
+                  id="newPublisherName"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Eg. Xyz publications"
+                  autoComplete="off"
+                  />
               {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
              </Field>)}
             />
@@ -237,6 +228,7 @@ export default function BookForm({
                 >
                     {isSubmitting ? "Saving..." : submitLabel}
                 </Button>
+          </div>
     </form>
   )
 }
