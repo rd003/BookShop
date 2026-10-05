@@ -16,6 +16,14 @@ namespace BookShop.Api.Controllers;
 [Route("/api/[controller]")]
 public class GenresController(AppDbContext context, SortHelper<Genre> sortHelper) : ControllerBase
 {
+    [HttpGet("all")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllGenres()
+    {
+        var genres = await context.Genres.Select(a => a.ToDto()).ToListAsync();
+        return Ok(genres);
+    }
+
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetGenres([FromQuery] QueryParameters queryParameters)

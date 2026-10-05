@@ -17,6 +17,13 @@ namespace BookShop.Api.Controllers;
 public class AuthorsController(AppDbContext context, SortHelper<Author> sortHelper) : ControllerBase
 {
     [AllowAnonymous]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllAuthors()
+    {
+        var authors = await context.Authors.Select(a => a.ToDto()).ToListAsync();
+        return Ok(authors);
+    }
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAuthors([FromQuery] QueryParameters queryParameters)
     {

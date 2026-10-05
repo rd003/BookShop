@@ -1,4 +1,5 @@
 export interface UpdateBook {
+  id: number
   title: string | null
   description: string | null
   isbn: string | null

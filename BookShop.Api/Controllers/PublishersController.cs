@@ -16,6 +16,15 @@ namespace BookShop.Api.Controllers;
 [Route("/api/[controller]")]
 public class PublishersController(AppDbContext context, SortHelper<Publisher> sortHelper) : ControllerBase
 {
+    [HttpGet("all")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllPublishers()
+    {
+        var publishers = await context.Publishers.Select(a => a.ToDto()).ToListAsync();
+        return Ok(publishers);
+    }
+
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetPublishers([FromQuery] QueryParameters queryParameters)
     {
@@ -61,6 +70,7 @@ public class PublishersController(AppDbContext context, SortHelper<Publisher> so
         return NoContent();
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}", Name = nameof(GetPublisher))]
     public async Task<IActionResult> GetPublisher(int id)
     {
