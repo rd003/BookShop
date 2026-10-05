@@ -7,6 +7,10 @@ import type { UpdateAuthor } from "../types/updateAuthor";
 
 const url = "/authors";
 
+export async function getAllAuthors() {
+  return apiFetch<ReadAuthor[]>(`${url}/all`)
+}
+
 export async function getAuthors(queryParams: QueryParameters) {
     const params = new URLSearchParams({
         pageNumber: String(queryParams.pageNumber),

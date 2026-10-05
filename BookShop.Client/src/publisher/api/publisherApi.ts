@@ -7,6 +7,10 @@ import type { PagedList } from "@/shared/types/pagedList"
 
 const url = "/publishers"
 
+export async function getAllPublishers() {
+  return apiFetch<ReadPublisher[]>(`${url}/all`)
+}
+
 export async function createPublisher(publisher: CreatePublisher) {
   return await apiFetch<ReadPublisher>(url, {
     method: "POST",
