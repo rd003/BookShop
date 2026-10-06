@@ -10,6 +10,8 @@ import type { ReadAuthor } from "@/author/types/readAuthor";
 import { Button } from "@/components/ui/button";
 import type { ReadPublisher } from "@/publisher/types/readPublisher";
 import type { ReadGenre } from "@/genres/types/readGenre";
+import MultiCombobox from "@/components/MultiCombobox";
+import type { ISelectItem } from "@/shared/types/ISelectItem";
 
 interface Props {
     defaultValues?: UpdateBook | null;
@@ -19,6 +21,7 @@ interface Props {
     publishers: ReadPublisher[],
     genres: ReadGenre[],
     authors: ReadAuthor[],
+    onGenreChange: (genreIds:number[])=>void,
 }
 
 const toFormValues = (book: UpdateBook): BookFormValues => ({
@@ -44,7 +47,8 @@ export default function BookForm({
     submitLabel = "Save",
     publishers,
     genres,
-    authors
+    authors,
+    onGenreChange
 }:Props) {
   const form = useForm<BookFormValues>({
     resolver:zodResolver(bookSchema),
@@ -64,6 +68,9 @@ export default function BookForm({
       newAuthorNames: [],
     },
   });
+
+  const genreItems = genres.map(g=>({label:g.name,value:g.id} as ISelectItem<number>));
+
   return (
     <form
             onSubmit={form.handleSubmit(onSubmit)}>
@@ -208,6 +215,27 @@ export default function BookForm({
                   />
               {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
              </Field>)}
+            />
+
+            <Controller
+             name="genreIds"
+             control={form.control}
+             render={({field,fieldState})=>(<Field>
+               <FieldLabel htmlFor="genreIds">Genres *</FieldLabel>
+               <MultiCombobox
+               id="genreIds"
+               items={genreItems}
+               onChange={(ids)=>{
+                  field.onChange(ids);
+                  onGenreChange(ids);
+               }}
+               value={field.value}
+               placeHolder="Select genres"
+               className=""
+               />
+                              {fieldState.invalid && <FieldError errors={[fieldState.error]}></FieldError>}
+             </Field>
+             )}
             />
           </FieldGroup>
 

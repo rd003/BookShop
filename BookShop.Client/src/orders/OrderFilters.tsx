@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Search, RotateCcw } from "lucide-react"
 import type { OrderStatus } from "@/shared/constants/orderStatus";
 import { orderStatusSelectItems } from "@/shared/constants/orderStatus";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SelectBasic from "@/components/SelectBasic";
 
 export interface OrderFilter {
@@ -17,8 +16,6 @@ interface OrderFilterProp {
     onClick: (values: OrderFilter) => void;
     onClearFilter: () => void;
 }
-
-
 
 export default function OrderFilters({
     onClick,
