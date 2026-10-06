@@ -55,12 +55,8 @@ export const bookSchema = z
   })
 
   .refine(
-    (data) =>
-      data.publisherId > 0 || (data.newPublisherName?.trim().length ?? 0) > 0,
-    {
-      message: "Select a publisher or enter a new publisher name",
-      path: ["publisherId"],
-    }
+    (v) => v.publisherId > 0 || (v.newPublisherName ?? "").trim().length > 0,
+    { message: "Select or create a publisher", path: ["publisherId"] }
   )
 
 export type BookFormValues = z.infer<typeof bookSchema>

@@ -1,4 +1,4 @@
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { UpdateBook } from "../types/updateBook";
 import { type BookFormValues, bookSchema } from "../types/bookSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,8 @@ import type { ReadPublisher } from "@/publisher/types/readPublisher";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import MultiCombobox from "@/components/MultiCombobox";
 import type { ISelectItem } from "@/shared/types/ISelectItem";
+import { toFormValues } from "../toFormValues";
+import CreatableCombobox from "@/components/CreatableCombobox";
 
 interface Props {
     defaultValues?: UpdateBook | null;
@@ -22,23 +24,8 @@ interface Props {
     genres: ReadGenre[],
     authors: ReadAuthor[],
     onGenreChange: (genreIds:number[])=>void,
+    onAuthorChange: (authorIds:number[])=>void,
 }
-
-const toFormValues = (book: UpdateBook): BookFormValues => ({
-  id: book.id,
-  title: book.title ?? "",
-  description: book.description ?? "",
-  coverImageUrl: book.coverImageUrl ?? "",
-  isbn: book.isbn ?? "",
-  price: book.price ?? 0,
-  stockQuantity: book.stockQuantity ?? 0,
-  publisherId: book.publisherId ?? 0,
-  newPublisherName: book.newPublisherName ?? "",
-  genreIds: book.genreIds ?? [],
-  newGenreNames: book.newGenreNames ?? [],
-  authorIds: book.authorIds ?? [],
-  newAuthorNames: book.newAuthorNames ?? [],
-});
 
 export default function BookForm({
     defaultValues = null,
@@ -48,7 +35,8 @@ export default function BookForm({
     publishers,
     genres,
     authors,
-    onGenreChange
+    onGenreChange,
+    onAuthorChange
 }:Props) {
   const form = useForm<BookFormValues>({
     resolver:zodResolver(bookSchema),
@@ -69,7 +57,12 @@ export default function BookForm({
     },
   });
 
+  const newPublisherName = useWatch({ control: form.control, name: "newPublisherName" });
+  const publisherItems = publishers.map(p => ({ label: p.name, value: p.id } as ISelectItem<number>));
+
   const genreItems = genres.map(g=>({label:g.name,value:g.id} as ISelectItem<number>));
+
+  const authorItems = authors.map(a=>({label:a.name,value:a.id} as ISelectItem<number>));
 
   return (
     <form
@@ -168,54 +161,29 @@ export default function BookForm({
             />
 
             <Controller
-             name="publisherId"
-             control={form.control}
-             render={({field,fieldState})=>(<Field>
-              <FieldLabel htmlFor="publisherId">Publisher (Enter new publisher below if you don't find it here)</FieldLabel>
-              <Combobox
-               items={publishers}
-               value= {publishers.find(p=>p.id===field.value)?? null}
-               onValueChange={(item: ReadPublisher | null) => field.onChange(item?.id ?? 0)}
-               itemToStringLabel={(item: ReadPublisher) => item.name}
-               isItemEqualToValue={(a: ReadPublisher, b: ReadPublisher) => a.id === b.id}
-               >
-                  <ComboboxInput
-                  id="publisherId"
-                  placeholder="Select the publisher"
-                  aria-invalid={fieldState.invalid}
-                  onBlur={field.onBlur}
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>No items found.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(item:ReadPublisher) => (
-                        <ComboboxItem key={item.id} value={item}>
-                          {item.name}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-              </Combobox>
-
-              {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
-             </Field>)}
-            />
-
-           <Controller
-             name="newPublisherName"
-             control={form.control}
-             render={({field,fieldState})=>(<Field>
-              <FieldLabel htmlFor="newPublisherName">New publisher (if not on above list)</FieldLabel>
-              <Input
-                  {...field}
-                  id="newPublisherName"
-                  aria-invalid={fieldState.invalid}
-                  placeholder="Eg. Xyz publications"
-                  autoComplete="off"
-                  />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]}/>}
-             </Field>)}
-            />
+  name="publisherId"
+  control={form.control}
+  render={({ field, fieldState }) => (
+    <Field>
+      <FieldLabel htmlFor="publisherId">Publisher *</FieldLabel>
+      <CreatableCombobox
+        id="publisherId"
+        items={publisherItems}
+        selectedId={field.value}
+        newName={newPublisherName ?? null}
+        onChange={(id, name) => {
+          field.onChange(id);
+          form.setValue("newPublisherName", name, { shouldDirty: true });
+          form.trigger("publisherId");
+        }}
+        placeHolder="Select or type a new publisher"
+        invalid={fieldState.invalid}
+        onBlur={field.onBlur}
+      />
+      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+    </Field>
+  )}
+/>
 
             <Controller
              name="genreIds"
@@ -237,6 +205,28 @@ export default function BookForm({
              </Field>
              )}
             />
+
+            <Controller
+             name="authorIds"
+             control={form.control}
+             render={({field,fieldState})=>(<Field>
+               <FieldLabel htmlFor="authorIds">Authors *</FieldLabel>
+               <MultiCombobox
+               id="authorIds"
+               items={authorItems}
+               onChange={(ids)=>{
+                  field.onChange(ids);
+                  onAuthorChange(ids);
+               }}
+               value={field.value}
+               placeHolder="Select authors"
+               className=""
+               />
+                              {fieldState.invalid && <FieldError errors={[fieldState.error]}></FieldError>}
+             </Field>
+             )}
+            />
+
           </FieldGroup>
 
           <div className="flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-end">

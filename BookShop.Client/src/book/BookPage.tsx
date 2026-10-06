@@ -121,6 +121,10 @@ export default function BookPage() {
        console.log(genreIds);
     }
 
+    function handleAuthorChange(authorIds:number[]){
+       console.log(authorIds);
+    }
+
     function toastSuccess(description: string) {
         toast.add({
             type: "success",
@@ -169,6 +173,7 @@ export default function BookPage() {
     isSubmitting={isSubmitting}
     submitLabel={editingBook ? 'Edit': 'add'}
     onGenreChange={handleGenreChange}
+    onAuthorChange={handleAuthorChange}
     />
 
     <BookFilter
