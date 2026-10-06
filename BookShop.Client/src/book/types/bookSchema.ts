@@ -58,5 +58,14 @@ export const bookSchema = z
     (v) => v.publisherId > 0 || (v.newPublisherName ?? "").trim().length > 0,
     { message: "Select or create a publisher", path: ["publisherId"] }
   )
+  .refine((v) => v.genreIds.length > 0 || (v.newGenreNames ?? []).length > 0, {
+    message: "Select or create at least one genre",
+    path: ["genreIds"],
+  })
+  // At least one author: existing OR new.
+  .refine(
+    (v) => v.authorIds.length > 0 || (v.newAuthorNames ?? []).length > 0,
+    { message: "Select or create at least one author", path: ["authorIds"] }
+  )
 
 export type BookFormValues = z.infer<typeof bookSchema>
