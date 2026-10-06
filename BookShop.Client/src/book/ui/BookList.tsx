@@ -51,7 +51,7 @@ export default function BookList({
                 <TableCell>{formatCurrency(b.price)}</TableCell>
                 <TableCell>{b.stockQuantity}</TableCell>
                 <TableCell className="flex justify-end">
-                      <Button type="button" variant="ghost" aria-label="Edit book"><Pencil className="s-4" onClick={()=>onEdit(b)}/></Button>
+                      <Button type="button" onClick={()=>onEdit(b)} variant="ghost" aria-label="Edit book"><Pencil className="s-4"/></Button>
 
                       <Button type="button" variant="ghost" onClick={()=>onDelete(b.id)}
                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"><Trash className="s-4"/></Button>

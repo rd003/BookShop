@@ -117,13 +117,13 @@ export default function BookPage() {
         })
     }
 
-    function handleGenreChange(genreIds:number[]){
-       console.log(genreIds);
-    }
+    // function handleGenreChange(genreIds:number[]){
+    //    console.log(genreIds);
+    // }
 
-    function handleAuthorChange(authorIds:number[]){
-       console.log(authorIds);
-    }
+    // function handleAuthorChange(authorIds:number[]){
+    //    console.log(authorIds);
+    // }
 
     function toastSuccess(description: string) {
         toast.add({
@@ -164,7 +164,6 @@ export default function BookPage() {
     <Button variant="default" className="mt-2"><Plus className="size-4"/> Add</Button>
 
     <BookForm
-    key={editingBook?.id ?? "new"}
     defaultValues={editingBook}
     onSubmit={handlOnBookSubmit}
     publishers={allPublishersQuery.data??[]}
@@ -172,8 +171,6 @@ export default function BookPage() {
     genres={allGenresQuery.data ?? []}
     isSubmitting={isSubmitting}
     submitLabel={editingBook ? 'Edit': 'add'}
-    onGenreChange={handleGenreChange}
-    onAuthorChange={handleAuthorChange}
     />
 
     <BookFilter
