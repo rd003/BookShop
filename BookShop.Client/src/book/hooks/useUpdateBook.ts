@@ -9,6 +9,9 @@ export default function useUpdateBook() {
       updateBook(obj.id, obj.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] })
+      queryClient.invalidateQueries({ queryKey: ["genres"] })
+      queryClient.invalidateQueries({ queryKey: ["authors"] })
+      queryClient.invalidateQueries({ queryKey: ["publishers"] })
     },
   })
 }

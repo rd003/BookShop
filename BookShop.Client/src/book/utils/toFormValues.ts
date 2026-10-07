@@ -1,5 +1,5 @@
-import type { BookFormValues } from "./types/bookSchema"
-import type { UpdateBook } from "./types/updateBook"
+import type { BookFormValues } from "../types/bookSchema"
+import type { UpdateBook } from "../types/updateBook"
 
 export function toFormValues(book: UpdateBook): BookFormValues {
   return {

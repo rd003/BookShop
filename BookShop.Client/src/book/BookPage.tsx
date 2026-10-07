@@ -22,6 +22,12 @@ import type { BookFormValues } from "./types/bookSchema";
 import { useAllGenres } from "@/genres/hooks/useAllGenres";
 import { useAllAuthors } from "@/author/hooks/useAllAuthors";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import useAddBook from "./hooks/useAddBook";
+import useUpdateBook from "./hooks/useUpdateBook";
+import useDeleteBook from "./hooks/useDeleteBook";
+import type { CreateBook } from "./types/createBook";
+import { toCreateBook } from "./utils/toCreateBook";
+import { toUpdateBook } from "./utils/toUpdateBook";
 
 const DEFAULT_SORTBY = "title";
 
@@ -43,6 +49,10 @@ export default function BookPage() {
     const allGenresQuery = useAllGenres();
     const allAuthorsQuery = useAllAuthors();
 
+    const addBookMutation = useAddBook();
+    const updateBookMutation = useUpdateBook();
+    const deleteBookMutation = useDeleteBook();
+
     const sortItems = parseSort(queryParams.sortBy);
     const hasFilters = !!(queryParams.searchTerm);
 
@@ -53,11 +63,39 @@ export default function BookPage() {
     const hasNext = data?.hasNext;
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
-    const isSubmitting = false; // Todo: calculate it
+    const isSubmitting = addBookMutation.status==='pending' || updateBookMutation.status === 'pending';
+
     const [editingBook,setEditingBook] =  useState<UpdateBook | null>(null);
 
     function handlOnBookSubmit(bookValues: BookFormValues){
-      console.log(bookValues);
+        if(bookValues.id === 0)
+            createBook(toCreateBook(bookValues));
+        else
+            updateBook(toUpdateBook(bookValues));
+    }
+
+    function createBook(book:CreateBook){
+        addBookMutation.mutate(book, {
+            onSuccess:()=>{
+                toastSuccess("Book is created.");
+                setSheetOpen(false);
+            },
+            onError:()=>{
+                toastError("Error while creating this entry");
+            }
+        })
+    }
+
+    function updateBook(book: UpdateBook){
+        updateBookMutation.mutate({id:book.id,data:book}, {
+            onSuccess:()=>{
+                toastSuccess("Book is updated.");
+                setSheetOpen(false);
+            },
+            onError:()=>{
+                toastError("Error while updating this entry.");
+            }
+        })
     }
 
     function handleEdit(book: ReadBook): void {
@@ -120,14 +158,6 @@ export default function BookPage() {
         })
     }
 
-    // function handleGenreChange(genreIds:number[]){
-    //    console.log(genreIds);
-    // }
-
-    // function handleAuthorChange(authorIds:number[]){
-    //    console.log(authorIds);
-    // }
-
     function onSheetOpenChange(){
           setSheetOpen(false);
     }
@@ -155,7 +185,6 @@ export default function BookPage() {
     }
 
     return (<>
-
     <div className="flex items-end justify-between">
         <div>
             <h1 className="text-3xl font-semibold tracking-tight">Books</h1>

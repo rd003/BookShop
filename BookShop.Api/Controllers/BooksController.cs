@@ -90,7 +90,10 @@ public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) 
     [HttpPost]
     public async Task<IActionResult> CreateBook(CreateBookDto createBookDto)
     {
-        if ((createBookDto.PublisherId is null) == string.IsNullOrWhiteSpace(createBookDto.NewPublisherName))
+        var hasPublisherId = createBookDto.PublisherId is > 0;
+        var hasNewPublisherName = !string.IsNullOrWhiteSpace(createBookDto.NewPublisherName);
+
+        if (hasPublisherId == hasNewPublisherName) // true when both or neither are provided
         {
             throw new BadRequestException("Pass exactly one of publisherId or publisherName");
         }
@@ -251,7 +254,10 @@ public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) 
             throw new NotFoundException("Book does not found");
         }
 
-        if (updateBookDto.PublisherId is not null && !string.IsNullOrWhiteSpace(updateBookDto.NewPublisherName))
+        var hasPublisherId = updateBookDto.PublisherId is > 0;
+        var hasNewPublisherName = !string.IsNullOrWhiteSpace(updateBookDto.NewPublisherName);
+
+        if (hasPublisherId && hasNewPublisherName)
         {
             throw new BadRequestException("Pass at most one of publisherId or publisherName");
         }
@@ -267,14 +273,15 @@ public class BooksController(AppDbContext context, SortHelper<Book> sortHelper) 
         if (updateBookDto.CoverImageUrl is not null) book.CoverImageUrl = updateBookDto.CoverImageUrl;
 
         // Publisher
-        if (updateBookDto.PublisherId is not null)
+        if (hasPublisherId)
         {
-            book.PublisherId = updateBookDto.PublisherId.Value;
+            book.PublisherId = updateBookDto.PublisherId!.Value;
         }
-        else if (!string.IsNullOrWhiteSpace(updateBookDto.NewPublisherName))
+        else if (hasNewPublisherName)
         {
+            var name = updateBookDto.NewPublisherName!.Trim();
             var existingPublisher = await context.Publishers
-                .SingleOrDefaultAsync(x => EF.Functions.Like(x.Name, updateBookDto.NewPublisherName));
+    .FirstOrDefaultAsync(x => x.Name == name);
 
             if (existingPublisher is null)
             {
