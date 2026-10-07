@@ -8,6 +8,9 @@ export default function useAddBook() {
     mutationFn: (data: CreateBook) => addBook(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] })
+      queryClient.invalidateQueries({ queryKey: ["genres"] })
+      queryClient.invalidateQueries({ queryKey: ["authors"] })
+      queryClient.invalidateQueries({ queryKey: ["publishers"] })
     },
   })
 }

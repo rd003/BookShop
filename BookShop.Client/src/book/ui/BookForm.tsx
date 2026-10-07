@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import type { ReadPublisher } from "@/publisher/types/readPublisher";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import type { ISelectItem } from "@/shared/types/ISelectItem";
-import { toFormValues } from "../toFormValues";
+import { toFormValues } from "../utils/toFormValues";
 import CreatableCombobox from "@/components/CreatableCombobox";
 import CreatableMultiCombobox from "@/components/CreatableMultiCombobox";
 import { useEffect } from "react";
