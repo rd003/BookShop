@@ -6,7 +6,7 @@ export default function useDeleteBook() {
   return useMutation({
     mutationFn: (id: number) => deleteBook(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] })
+      queryClient.invalidateQueries({ queryKey: ["books"] })
     },
   })
 }

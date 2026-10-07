@@ -119,7 +119,26 @@ export default function BookPage() {
     }
 
     function handleDelete(id: number): void {
-        console.log(id);
+               const toastId = toast.add({
+        type: "warning",
+        title: "Delete this publisher?",
+        description: "This action cannot be undone.",
+        timeout: 0,
+        actionProps: {
+            children: "Delete",
+            onClick: () => {
+                toast.close(toastId);
+                confirmDelete(id);
+            },
+        },
+    });
+    }
+
+    function confirmDelete(id:number){
+        deleteBookMutation.mutate(id,{
+            onSuccess: () => toastSuccess("Book is deleted."),
+            onError: () => toastError("Error on deleting book."),
+        })
     }
 
     function handleSortToggle(column: string, multi = false) {
