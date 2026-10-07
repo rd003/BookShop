@@ -21,12 +21,14 @@ import type { UpdateBook } from "./types/updateBook";
 import type { BookFormValues } from "./types/bookSchema";
 import { useAllGenres } from "@/genres/hooks/useAllGenres";
 import { useAllAuthors } from "@/author/hooks/useAllAuthors";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const DEFAULT_SORTBY = "title";
 
 export default function BookPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [resetFilterSignal,setResetFilterSignal] = useState(0);
+    const [sheetOpen, setSheetOpen] = useState(false);
 
     const queryParams: QueryParameters = {
                 pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
@@ -75,6 +77,7 @@ export default function BookPage() {
         newGenreNames:[],
        };
        setEditingBook(updateBook);
+       setSheetOpen(true);
     }
 
     function handleDelete(id: number): void {
@@ -125,6 +128,10 @@ export default function BookPage() {
     //    console.log(authorIds);
     // }
 
+    function onSheetOpenChange(){
+          setSheetOpen(false);
+    }
+
     function toastSuccess(description: string) {
         toast.add({
             type: "success",
@@ -161,17 +168,7 @@ export default function BookPage() {
         )}
     </div>
 
-    <Button variant="default" className="mt-2"><Plus className="size-4"/> Add</Button>
-
-    <BookForm
-    defaultValues={editingBook}
-    onSubmit={handlOnBookSubmit}
-    publishers={allPublishersQuery.data??[]}
-    authors={allAuthorsQuery.data ?? []}
-    genres={allGenresQuery.data ?? []}
-    isSubmitting={isSubmitting}
-    submitLabel={editingBook ? 'Edit': 'add'}
-    />
+    <Button variant="default" className="mt-2" onClick={()=>{setEditingBook(null);setSheetOpen(true);}}><Plus className="size-4"/> Add</Button>
 
     <BookFilter
     className="mt-2"
@@ -212,5 +209,19 @@ export default function BookPage() {
                     onLimitSelect={handleLimitSelect}
                     className="mt-2"
                 />}
+
+        <Sheet open={sheetOpen} onOpenChange={onSheetOpenChange}>
+            <SheetContent className="overflow-y-auto px-2.5 pb-2 pt-4">
+                    <BookForm
+                    defaultValues={editingBook}
+                    onSubmit={handlOnBookSubmit}
+                    publishers={allPublishersQuery.data??[]}
+                    authors={allAuthorsQuery.data ?? []}
+                    genres={allGenresQuery.data ?? []}
+                    isSubmitting={isSubmitting}
+                    submitLabel={editingBook ? 'Edit': 'add'}
+                    />
+            </SheetContent>
+        </Sheet>
     </>)
 }

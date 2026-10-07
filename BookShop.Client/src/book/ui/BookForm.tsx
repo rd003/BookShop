@@ -91,7 +91,7 @@ export default function BookForm({
                render={
                 ({field,fieldState})=>(
                   <Field>
-                  <FieldLabel>Title *</FieldLabel>
+                  <FieldLabel htmlFor="title">Title *</FieldLabel>
                   <Input
                   {...field}
                   id="title"
