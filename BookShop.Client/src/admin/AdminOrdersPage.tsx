@@ -8,6 +8,7 @@ import { useAdminOrders } from "./hooks/useAdminOrders";
 import QueryState from "@/components/QueryState";
 import EmptyRecords from "@/components/EmptyRecords";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import Paginator from "@/components/Paginator";
 
 const DEFAULT_SORTBY = "orderDate";
 
@@ -49,6 +50,14 @@ const queryParams: AdminOrderQueryParameters = {
         throw new Error("Function not implemented.");
     }
 
+    function handlePageSelect(page: number): void {
+        console.log(page);
+    }
+
+    function handleLimitSelect(limit: number): void {
+        console.log(limit)
+    }
+
     return (<>
       <h1 className="text-2xl">Orders</h1>
 
@@ -70,6 +79,18 @@ const queryParams: AdminOrderQueryParameters = {
         </QueryState>
       </div>
 
+    {orderQuery.status !== 'pending' && publishers.length > 0 &&
+        <Paginator
+            currentPage={queryParams.pageNumber}
+            currentPageLimit={queryParams.pageSize}
+            pageSizes={PAGE_SIZES}
+            hasNext={hasNext! && !isPlaceholderData}
+            hasPrevious={hasPrev! && !isPlaceholderData}
+            totalPages={totalPages!}
+            onPageSelect={handlePageSelect}
+            onLimitSelect={handleLimitSelect}
+            className="mt-2"
+        />}
 
     </>)
 }
