@@ -31,7 +31,7 @@ export default function AdminOrderList({
              <SortableHead
                                label="OrderDate"
                                direction={getDirection(sort, "orderDate")}
-                               onToggle={multi => onSortToggle("name", multi)}
+                               onToggle={multi => onSortToggle("orderDate", multi)}
              />
              <TableHead>Email</TableHead>
              <TableHead>Order Status</TableHead>
