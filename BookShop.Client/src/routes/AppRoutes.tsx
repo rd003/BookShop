@@ -27,6 +27,7 @@ import BookPage from "@/book/BookPage";
 import AdminOrdersPage from "@/admin/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
 import BookDetail from "@/book/ui/BookDetail";
+import AdminOrderDetailPage from "@/admin/AdminOrderDetailPage";
 
 export default function AppRoutes() {
     return (<Routes>
@@ -62,6 +63,7 @@ export default function AppRoutes() {
                 <Route path="/admin/books" element={<BookPage />} />
                 <Route path="/admin/books/:id" element={<BookDetail />} />
                 <Route path="/admin/orders" element={<AdminOrdersPage />} />
+                <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
                 <Route path="/admin/change-password" element={<ChangePassword />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
