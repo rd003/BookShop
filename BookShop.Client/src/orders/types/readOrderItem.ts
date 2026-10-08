@@ -1,11 +1,11 @@
 export interface ReadOrderItem {
-    id: number;
-    bookId: number;
-    bookTitle: string;
-    coverImageUrl: string;
-    authors: string[];
-    genres: string[];
-    quantity: number;
-    unitPrice: number;
-    itemTotalPrice: number;
+  id: number
+  bookId: number
+  bookTitle: string
+  coverImageUrl: string | null
+  authors: string[]
+  genres: string[]
+  quantity: number
+  unitPrice: number
+  itemTotalPrice: number
 }
