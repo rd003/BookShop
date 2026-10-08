@@ -24,7 +24,7 @@ import GenrePage from "@/genres/GenrePage";
 import AuthorPage from "@/author/AuthorPage";
 import PublisherPage from "@/publisher/PublisherPage";
 import BookPage from "@/book/BookPage";
-import AdminOrdersPage from "@/reports/AdminOrdersPage";
+import AdminOrdersPage from "@/admin/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
 import BookDetail from "@/book/ui/BookDetail";
 
