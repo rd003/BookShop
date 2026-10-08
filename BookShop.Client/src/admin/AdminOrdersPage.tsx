@@ -1,4 +1,4 @@
-import { parseSort } from "@/lib/sort";
+import { parseSort, serializeSort, toggleSort } from "@/lib/sort";
 import AdminOrderList from "./ui/AdminOrderList";
 import { parsePositiveInt } from "@/lib/parsePositiveInt";
 import { useSearchParams } from "react-router-dom";
@@ -42,25 +42,57 @@ const queryParams: AdminOrderQueryParameters = {
 
   function handleSortToggle(column: string, multi = false){
     console.log(column);
-    //  updateSearchParams((p) => {
-    //                 p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
-    //                 p.set("pageNumber", "1");
-    //             })
+     updateSearchParams((p) => {
+                    p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+                    p.set("pageNumber", "1");
+                })
   }
     function handleSetFilter(values: AdminOrderFilter){
-       console.log(values);
+       updateSearchParams(p=>{
+        if(values.startingDate){
+            p.set("startingDate",values.startingDate.toISOString());
+        }else{
+            p.delete("startingDate")
+        }
+
+        if(values.endingDate){
+            p.set("endingDate",values.endingDate.toISOString());
+        }else{
+            p.delete("endingDate")
+        }
+
+         p.set("pageNumber","1");
+       })
     }
 
     function handleClearFilter() {
-        throw new Error("Function not implemented.");
+        updateSearchParams((p)=>{
+          ["startingDate","endingDate"].forEach((val)=>{
+             p.delete(val);
+          })
+          p.set("pageNumber","1");
+        });
     }
 
     function handlePageSelect(page: number): void {
-        console.log(page);
+        updateSearchParams(p=>{
+            p.set("pageNumber",String(page));
+        })
     }
 
     function handleLimitSelect(limit: number): void {
-        console.log(limit)
+        updateSearchParams(p=>{
+            p.set("pageSize",String(limit));
+            p.set("pageNumber","1");
+        })
+    }
+
+    function updateSearchParams(mutate:(p:URLSearchParams)=>void,options?:{replace?:boolean}){
+        setSearchParams((prev)=>{
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        },options)
     }
 
     return (<>
