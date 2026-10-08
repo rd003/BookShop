@@ -16,7 +16,7 @@ namespace BookShop.Api.Controllers;
 public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHelper) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetOrders([FromQuery] QueryParameters queryParameters, [FromQuery] DateTimeOffset? startingOrderDate, [FromQuery] DateTimeOffset? endingOrderDate)
+    public async Task<IActionResult> GetOrders([FromQuery] AdminOrderQueryParameters queryParameters)
     {
         string[] allowedSortColumns = ["OrderDate"];
         var sortColumns = queryParameters.SortBy?.Trim().Split(',');
@@ -30,7 +30,7 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
             throw new BadRequestException($"Sorting not allowed on: {string.Join(", ", invalidColumns)}");
         }
 
-        if (startingOrderDate.HasValue && endingOrderDate.HasValue && startingOrderDate > endingOrderDate)
+        if (queryParameters.StartingOrderDate.HasValue && queryParameters.EndingOrderDate.HasValue && queryParameters.StartingOrderDate > queryParameters.EndingOrderDate)
         {
             throw new BadRequestException("startingOrderDate cannot be after endingOrderDate");
         }
@@ -40,13 +40,13 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
 
         // Each bound applied independently — supports open-ended ranges
         // (only "from" or only "to") instead of requiring both
-        if (startingOrderDate.HasValue)
+        if (queryParameters.StartingOrderDate.HasValue)
         {
-            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date >= startingOrderDate.Value.Date);
+            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date >= queryParameters.StartingOrderDate.Value.Date);
         }
-        if (endingOrderDate.HasValue)
+        if (queryParameters.EndingOrderDate.HasValue)
         {
-            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date <= endingOrderDate.Value.Date);
+            ordersQuery = ordersQuery.Where(o => o.OrderDate.Date <= queryParameters.EndingOrderDate.Value.Date);
         }
 
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
@@ -85,8 +85,8 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
         return Ok(pagedOrderDtos);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetOrders(int id)
+    [HttpGet("{orderId:int}")]
+    public async Task<IActionResult> GetOrderDetail(int orderId)
     {
         var order = await context.Orders
             .Include(o => o.User)
@@ -114,7 +114,7 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
                         Genres = oi.Book.BookGenres.Select(bg => bg.Genre!.Name).ToList()
                     })
                 }
-            ).SingleOrDefaultAsync(o => o.OrderId == id);
+            ).SingleOrDefaultAsync(o => o.OrderId == orderId);
         if (order is null)
         {
             throw new NotFoundException("Order not found");
