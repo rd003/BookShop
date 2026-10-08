@@ -27,7 +27,7 @@ export async function getAdminOrders(
     params.set("endingOrderDate", queryParams.endingOrderDate)
   }
 
-  return await apiFetch<PagedList<GetAdminOrder>>(`${url}/${params.toString()}`)
+  return await apiFetch<PagedList<GetAdminOrder>>(`${url}?${params.toString()}`)
 }
 
 export async function getAdminOrderDetail(

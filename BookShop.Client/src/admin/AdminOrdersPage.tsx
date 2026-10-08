@@ -1,99 +1,42 @@
-import { parseSort, type SortItem } from "@/lib/sort";
-import type { GetAdminOrder } from "./types/getAdminOrder"
+import { parseSort } from "@/lib/sort";
 import AdminOrderList from "./ui/AdminOrderList";
+import { parsePositiveInt } from "@/lib/parsePositiveInt";
+import { useSearchParams } from "react-router-dom";
+import type { AdminOrderQueryParameters } from "./types/adminOrderQueryParameters";
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE, PAGE_SIZES } from "@/shared/constants/pagination";
+import { useAdminOrders } from "./hooks/useAdminOrders";
+import QueryState from "@/components/QueryState";
+import EmptyRecords from "@/components/EmptyRecords";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+
+const DEFAULT_SORTBY = "orderDate";
 
 export default function AdminOrdersPage() {
-    // const sortItems = parseSort(queryParams.sortBy);
-    const sortItems:SortItem[] = [{column:'orderDate',direction:'asc'}];
-    const orders:GetAdminOrder[] = [
-    {
-      "orderId": 1,
-      "customerEmail": "john@example.com",
-      "orderNumber": "ORD-20261008-27A49",
-      "orderDate": "2026-10-08T08:34:00.9434418+05:30",
-      "orderStatus": "Pending",
-      "pyamentMethod": "CashOnDelivery",
-      "pyamentStatus": "Pending",
-      "orderItems": [
-        {
-          "id": 0,
-          "bookId": 1,
-          "bookTitle": "The Fellowship of the Ring",
-          "coverImageUrl": null,
-          "authors": [
-            "J.R.R. Tolkien"
-          ],
-          "genres": [
-            "Fiction",
-            "Fantasy"
-          ],
-          "quantity": 1,
-          "unitPrice": 12.99,
-          "itemTotalPrice": 12.99
-        },
-        {
-          "id": 0,
-          "bookId": 2,
-          "bookTitle": "Dune",
-          "coverImageUrl": null,
-          "authors": [
-            "Frank Herbert"
-          ],
-          "genres": [
-            "Fiction",
-            "Science Fiction"
-          ],
-          "quantity": 2,
-          "unitPrice": 15.99,
-          "itemTotalPrice": 31.98
-        },
-        {
-          "id": 0,
-          "bookId": 4,
-          "bookTitle": "Clean Code",
-          "coverImageUrl": null,
-          "authors": [
-            "Robert C. Martin"
-          ],
-          "genres": [
-            "Programming"
-          ],
-          "quantity": 1,
-          "unitPrice": 500.0,
-          "itemTotalPrice": 500.0
-        }
-      ],
-      "orderTotal": 544.97
-    },
-    {
-      "orderId": 2,
-      "customerEmail": "john@example.com",
-      "orderNumber": "ORD-20261008-B1E53",
-      "orderDate": "2026-10-08T08:34:46.2462214+05:30",
-      "orderStatus": "Pending",
-      "pyamentMethod": "CashOnDelivery",
-      "pyamentStatus": "Pending",
-      "orderItems": [
-        {
-          "id": 0,
-          "bookId": 1,
-          "bookTitle": "The Fellowship of the Ring",
-          "coverImageUrl": null,
-          "authors": [
-            "J.R.R. Tolkien"
-          ],
-          "genres": [
-            "Fiction",
-            "Fantasy"
-          ],
-          "quantity": 1,
-          "unitPrice": 12.99,
-          "itemTotalPrice": 12.99
-        }
-      ],
-      "orderTotal": 12.99
-    }
-  ]
+ const [searchParams,setSearchParams] = useSearchParams();
+
+const queryParams: AdminOrderQueryParameters = {
+    pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
+    pageSize: (() => {
+                const s = parsePositiveInt(searchParams.get("pageSize"), DEFAULT_PAGE_SIZE);
+                return PAGE_SIZES.includes(s) ? s : DEFAULT_PAGE_SIZE;
+            })(),
+    sortBy: searchParams.get("sortBy") ?? DEFAULT_SORTBY,
+    startingOrderDate: searchParams.get("startingOrderDate") ?? null,
+    endingOrderDate: searchParams.get("endingOrderDate") ?? null,
+  }
+
+    const sortItems = parseSort(queryParams.sortBy);
+    const hasFilters = !!(queryParams.startingOrderDate || queryParams.endingOrderDate);
+
+    const orderQuery = useAdminOrders(queryParams);
+
+    const {data,isFetching,isPlaceholderData} = orderQuery;
+    const publishers = data?.items || [];
+    const hasNext = data?.hasNext;
+    const hasPrev  = data?.hasPrevious;
+    const totalPages = data?.totalPages;
+
+    const orders = data?.items ?? [];
 
   function handleSortToggle(column: string, multi = false){
     console.log(column);
@@ -102,13 +45,31 @@ export default function AdminOrdersPage() {
     //                 p.set("pageNumber", "1");
     //             })
   }
+    function handleClearFilter() {
+        throw new Error("Function not implemented.");
+    }
+
     return (<>
       <h1 className="text-2xl">Orders</h1>
 
-      <AdminOrderList
-       orders={orders}
-       sort={sortItems}
-       onSortToggle={handleSortToggle}
-      />
+      <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+                <QueryState
+                    query={orderQuery}
+                    isEmpty={d => d.items.length === 0}
+                    skeleton={<LoadingSkeleton label="Loading orders" rows={queryParams.pageSize} />}
+                    empty={<EmptyRecords
+                        filtered={hasFilters}
+                        onClear={()=>{handleClearFilter();}}
+                        message="No orders match the selected filters"
+                    />}>
+                    {d => <AdminOrderList
+                            orders={orders}
+                            sort={sortItems}
+                            onSortToggle={handleSortToggle}/>
+                    }
+        </QueryState>
+      </div>
+
+
     </>)
 }
