@@ -9,6 +9,7 @@ import QueryState from "@/components/QueryState";
 import EmptyRecords from "@/components/EmptyRecords";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import Paginator from "@/components/Paginator";
+import AdminOrderFilters, { type AdminOrderFilter } from "./ui/AdminOrderFilter";
 
 const DEFAULT_SORTBY = "orderDate";
 
@@ -46,6 +47,10 @@ const queryParams: AdminOrderQueryParameters = {
     //                 p.set("pageNumber", "1");
     //             })
   }
+    function handleSetFilter(values: AdminOrderFilter){
+       console.log(values);
+    }
+
     function handleClearFilter() {
         throw new Error("Function not implemented.");
     }
@@ -60,6 +65,11 @@ const queryParams: AdminOrderQueryParameters = {
 
     return (<>
       <h1 className="text-2xl">Orders</h1>
+
+      <AdminOrderFilters
+      onClick={handleSetFilter}
+      onClearFilter={handleClearFilter}
+      />
 
       <div aria-busy={isFetching} className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
                 <QueryState
