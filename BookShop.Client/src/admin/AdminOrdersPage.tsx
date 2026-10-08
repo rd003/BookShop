@@ -1,7 +1,10 @@
+import { parseSort, type SortItem } from "@/lib/sort";
 import type { GetAdminOrder } from "./types/getAdminOrder"
-import AdminOrderList from "./ui/adminOrderList"
+import AdminOrderList from "./ui/AdminOrderList";
 
 export default function AdminOrdersPage() {
+    // const sortItems = parseSort(queryParams.sortBy);
+    const sortItems:SortItem[] = [{column:'orderDate',direction:'asc'}];
     const orders:GetAdminOrder[] = [
     {
       "orderId": 1,
@@ -91,11 +94,21 @@ export default function AdminOrdersPage() {
       "orderTotal": 12.99
     }
   ]
+
+  function handleSortToggle(column: string, multi = false){
+    console.log(column);
+    //  updateSearchParams((p) => {
+    //                 p.set("sortBy", serializeSort(toggleSort(sortItems, column, multi)));
+    //                 p.set("pageNumber", "1");
+    //             })
+  }
     return (<>
       <h1 className="text-2xl">Orders</h1>
 
       <AdminOrderList
        orders={orders}
+       sort={sortItems}
+       onSortToggle={handleSortToggle}
       />
     </>)
 }
