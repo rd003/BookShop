@@ -6,7 +6,8 @@ interface SelectBasicProps<T extends React.Key> {
     value: T | null,
     onChange: (val: T) => void,
     placeHolder: string,
-    className?: string
+    className?: string,
+    id:string,
 }
 
 export default function SelectBasic<T extends React.Key>({
@@ -14,9 +15,10 @@ export default function SelectBasic<T extends React.Key>({
     value,
     onChange,
     placeHolder,
-    className = 'w-45'
+    className = 'w-45',
+    id
 }: SelectBasicProps<T>) {
-    return (<Select items={items} onValueChange={(val) => onChange(val as T)} value={value ?? undefined}>
+    return (<Select items={items} onValueChange={(val) => onChange(val as T)} value={value ?? undefined} id={id}>
         <SelectTrigger className={className}>
             <SelectValue placeholder={placeHolder} />
         </SelectTrigger>
