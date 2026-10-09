@@ -33,12 +33,11 @@ const queryParams: AdminOrderQueryParameters = {
     const orderQuery = useAdminOrders(queryParams);
 
     const {data,isFetching,isPlaceholderData} = orderQuery;
-    const publishers = data?.items || [];
+    const orders = data?.items ?? [];
     const hasNext = data?.hasNext;
     const hasPrev  = data?.hasPrevious;
     const totalPages = data?.totalPages;
 
-    const orders = data?.items ?? [];
 
   function handleSortToggle(column: string, multi = false){
     console.log(column);
@@ -50,15 +49,15 @@ const queryParams: AdminOrderQueryParameters = {
     function handleSetFilter(values: AdminOrderFilter){
        updateSearchParams(p=>{
         if(values.startingDate){
-            p.set("startingDate",values.startingDate.toISOString());
+            p.set("startingOrderDate",values.startingDate.toISOString());
         }else{
-            p.delete("startingDate")
+            p.delete("startingOrderDate")
         }
 
         if(values.endingDate){
-            p.set("endingDate",values.endingDate.toISOString());
+            p.set("endingOrderDate",values.endingDate.toISOString());
         }else{
-            p.delete("endingDate")
+            p.delete("endingOrderDate")
         }
 
          p.set("pageNumber","1");
@@ -67,7 +66,7 @@ const queryParams: AdminOrderQueryParameters = {
 
     function handleClearFilter() {
         updateSearchParams((p)=>{
-          ["startingDate","endingDate"].forEach((val)=>{
+          ["startingOrderDate","endingOrderDate"].forEach((val)=>{
              p.delete(val);
           })
           p.set("pageNumber","1");
@@ -121,7 +120,7 @@ const queryParams: AdminOrderQueryParameters = {
         </QueryState>
       </div>
 
-    {orderQuery.status !== 'pending' && publishers.length > 0 &&
+    {orderQuery.status !== 'pending' && orders.length > 0 &&
         <Paginator
             currentPage={queryParams.pageNumber}
             currentPageLimit={queryParams.pageSize}
