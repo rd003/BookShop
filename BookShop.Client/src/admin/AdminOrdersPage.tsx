@@ -14,11 +14,20 @@ import { orderStatusSelectItems } from "@/shared/constants/orderStatus";
 import {paymentStatusSelectItems} from "@/shared/constants/paymentStatus";
 import type { ChangeOrderStatus } from "./types/changeOrderStatus";
 import type { ChangePaymentStatus } from "./types/changePaymentStatus";
+import { useState } from "react";
+import { useChangeOrderStatusMutation } from "./hooks/useChangeOrderStatusMutation";
+import { useChangePaymentStatusMutation } from "./hooks/useChangePaymentStatusMutation";
+import { toast } from "@/components/ui/toast";
 
 const DEFAULT_SORTBY = "orderDate";
 
 export default function AdminOrdersPage() {
  const [searchParams,setSearchParams] = useSearchParams();
+ const [resetChangeOrderStatusSignal, setResetChangeOrderStatusSignal] = useState(0);
+ const [resetChangePaymentStatusSignal, setResetChangePaymentStatusSignal] = useState(0);
+
+ const changeOrderStatusMutation = useChangeOrderStatusMutation();
+ const changePaymentStatusMutation = useChangePaymentStatusMutation();
 
 const queryParams: AdminOrderQueryParameters = {
     pageNumber: parsePositiveInt(searchParams.get("pageNumber"), DEFAULT_PAGE_NUMBER),
@@ -50,7 +59,8 @@ const queryParams: AdminOrderQueryParameters = {
                     p.set("pageNumber", "1");
                 })
   }
-    function handleSetFilter(values: AdminOrderFilter){
+
+  function handleSetFilter(values: AdminOrderFilter){
        updateSearchParams(p=>{
         if(values.startingDate){
             p.set("startingOrderDate",values.startingDate.toISOString());
@@ -91,11 +101,43 @@ const queryParams: AdminOrderQueryParameters = {
     }
 
     function handleChangeOrderStatus(data:ChangeOrderStatus){
-        console.log(data)
+        changeOrderStatusMutation.mutate(data,{
+            onSuccess:()=>{
+              setResetChangeOrderStatusSignal(s=>s+1);
+              toastSuccess("Order status is updated");
+            },
+            onError:(error)=>{
+              console.log(error);
+              toastError("Error on updating order status");
+            }
+        })
     }
 
     function handleChangePaymentStatus(data:ChangePaymentStatus){
-        console.log(data)
+        changePaymentStatusMutation.mutate(data,{
+            onSuccess:()=>{
+              setResetChangePaymentStatusSignal(s=>s+1);
+              toastSuccess("Order status is updated");
+            },
+            onError:(error)=>{
+              console.log(error);
+              toastError("Error on updating order status");
+            }
+        })
+    }
+
+        function toastSuccess(description: string) {
+        toast.add({
+            type: "success",
+            description
+        })
+    }
+
+    function toastError(description: string) {
+        toast.add({
+            type: 'error',
+            description
+        })
     }
 
     function updateSearchParams(mutate:(p:URLSearchParams)=>void,options?:{replace?:boolean}){
@@ -129,6 +171,8 @@ const queryParams: AdminOrderQueryParameters = {
                             sort={sortItems}
                             orderStatuses={orderStatusSelectItems}
                             paymentStatuses={paymentStatusSelectItems}
+                            resetOrderStausSignal={resetChangeOrderStatusSignal}
+                            resetPaymentStatusSignal={resetChangePaymentStatusSignal}
                             onChangeOrderStatus={handleChangeOrderStatus}
                             onChangePaymentStatus={handleChangePaymentStatus}
                             onSortToggle={handleSortToggle}/>

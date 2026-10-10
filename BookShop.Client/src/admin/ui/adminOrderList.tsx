@@ -11,7 +11,7 @@ import { getDirection, type SortItem } from "@/lib/sort";
 import SortableHead from "@/components/SortableHead";
 import { PaymentMethods } from "@/shared/constants/paymentMethod";
 import SelectBasic from "@/components/SelectBasic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ISelectItem } from "@/shared/types/ISelectItem";
 import { type PaymentStatus } from "@/shared/constants/paymentStatus";
 import type { OrderStatus } from "@/shared/constants/orderStatus";
@@ -27,6 +27,8 @@ interface Props{
     orderStatuses: ISelectItem<OrderStatus>[];
     onChangeOrderStatus: (data:ChangeOrderStatus)=>void;
     onChangePaymentStatus: (data:ChangePaymentStatus)=>void;
+    resetOrderStausSignal: number;
+    resetPaymentStatusSignal: number;
 }
 
 export default function AdminOrderList({
@@ -37,12 +39,22 @@ export default function AdminOrderList({
     paymentStatuses,
     orderStatuses,
     onChangeOrderStatus,
-    onChangePaymentStatus
+    onChangePaymentStatus,
+    resetOrderStausSignal,
+    resetPaymentStatusSignal
 }:Props) {
     const [editingOrderStatusId, setEditingOrderStatusId] = useState<number|null>(null);
     const [editingPaymentStatusId, setEditingPaymentStatusId] = useState<number|null>(null);
     const [orderStatus, setOrderStatus] = useState<OrderStatus|null>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus|null>(null);
+
+    useEffect(()=>{
+       cancelOrderStatusUpdate();
+    },[resetOrderStausSignal]);
+
+    useEffect(()=>{
+        cancelPaymentStatusUpdate();
+    },[resetPaymentStatusSignal]);
 
     function startOrderStatusEdit(order:GetAdminOrder){
         setEditingOrderStatusId(order.orderId);
@@ -59,9 +71,6 @@ export default function AdminOrderList({
         if(!orderStatus) return;
         const data: ChangeOrderStatus = {orderId,orderStatus};
         onChangeOrderStatus(data);
-
-        setEditingOrderStatusId(null);
-        setOrderStatus(null);
     }
 
     function cancelOrderStatusUpdate(): void {
@@ -73,9 +82,6 @@ export default function AdminOrderList({
         if(!paymentStatus) return;
         const data: ChangePaymentStatus = {orderId,paymentStatus};
         onChangePaymentStatus(data);
-
-        setEditingPaymentStatusId(null);
-        setPaymentStatus(null);
     }
 
     function cancelPaymentStatusUpdate(): void {
