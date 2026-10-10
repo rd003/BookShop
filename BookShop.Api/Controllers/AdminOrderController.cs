@@ -106,8 +106,10 @@ public class AdminOrderController(AppDbContext context, SortHelper<Order> sortHe
                     CustomerEmail = o.User != null ? o.User.Email ?? "N/A" : "N/A",
                     OrderItems = o.OrderItems.Select(oi => new ReadOrderItemDto
                     {
+                        Id = oi.Id,
                         BookId = oi.BookId,
                         BookTitle = oi.Book!.Title,
+                        CoverImageUrl = oi.Book!.CoverImageUrl,
                         UnitPrice = oi.UnitPrice,
                         Quantity = oi.Quantity,
                         Authors = oi.Book!.BookAuthors.Select(ba => ba.Author!.Name).ToList(),
