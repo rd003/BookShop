@@ -12,12 +12,21 @@ import SortableHead from "@/components/SortableHead";
 import { PaymentMethods } from "@/shared/constants/paymentMethod";
 import SelectBasic from "@/components/SelectBasic";
 import { useState } from "react";
+import type { ISelectItem } from "@/shared/types/ISelectItem";
+import { type PaymentStatus } from "@/shared/constants/paymentStatus";
+import type { OrderStatus } from "@/shared/constants/orderStatus";
+import type { ChangeOrderStatus } from "../types/changeOrderStatus";
+import type { ChangePaymentStatus } from "../types/changePaymentStatus";
 
 interface Props{
     orders: GetAdminOrder[],
     className?: string,
     onSortToggle: (column: string, multi?: boolean) => void;
     sort: SortItem[];
+    paymentStatuses: ISelectItem<PaymentStatus>[];
+    orderStatuses: ISelectItem<OrderStatus>[];
+    onChangeOrderStatus: (data:ChangeOrderStatus)=>void;
+    onChangePaymentStatus: (data:ChangePaymentStatus)=>void;
 }
 
 export default function AdminOrderList({
@@ -25,16 +34,54 @@ export default function AdminOrderList({
     className,
     onSortToggle,
     sort,
+    paymentStatuses,
+    orderStatuses,
+    onChangeOrderStatus,
+    onChangePaymentStatus
 }:Props) {
-  const [changeOrderStatus, setChangeOrderStatus] = useState(false);
+    const [editingOrderStatusId, setEditingOrderStatusId] = useState<number|null>(null);
+    const [editingPaymentStatusId, setEditingPaymentStatusId] = useState<number|null>(null);
+    const [orderStatus, setOrderStatus] = useState<OrderStatus|null>(null);
+    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus|null>(null);
 
-  function handleCancelOrderStatusChange(){
-    setChangeOrderStatus(false);
-  }
+    function startOrderStatusEdit(order:GetAdminOrder){
+        setEditingOrderStatusId(order.orderId);
+        setOrderStatus(order.orderStatus);
+    }
 
-  function handleUpdateOrderStatus(){
-    setChangeOrderStatus(false);
-  }
+    function startPaymentStatusEdit(order:GetAdminOrder){
+        setEditingPaymentStatusId(order.orderId);
+        setPaymentStatus(order.pyamentStatus);
+    }
+
+
+    function handleUpdateOrderStatus(orderId:number): void {
+        if(!orderStatus) return;
+        const data: ChangeOrderStatus = {orderId,orderStatus};
+        onChangeOrderStatus(data);
+
+        setEditingOrderStatusId(null);
+        setOrderStatus(null);
+    }
+
+    function cancelOrderStatusUpdate(): void {
+        setEditingOrderStatusId(null);
+        setOrderStatus(null);
+    }
+
+    function handleUpdatePaymentStatus(orderId:number): void {
+        if(!paymentStatus) return;
+        const data: ChangePaymentStatus = {orderId,paymentStatus};
+        onChangePaymentStatus(data);
+
+        setEditingPaymentStatusId(null);
+        setPaymentStatus(null);
+    }
+
+    function cancelPaymentStatusUpdate(): void {
+        setEditingPaymentStatusId(null);
+        setPaymentStatus(null);
+    }
 
   return (
     <Table className={cn("",className)}>
@@ -62,31 +109,45 @@ export default function AdminOrderList({
             <TableCell>{formatDateTime(o.orderDate)}</TableCell>
             <TableCell>{o.customerEmail}</TableCell>
             <TableCell>
-                {!changeOrderStatus &&
-                <>
+                {editingOrderStatusId!==o.orderId ? (
+                    <>
                 <OrderStatusBadge status={o.orderStatus}/>
-                <Button variant="outline" onClick={()=>setChangeOrderStatus(true)}>Change</Button>
+                <Button variant="outline" onClick={()=>startOrderStatusEdit(o)}>Change</Button>
                 </>
-                }
-                {changeOrderStatus &&
-                <div className="flex gap-2">
+                ) :(
+                    <div className="flex gap-2">
                     <SelectBasic
                     id={`orderStatus-${o.orderId}`}
-                    items={}
-                    onChange={}
-                    placeHolder="select order status"
-                    value={}
+                    items={orderStatuses}
+                    onChange={(val)=>setOrderStatus(val)}
+                    placeHolder="Order Status"
+                    value={orderStatus ?? o.orderStatus}
                     className=""
                     key={`orderStatus-${o.orderId}`}
                     />
-                   <Button variant="default" onClick={()=>handleUpdateOrderStatus()}>Update</Button>
-                   <Button variant="destructive" onClick={handleCancelOrderStatusChange}>Cancel</Button>
+                   <Button variant="default" onClick={()=>handleUpdateOrderStatus(o.orderId)}>Update</Button>
+                   <Button variant="destructive" onClick={()=>cancelOrderStatusUpdate()}>Cancel</Button>
                 </div>
-              }
+                )}
             </TableCell>
             <TableCell>
+                {o.orderId !== editingPaymentStatusId ? (<>
                 <PaymentStatusBadge status={o.pyamentStatus}/>
-                {o.pyamentMethod === PaymentMethods.CashOnDelivery && <Button variant="outline">Change</Button>}
+                {o.pyamentMethod === PaymentMethods.CashOnDelivery && <Button variant="outline" onClick={()=>startPaymentStatusEdit(o)}>Change</Button>}
+                </>): (<div className="flex gap-2">
+                    <SelectBasic
+                    id={`paymentStatus-${o.orderId}`}
+                    items={paymentStatuses}
+                    onChange={(val)=>setPaymentStatus(val)}
+                    placeHolder="Payment Status"
+                    value={paymentStatus ?? o.pyamentStatus}
+                    className=""
+                    key={`orderStatus-${o.orderId}`}
+                    />
+                   <Button variant="default" onClick={()=>handleUpdatePaymentStatus(o.orderId)}>Update</Button>
+                   <Button variant="destructive" onClick={()=>cancelPaymentStatusUpdate()}>Cancel</Button>
+                </div>)}
+
             </TableCell>
             <TableCell><PaymentMethodBadge paymentMethod={o.pyamentMethod}/></TableCell>
             <TableCell>{formatCurrency(o.orderTotal)}</TableCell>

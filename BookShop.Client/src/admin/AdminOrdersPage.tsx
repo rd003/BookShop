@@ -10,6 +10,10 @@ import EmptyRecords from "@/components/EmptyRecords";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import Paginator from "@/components/Paginator";
 import AdminOrderFilters, { type AdminOrderFilter } from "./ui/AdminOrderFilter";
+import { orderStatusSelectItems } from "@/shared/constants/orderStatus";
+import {paymentStatusSelectItems} from "@/shared/constants/paymentStatus";
+import type { ChangeOrderStatus } from "./types/changeOrderStatus";
+import type { ChangePaymentStatus } from "./types/changePaymentStatus";
 
 const DEFAULT_SORTBY = "orderDate";
 
@@ -86,6 +90,14 @@ const queryParams: AdminOrderQueryParameters = {
         })
     }
 
+    function handleChangeOrderStatus(data:ChangeOrderStatus){
+        console.log(data)
+    }
+
+    function handleChangePaymentStatus(data:ChangePaymentStatus){
+        console.log(data)
+    }
+
     function updateSearchParams(mutate:(p:URLSearchParams)=>void,options?:{replace?:boolean}){
         setSearchParams((prev)=>{
             const next = new URLSearchParams(prev);
@@ -115,6 +127,10 @@ const queryParams: AdminOrderQueryParameters = {
                     {d => <AdminOrderList
                             orders={orders}
                             sort={sortItems}
+                            orderStatuses={orderStatusSelectItems}
+                            paymentStatuses={paymentStatusSelectItems}
+                            onChangeOrderStatus={handleChangeOrderStatus}
+                            onChangePaymentStatus={handleChangePaymentStatus}
                             onSortToggle={handleSortToggle}/>
                     }
         </QueryState>

@@ -44,6 +44,7 @@ export default function OrderFilters({
 
                 <div className="min-w-35 flex-1">
                     <SelectBasic
+                        id="orderStatus"
                         items={orderStatusSelectItems}
                         value={orderStatus}
                         onChange={(val) => setOrderStatus(val)}
