@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { changeOrderStatus } from "../api/adminOrderApi"
 import type { ChangeOrderStatus } from "../types/changeOrderStatus"
 
-export function useChangeOrderStatus() {
+export function useChangeOrderStatusMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: ChangeOrderStatus) => changeOrderStatus(data),
