@@ -28,12 +28,14 @@ import AdminOrdersPage from "@/admin/AdminOrdersPage";
 import RequireRole from "@/RequiredRole";
 import BookDetail from "@/book/ui/BookDetail";
 import AdminOrderDetailPage from "@/admin/AdminOrderDetailPage";
+import CatalogBookDetail from "@/catalog/CatalogBookDetail";
 
 export default function AppRoutes() {
     return (<Routes>
         <Route element={<Layout />}>
             <Route index element={<Catalog />} />
             <Route path="catalog" element={<Catalog />} />
+            <Route path="books/:id" element={<CatalogBookDetail />} />
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />
             <Route path="privacy" element={<PrivacyPolicy />} />

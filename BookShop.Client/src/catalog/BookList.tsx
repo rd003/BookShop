@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import type { ReadBook } from "../book/types/readBook";
 import type { ReadGenre } from "@/genres/types/readGenre";
+import { Link, useLocation } from "react-router-dom";
 
 interface BookListProps {
     book: ReadBook,
@@ -10,17 +11,23 @@ interface BookListProps {
     onAddToCart: (bookId: number) => void
 }
 export default function BookList({ book, disableCartButton, onAddToCart }: BookListProps) {
+    const location = useLocation();
+
     return (
         <Card className="overflow-hidden border-stone-200 py-0 gap-0">
-            <img
-                src={book.coverImageUrl || "https://placehold.co/300x440?text=Book"}
-                alt={book.title}
-                className="h-56 w-full object-cover"
-            />
+            <Link to={`books/${book.id}`} state={{from:`${location.pathname}/${location.search}`}}>
+                <img
+                    src={book.coverImageUrl || "https://placehold.co/300x440?text=Book"}
+                    alt={book.title}
+                    className="h-56 w-full object-cover"
+                />
+            </Link>
             <CardContent className="p-3">
-                <h3 className="text-sm font-medium text-stone-900 line-clamp-2">
-                    {book.title}
-                </h3>
+                <Link to={`/books/${book.id}`} state={{from:`${location.pathname}/${location.search}`}} className="hover:underline">
+                    <h3 className="text-sm font-medium text-stone-900 line-clamp-2">
+                        {book.title}
+                    </h3>
+                </Link>
                 <p className="text-xs text-stone-500 mt-0.5">
                     {book.authors.map((a) => a.name).join(", ")}
                 </p>
