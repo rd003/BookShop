@@ -66,8 +66,7 @@ export default function Login() {
                             id="username"
                             name="username"
                             type="text"
-                            value="admin@example.com"
-                            placeholder="you@example.com"
+                             placeholder="you@example.com"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
                         {errors.username && <p style={{ 'color': 'red' }}>{errors.username?.message}</p>}
@@ -83,10 +82,8 @@ export default function Login() {
                                 Forgot password?
                             </Link>
                         </div>
-                        {/* TODO: remove value of username and password after testing */}
                         <input
                             {...register("password")}
-                            value="Admin@123"
                             id="password"
                             name="password"
                             type="password"
