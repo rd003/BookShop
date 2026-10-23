@@ -1,7 +1,44 @@
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import z from "zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+    name: z.string()
+        .min(1, "Name is required")
+        .max(30, "Name can not exceed 30 characters."),
+    email: z.string()
+        .min(1, "Email is required")
+        .max(30, "Email can not exceed 30 characters."),
+    password: z.string()
+        .min(1, "Password is required")
+        .max(30, "Password can not exceed 30 characters."),
+    confirmPassword: z.string()
+        .min(1, "Password Confirm is required")
+        .max(30, "Password Confirm can not exceed 30 characters.")
+
+})
+.refine((data)=> data.password === data.confirmPassword,{
+   message: "Passwords do not match",
+   path: ['confirmPassword']
+})
+
+type IFormInput = z.infer<typeof schema>;
 
 export default function Signup() {
+    // const signupMutation = useMutation();
+    const { register, handleSubmit, reset, formState: { errors, isValid, isDirty } } = useForm<IFormInput>({
+            resolver: zodResolver(schema),
+            mode: 'onChange'
+    })
+
+    const onFormSubmit: SubmitHandler<IFormInput> = (data) => {
+        const {confirmPassword, ...signupData} =  data;
+        console.log(signupData);
+    }
+
     return (
         <div className="flex min-h-[80vh] items-center justify-center bg-[#FBF8F3] px-4 py-4">
             <div className="w-full max-w-sm rounded-lg border border-stone-200 bg-white p-8">
@@ -11,18 +48,20 @@ export default function Signup() {
                     <p className="mt-1 text-sm text-stone-500">Join Chapter & Verse</p>
                 </div>
 
-                <form className="mt-6 flex flex-col gap-4">
+                <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit(onFormSubmit)}>
                     <div className="flex flex-col gap-1.5">
                         <label htmlFor="name" className="text-sm font-medium text-stone-700">
                             Full name
                         </label>
                         <input
+                            {...register("name")}
                             id="name"
                             name="name"
                             type="text"
                             placeholder="Jane Doe"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
+                         {errors.name && <p style={{ 'color': 'red' }}>{errors.name?.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -30,12 +69,14 @@ export default function Signup() {
                             Email
                         </label>
                         <input
+                            {...register("email")}
                             id="email"
                             name="email"
                             type="email"
                             placeholder="you@example.com"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
+                         {errors.email && <p style={{ 'color': 'red' }}>{errors.email?.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -43,12 +84,14 @@ export default function Signup() {
                             Password
                         </label>
                         <input
+                            {...register("password")}
                             id="password"
                             name="password"
                             type="password"
                             placeholder="••••••••"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
+                         {errors.password && <p style={{ 'color': 'red' }}>{errors.password?.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -56,12 +99,14 @@ export default function Signup() {
                             Confirm password
                         </label>
                         <input
+                            {...register("confirmPassword")}
                             id="confirmPassword"
                             name="confirmPassword"
                             type="password"
                             placeholder="••••••••"
                             className="rounded-md border border-stone-300 px-3 py-2 text-sm outline-none focus:border-[#8A2E2E]"
                         />
+                         {errors.confirmPassword && <p style={{ 'color': 'red' }}>{errors.confirmPassword?.message}</p>}
                     </div>
 
                     <button

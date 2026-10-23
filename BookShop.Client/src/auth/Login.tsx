@@ -8,13 +8,15 @@ import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { UserInfo } from "./types/UserInfo";
 
+// TODO:
+
 const schema = z.object({
     username: z.string()
         .min(1, "Username is required")
         .max(30, "Username can not exceed 30 characters."),
     password: z.string()
         .min(1, "Password is required")
-        .max(30, "Password can not exceed 30 characters.")
+        .max(30, "Password can not exceed 30 characters."),
 })
 
 type IFormInput = z.infer<typeof schema>;
