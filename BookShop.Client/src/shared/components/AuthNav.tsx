@@ -13,7 +13,6 @@ import useLogout from "@/auth/hooks/useLogout";
 
 export default function AuthNav() {
     const { data: user, isLoading,status } = useUser();
-    console.log("useUser state:", status, user); // TODO: remove this
     const navigate = useNavigate();
     const logoutMutation = useLogout();
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { ReadGenre } from "@/genres/types/readGenre";
 import { useSearchParams } from "react-router-dom";
 import GenreSidebar from "./GenreSidebar";
@@ -29,17 +28,18 @@ export default function Books() {
 
     const allGenres = data?.items ?? [];
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
-    const genreIds = selectedGenres.map(g => g.id);
+    // const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
+    // const genreIds = selectedGenres.map(g => g.id);
+   const selectedGenreIds = searchParams.getAll("genreIds").map(Number).filter(n => !Number.isNaN(n));
 
     const bookQueryParam: BookQueryParameters = {
         pageNumber: 1,
         pageSize: 1000,
         sortBy: null,
         searchTerm: searchParams.get('search') ?? null,
-        genreIds
+        genreIds: selectedGenreIds.length > 0 ? selectedGenreIds : undefined
     };
 
     const { books,
@@ -67,12 +67,38 @@ export default function Books() {
         })
     }
 
+    function getSelectedGenre(): ReadGenre[]{
+        // retrieve it from url
+        const ids = searchParams.getAll('genreIds').map(Number).filter(n => !Number.isNaN(n));
+        return allGenres.filter(g=> ids.includes(g.id));
+    }
+
     function toggleGenre(genre: ReadGenre) {
-        setSelectedGenres(prev => prev.some(g => g.id === genre.id) ? prev.filter(g => g.id !== genre.id) : [...prev, genre]);
+        updateSearchParams((p)=>{
+            const current = p.getAll("genreIds");
+            const id = String(genre.id);
+
+            p.delete("genreIds");
+
+            const next = current.includes(id) ? current.filter(x=>x!==id)
+            : [...current,id];
+
+            next.forEach(x=> p.append("genreIds",x));
+        });
     }
 
     function clearFilters() {
-        setSelectedGenres([]);
+       updateSearchParams((p)=>{
+           p.delete("genreIds");
+       });
+    }
+
+    function updateSearchParams(mutate: (p:URLSearchParams)=>void, options?:{replace?:boolean}){
+        setSearchParams((prev)=>{
+            const next = new URLSearchParams(prev);
+            mutate(next);
+            return next;
+        },options)
     }
 
     return (
@@ -85,7 +111,7 @@ export default function Books() {
                     allGenres={allGenres}
                     genreStatus={genreStatus}
                     genreError={genreError}
-                    selectedGenres={selectedGenres}
+                    selectedGenres={getSelectedGenre()}
                     onToggleGenre={toggleGenre}
                     onClearFilters={clearFilters}
                 />
