@@ -12,15 +12,15 @@ import {
 import useLogout from "@/auth/hooks/useLogout";
 
 export default function AuthNav() {
-    const { data: user, isLoading } = useUser();
+    const { data: user, isLoading,status } = useUser();
+    console.log("useUser state:", status, user); // TODO: remove this
     const navigate = useNavigate();
     const logoutMutation = useLogout();
 
     function handleLogoutClick() {
         logoutMutation.mutate(undefined, {
             onSuccess: () => {
-                console.trace("Logout onSuccess navigate ('/') firing");
-                navigate("/")
+                navigate("/login", { replace: true });
             }
         });
     }
