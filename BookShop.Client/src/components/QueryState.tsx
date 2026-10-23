@@ -1,10 +1,16 @@
-import type { UseQueryResult } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { getUserFacingError } from "@/lib/getUserFacingError";
 import ListError from "./ListError";
 
+export type QueryLike<T> = {
+    status: "pending" | "error" | "success";
+    data: T | undefined;
+    error: unknown;
+    refetch: () => unknown;
+};
+
 type Props<T> = {
-    query: UseQueryResult<T>;
+    query: QueryLike<T>;
     isEmpty: (data: T) => boolean;
     skeleton: ReactNode;
     empty: ReactNode;
@@ -15,6 +21,7 @@ export default function QueryState<T>({ query, isEmpty, skeleton, empty, childre
     if (query.status === "pending") return <>{skeleton}</>;
     if (query.status === "error")
         return <ListError message={getUserFacingError(query.error)} onRetry={() => query.refetch()} />;
-    if (isEmpty(query.data)) return <>{empty}</>;
-    return <>{children(query.data)}</>;
+    const data = query.data as T;
+    if (isEmpty(data)) return <>{empty}</>;
+    return <>{children(data)}</>;
 }

@@ -1,17 +1,18 @@
 import type { ReadGenre } from "@/genres/types/readGenre";
 import GenresFilter from "./GenresFilter";
 import { X } from "lucide-react";
+import type { QueryLike } from "@/components/QueryState";
+import QueryState from "@/components/QueryState";
 
 type GenreSidebarProps = {
     allGenres: ReadGenre[],
     selectedGenres: ReadGenre[],
     onClearFilters: () => void,
-    genreStatus: "pending" | "error" | "success",
-    genreError: Error | null,
+   genreQuery: QueryLike<{ items: ReadGenre[] }>,
     onToggleGenre: (genre: ReadGenre) => void
 }
 
-export default function GenreSidebar({ allGenres, selectedGenres, genreStatus, onToggleGenre, genreError, onClearFilters }: GenreSidebarProps) {
+export default function GenreSidebar({ allGenres, selectedGenres, genreQuery, onToggleGenre,  onClearFilters }: GenreSidebarProps) {
     return <aside>
         <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-stone-900">Genres</h2>
@@ -25,12 +26,14 @@ export default function GenreSidebar({ allGenres, selectedGenres, genreStatus, o
             )}
         </div>
 
-        {/* genres */}
-        {genreStatus === 'pending' && <p className="text-xs text-stone-400">Loading genres...</p>}
 
-        {genreStatus === 'error' && <p className="text-xs text-red-500">{genreError?.message}</p>}
-
-        <GenresFilter allGenres={allGenres} selectedGenres={selectedGenres} toggleGenre={onToggleGenre} />
+        <QueryState
+            query={genreQuery}
+            isEmpty={d => d.items.length === 0}
+            skeleton={<p className="text-xs text-stone-400">Loading genres...</p>} // or a compact skeleton
+            empty={<p className="text-xs text-stone-400">No genres found.</p>}>
+            {() => <GenresFilter allGenres={allGenres} selectedGenres={selectedGenres} toggleGenre={onToggleGenre} />}
+        </QueryState>
 
     </aside>
 }

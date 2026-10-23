@@ -22,16 +22,12 @@ export default function Books() {
 
     const {
         data,
-        status: genreStatus,
-        error: genreError,
     } = genreQuery;
 
     const allGenres = data?.items ?? [];
 
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // const [selectedGenres, setSelectedGenres] = useState<ReadGenre[]>([]);
-    // const genreIds = selectedGenres.map(g => g.id);
    const selectedGenreIds = searchParams.getAll("genreIds").map(Number).filter(n => !Number.isNaN(n));
 
     const bookQueryParam: BookQueryParameters = {
@@ -41,13 +37,10 @@ export default function Books() {
         searchTerm: searchParams.get('search') ?? null,
         genreIds: selectedGenreIds.length > 0 ? selectedGenreIds : undefined
     };
+    const { books, status, error, fetchNextPage, hasNextPage, isFetchingNextPage,
+    refetch } = useBooksQuery(bookQueryParam);
 
-    const { books,
-        status,
-        error,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage } = useBooksQuery(bookQueryParam);
+    const hasFilters = selectedGenreIds.length > 0 || !!bookQueryParam.searchTerm;
 
     const loadMoreRef = useInfiniteScroll({ hasNextPage, isFetchingNextPage, fetchNextPage });
 
@@ -68,7 +61,6 @@ export default function Books() {
     }
 
     function getSelectedGenre(): ReadGenre[]{
-        // retrieve it from url
         const ids = searchParams.getAll('genreIds').map(Number).filter(n => !Number.isNaN(n));
         return allGenres.filter(g=> ids.includes(g.id));
     }
@@ -90,6 +82,7 @@ export default function Books() {
     function clearFilters() {
        updateSearchParams((p)=>{
            p.delete("genreIds");
+           p.delete("search");
        });
     }
 
@@ -109,20 +102,20 @@ export default function Books() {
                 }
                 <GenreSidebar
                     allGenres={allGenres}
-                    genreStatus={genreStatus}
-                    genreError={genreError}
+                    genreQuery={genreQuery}
                     selectedGenres={getSelectedGenre()}
                     onToggleGenre={toggleGenre}
                     onClearFilters={clearFilters}
                 />
 
                 <BookGrid
-                    books={books}
-                    status={status}
-                    error={error}
                     disableCartButton={disableCartButton}
                     onAddToCart={handleAddToCart}
+                     query={{ status, data: books, error, refetch }}
+                     hasFilters={hasFilters}
+                     onClearFilters={clearFilters}
                 />
+
             </div>
             <div ref={loadMoreRef} className="h-1" />
             {isFetchingNextPage && (

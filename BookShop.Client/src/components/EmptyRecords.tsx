@@ -1,4 +1,4 @@
-export default function EmptyRecords({ filtered, onClear, message }: { filtered: boolean; onClear: () => void, message: string }) {
+export default function EmptyRecords({ filtered, onClear, message, emptyMessage = "You haven't added any records yet." }: { filtered: boolean; onClear: () => void, message: string,emptyMessage?:string }) {
     return (
         <div className="mt-2 rounded-md border p-6 text-center">
             {filtered ? (
@@ -8,7 +8,7 @@ export default function EmptyRecords({ filtered, onClear, message }: { filtered:
                 </>
             ) : (
                 <>
-                    <p>You haven't added any genres yet.</p>
+                    <p>{emptyMessage}</p>
                 </>
             )}
         </div>
