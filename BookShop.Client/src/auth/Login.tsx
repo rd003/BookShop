@@ -95,7 +95,7 @@ export default function Login() {
                         {errors.password && <p style={{ 'color': 'red' }}>{errors.password.message}</p>}
                     </div>
                     {
-                        loginMutation.isError && (<p className="text-red-500">Invalid username or password</p>)
+                        loginMutation.isError && (<p className="text-red-500" role="alert">Invalid username or password</p>)
                     }
                     <button
                         type="submit"

@@ -4,8 +4,8 @@ import type { UserInfo } from "../types/UserInfo"
 import type { TokenInfoRequest } from "../types/tokenInfoRequest"
 import type { SignupPayload } from "../types/signupPayload"
 
-export async function signup(payload: SignupPayload) {
-  await apiFetch("/auth/signup", {
+export async function signup(payload: SignupPayload): Promise<void> {
+  await apiFetch<void>("/auth/signup", {
     method: "POST",
     body: JSON.stringify(payload),
   })

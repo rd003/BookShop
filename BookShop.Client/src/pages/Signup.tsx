@@ -1,9 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BookOpen } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import z from "zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signup } from "@/auth/api/authApi";
+import { getUserFacingError } from "@/lib/getUserFacingError";
+import { useState } from "react";
+import type { SignupPayload } from "@/auth/types/signupPayload";
 
 const schema = z.object({
     name: z.string()
@@ -28,7 +32,23 @@ const schema = z.object({
 type IFormInput = z.infer<typeof schema>;
 
 export default function Signup() {
-    // const signupMutation = useMutation();
+    const navigate = useNavigate();
+    const [message, setMessage] = useState<string|null>(null);
+
+    const signupMutation = useMutation({
+        mutationFn: signup,
+        onSuccess:()=>{
+            setMessage('You have been successfully registered');
+            reset();
+            navigate("/login")
+        },
+        onError:(err)=>{
+          console.log(err);
+        }
+    });
+
+    const submitting = signupMutation.status === 'pending';
+
     const { register, handleSubmit, reset, formState: { errors, isValid, isDirty } } = useForm<IFormInput>({
             resolver: zodResolver(schema),
             mode: 'onChange'
@@ -36,7 +56,7 @@ export default function Signup() {
 
     const onFormSubmit: SubmitHandler<IFormInput> = (data) => {
         const {confirmPassword, ...signupData} =  data;
-        console.log(signupData);
+        signupMutation.mutate(signupData);
     }
 
     return (
@@ -109,11 +129,22 @@ export default function Signup() {
                          {errors.confirmPassword && <p style={{ 'color': 'red' }}>{errors.confirmPassword?.message}</p>}
                     </div>
 
+
+                {signupMutation.status==='error' && <p role="alert" className="text-destructive mt-1">
+                    {getUserFacingError(signupMutation.error)}
+                </p>}
+
+                 {
+                    message && <p role="alert" className="text-green-600 mt-1">
+                       {message}
+                    </p>
+                 }
                     <button
                         type="submit"
                         className="mt-2 rounded-md bg-[#8A2E2E] px-4 py-2 text-sm font-medium text-white hover:bg-[#732626]"
+                        disabled = {submitting || !isDirty || !isValid}
                     >
-                        Sign up
+                        {submitting ? 'Saving...':'Sign up'}
                     </button>
                 </form>
 
