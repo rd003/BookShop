@@ -8,7 +8,7 @@ A web app for selling books.
   - **Database:** Sqlite
   - **ORM**: Entity Framework Core
 
-- **Frontend:** React 19
+- **Frontend:** React 19.2
   - React hook form (form)
   - Zod (shema validation)
   - Tanstack query (server side state management and client side caching)
